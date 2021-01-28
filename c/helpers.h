@@ -3,17 +3,17 @@
 
 static JavaVM* gJavaVM;
 
+void jniSetJavaVM(JavaVM* vm) {
+  //LOGI("jniSetJavaVM");
+  gJavaVM = vm;
+}
+
 // Called to save JavaVM if library is loaded from Java:
 int JNI_OnLoad(JavaVM* vm, void* reserved) {
   //LOGI("JNI_OnLoad: saving gJavaVM");
   jniSetJavaVM(vm);
 
   return JNI_VERSION_1_6;
-}
-
-void jniSetJavaVM(JavaVM* vm) {
-  //LOGI("jniSetJavaVM");
-  gJavaVM = vm;
 }
 
 JavaVM* jniGetJavaVM() {

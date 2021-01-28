@@ -1,14 +1,15 @@
 module jni
 
-type Type = bool | int | f32 | f64 | string | JavaObject
-// pub type Any = string | int | i64 | f32 | f64 | bool | []Any | map[voidptr]Any
+type Type = JavaObject | bool | f32 | f64 | int | string
 
+// pub type Any = string | int | i64 | f32 | f64 | bool | []Any | map[voidptr]Any
 enum ObjectType {
 	@static
 	instance
 }
 
-/* JNI signature table
+/*
+JNI signature table
 
 Signature                 | Java Type
 --------------------------------------------------
@@ -33,9 +34,7 @@ L fully-qualified-class ; | fully-qualified-class
 [ type                    | type[]
 --------------------------------------------------
 ( arg-types ) ret-type    | method type
-
 */
-
 pub fn v2j_fn_name(v_func_name string) string {
 	splt := v_func_name.split('_')
 	mut java_fn_name := splt[0]
@@ -69,12 +68,30 @@ fn v2j_string_signature_type(vt string) string {
 
 fn v2j_value(vt Type) C.jvalue {
 	return match vt {
-		bool { C.jvalue{z: jboolean(vt) } }
-		f32 { C.jvalue{i: jfloat(vt) } }
-		f64 { C.jvalue{i: jdouble(vt) } }
-		int { C.jvalue{i: jint(vt) } }
+		bool {
+			C.jvalue{
+				z: jboolean(vt)
+			}
+		}
+		f32 {
+			C.jvalue{
+				i: jfloat(vt)
+			}
+		}
+		f64 {
+			C.jvalue{
+				i: jdouble(vt)
+			}
+		}
+		int {
+			C.jvalue{
+				i: jint(vt)
+			}
+		}
 		string { // TODO
-			C.jvalue{l: C.StringToObject(jstring(C.jniGetEnv(),vt)) }
+			C.jvalue{
+				l: C.StringToObject(jstring(C.jniGetEnv(), vt))
+			}
 		}
 		else {
 			C.jvalue{}
@@ -86,14 +103,13 @@ pub fn j2v_string(env &Env, jstr C.jstring) string {
 	mut cn := ''
 	unsafe {
 		native_string := C.GetStringUTFChars(env, jstr, C.JNI_FALSE)
-		cn = ''+native_string.vstring()
+		cn = '' + native_string.vstring()
 		C.ReleaseStringUTFChars(env, jstr, native_string)
 	}
 	return cn
 }
 
 //
-
 pub fn jboolean(val bool) C.jboolean {
 	if val {
 		return C.jboolean(C.JNI_TRUE)
@@ -116,4 +132,3 @@ pub fn jint(val int) C.jint {
 pub fn jstring(env &Env, val string) C.jstring {
 	return C.NewStringUTF(env, val.str)
 }
-
