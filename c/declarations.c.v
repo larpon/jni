@@ -6,13 +6,13 @@ pub const (
 	used_import = 1
 )
 
-#include <jni.h>
-
-#flag linux -I /usr/lib/jvm/java-11-openjdk-amd64/include/linux
-#flag linux -I /usr/lib/jvm/java-11-openjdk-amd64/include/
+///usr/lib/jvm/java-11-openjdk-amd64/include/
+#flag linux -I $env('JAVA_HOME')/include
+#flag linux -I $env('JAVA_HOME')/include/linux
 #flag -I @VROOT/c
 
 #flag -lc
 
+#include <jni.h>
 #include "jni_wrapper.h"
 #include "helpers.h"

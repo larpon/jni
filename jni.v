@@ -11,16 +11,24 @@ struct CallResult {
 pub:
 	call      string
 	call_type ObjectType
-	bool      bool
-	int       int
-	f32       f32
-	f64       f64
-	string    string
+	bool_      bool
+	int_       int
+	f32_       f32
+	f64_       f64
+	string_    string
 	void      bool
 }
 
 pub fn auto_env() &Env {
 	return C.jniGetEnv()
+}
+
+pub fn set_java_vm(vm &JavaVM) {
+	C.jniSetJavaVM(vm)
+}
+
+pub fn setup_android(fq_activity_name string) {
+	C.jniSetupAndroid(fq_activity_name.str)
 }
 
 // sig builds a V `jni` style signature from the supplied arguments.
@@ -29,8 +37,21 @@ pub fn sig(pkg string, f_name string, rt Type, args ...Type) string {
 	for arg in args {
 		vtypargs += arg.type_name() + ', '
 	}
+
+	mut return_type := ' ' + rt.type_name()
+	is_void := match rt {
+		string {
+			rt == 'void'
+		} else {
+			false
+		}
+	}
+
+	if rt.type_name() == 'string' && is_void {
+		return_type = ''
+	}
 	vtypargs = vtypargs.trim_right(', ')
-	jni_sig := pkg + '.' + jni.v2j_fn_name(f_name) + '(' + vtypargs + ')' + ' ' + rt.type_name()
+	jni_sig := pkg + '.' + jni.v2j_fn_name(f_name) + '(' + vtypargs + ')' + return_type
 	// println(jni_sig)
 	return jni_sig
 }
@@ -52,7 +73,7 @@ fn parse_signature(fqn_sig string) (string, string) {
 	}
 	// fargs := sig.all_after('(').all_before(')')
 	$if debug {
-		eprintln(@MOD + '.' + @FN + ' ' + '"$sig" -> fqn: "$fqn", return: "$return_type"')
+		println(@MOD + '.' + @FN + ' ' + '"$sig" -> fqn: "$fqn", return: "$return_type"')
 	}
 
 	return fqn, return_type
@@ -70,38 +91,38 @@ pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 		jv_args << v2j_value(vt)
 	}
 	jdef := fqn + '(' + jargs + ')' + v2j_string_signature_type(return_type)
-	class, mid := get_class_static_method_id(env, jdef) or { panic(err) }
 
+	class, mid := get_class_static_method_id(env, jdef) or { panic(err) }
 	call_result := match return_type {
 		'bool' {
 			CallResult{
 				call: signature
-				bool: C.CallStaticBooleanMethodA(env, class, mid, jv_args.data) == jboolean(true)
+				bool_: C.CallStaticBooleanMethodA(env, class, mid, jv_args.data) == jboolean(true)
 			}
 		}
 		'f32' {
 			CallResult{
 				call: signature
-				f32: f32(C.CallStaticFloatMethodA(env, class, mid, jv_args.data))
+				f32_: f32(C.CallStaticFloatMethodA(env, class, mid, jv_args.data))
 			}
 		}
 		'f64' {
 			CallResult{
 				call: signature
-				f64: f64(C.CallStaticDoubleMethodA(env, class, mid, jv_args.data))
+				f64_: f64(C.CallStaticDoubleMethodA(env, class, mid, jv_args.data))
 			}
 		}
 		'int' {
 			CallResult{
 				call: signature
-				int: int(C.CallStaticIntMethodA(env, class, mid, jv_args.data))
+				int_: int(C.CallStaticIntMethodA(env, class, mid, jv_args.data))
 			}
 		}
 		'string' {
 			jstr := C.jstring(C.CallStaticObjectMethodA(env, class, mid, jv_args.data))
 			CallResult{
 				call: signature
-				string: j2v_string(env, jstr)
+				string_: j2v_string(env, jstr)
 			}
 		}
 		'void' {
@@ -119,6 +140,9 @@ pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 	if env_has_exception(env) {
 		C.ExceptionDescribe(env)
 		excp := 'An exception occured while executing "$signature" in JNIEnv (${ptr_str(env)})'
+		$if debug {
+			println(excp)
+		}
 		// throw_exception(env, excp)
 		panic(excp)
 	}
@@ -143,32 +167,32 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 		'bool' {
 			CallResult{
 				call: signature
-				bool: C.CallBooleanMethodA(env, obj, mid, jv_args.data) == jboolean(true)
+				bool_: C.CallBooleanMethodA(env, obj, mid, jv_args.data) == jboolean(true)
 			}
 		}
 		'f32' {
 			CallResult{
 				call: signature
-				f32: f32(C.CallFloatMethodA(env, obj, mid, jv_args.data))
+				f32_: f32(C.CallFloatMethodA(env, obj, mid, jv_args.data))
 			}
 		}
 		'f64' {
 			CallResult{
 				call: signature
-				f64: f64(C.CallDoubleMethodA(env, obj, mid, jv_args.data))
+				f64_: f64(C.CallDoubleMethodA(env, obj, mid, jv_args.data))
 			}
 		}
 		'int' {
 			CallResult{
 				call: signature
-				int: int(C.CallIntMethodA(env, obj, mid, jv_args.data))
+				int_: int(C.CallIntMethodA(env, obj, mid, jv_args.data))
 			}
 		}
 		'string' {
 			jstr := C.ObjectToString(C.CallObjectMethodA(env, obj, mid, jv_args.data))
 			CallResult{
 				call: signature
-				string: j2v_string(env, jstr)
+				string_: j2v_string(env, jstr)
 			}
 		}
 		'void' {
@@ -193,6 +217,27 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 }
 
 //
+pub fn auto_find_class(clazz string) ?JavaClass {
+	jclazz := clazz.replace('.', '/')
+	mut cls := C.jniFindClass(jclazz.str)
+	//
+	env := jni.auto_env()
+	if env_has_exception(env) {
+		C.ExceptionDescribe(env)
+		if !isnil(cls) {
+			C.DeleteLocalRef(env, cls)
+		}
+		excp := 'An exception occured. Couldn\'t auto find class "$clazz" in JNIEnv (${ptr_str(env)})'
+		$if debug {
+			println(excp)
+		}
+		// throw_exception(env, excp)
+		panic(excp)
+	}
+	return cls
+}
+
+//
 pub fn find_class(env &Env, clazz string) ?JavaClass {
 	jclazz := clazz.replace('.', '/')
 	mut cls := C.FindClass(env, jclazz.str)
@@ -202,6 +247,9 @@ pub fn find_class(env &Env, clazz string) ?JavaClass {
 			C.DeleteLocalRef(env, cls)
 		}
 		excp := 'An exception occured. Couldn\'t find class "$clazz" in JNIEnv (${ptr_str(env)})'
+		$if debug {
+			println(excp)
+		}
 		// throw_exception(env, excp)
 		panic(excp)
 	}
@@ -220,12 +268,18 @@ pub fn get_object_class_name(env &Env, obj JavaObject) string {
 			C.DeleteLocalRef(env, classclass)
 		}
 		excp := "An exception occured. Couldn\'t get object class in JNIEnv (${ptr_str(env)})"
+		$if debug {
+			println(excp)
+		}
 		// throw_exception(env, excp)
 		panic(excp)
 	}
 	mid_get_name := C.GetMethodID(env, classclass, 'getName', '()Ljava/lang/String;')
 	if isnil(mid_get_name) {
 		excp := "An exception occured. Couldn\'t get object class getName() method in JNIEnv (${ptr_str(env)})"
+		$if debug {
+			println(excp)
+		}
 		// throw_exception(env, excp)
 		panic(excp)
 	}
@@ -236,6 +290,9 @@ pub fn get_object_class_name(env &Env, obj JavaObject) string {
 			C.DeleteLocalRef(env, jstr_class_name)
 		}
 		excp := "An exception occured. Couldn\'t call object method in JNIEnv (${ptr_str(env)})"
+		$if debug {
+			println(excp)
+		}
 		// throw_exception(env, excp)
 		panic(excp)
 	}
@@ -255,8 +312,12 @@ pub fn raw_get_static_method_id(env &Env, clazz C.jclass, fn_name string, sig st
 			C.DeleteLocalRef(env, mid)
 		}
 		clsn := get_class_name(env, clazz)
-		panic('An exception occured. ' + @FN +
-			': JNIEnv (${ptr_str(env)} couldn\'t find method "$fn_name" with signature "$sig" on class "$clsn")')
+		excp := 'An exception occured. ' + @FN +
+			': JNIEnv (${ptr_str(env)} couldn\'t find method "$fn_name" with signature "$sig" on class "$clsn")'
+		$if debug {
+			println(excp)
+		}
+		panic(excp)
 	}
 	return mid
 }
@@ -268,11 +329,16 @@ pub fn get_static_method_id(env &Env, clazz C.jclass, signature string) ?C.jmeth
 	return mid
 }
 
-pub fn get_class_static_method_id(env &Env, fqn_sig string) ?(C.jclass, C.jmethodID) {
+pub fn get_class_static_method_id(env &Env, fqn_sig string) ?(JavaClass, C.jmethodID) {
 	clazz := fqn_sig.all_before_last('.')
 	fn_sig := fqn_sig.all_after_last('.')
+	mut jclazz := JavaClass{}
 	// Find the Java class
-	jclazz := find_class(env, clazz) or { panic(@FN + ' ' + err) }
+	$if android {
+		jclazz = auto_find_class(clazz) or { panic(@FN + ' ' + err) }
+	} $else {
+		jclazz = find_class(env, clazz) or { panic(@FN + ' ' + err) }
+	}
 	mid := get_static_method_id(env, jclazz, fn_sig) or { panic(@FN + ' ' + err) }
 	return jclazz, mid
 }
@@ -288,7 +354,11 @@ pub fn get_method_id(env &Env, clazz C.jclass, signature string) ?C.jmethodID {
 			C.DeleteLocalRef(env, mid)
 		}
 		// n := get_class_name(env, clazz)
-		panic('An exception occured. Couldn\'t find method "$signature" on class "?" in JNIEnv (${ptr_str(env)})')
+		excp := 'An exception occured. Couldn\'t find method "$signature" on class "?" in JNIEnv (${ptr_str(env)})'
+		$if debug {
+			println(excp)
+		}
+		panic(excp)
 	}
 	return mid
 }
@@ -304,6 +374,9 @@ pub fn get_object_method_id(env &Env, obj C.jobject, fqn_sig string) ?(C.jclass,
 			C.DeleteLocalRef(env, jclazz)
 		}
 		excp := 'An exception occured. Couldn\'t find class "$clazz" of signature "$fqn_sig" JNIEnv (${ptr_str(env)})'
+		$if debug {
+			println(excp)
+		}
 		// throw_exception(env, excp)
 		panic(excp)
 	}

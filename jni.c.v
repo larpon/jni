@@ -2,6 +2,7 @@
 // Use of this source code is governed by an MIT license file distributed with this software package
 module jni
 
+type JavaVM = C.JavaVM
 type Env = C.JNIEnv
 type JavaObject = C.jobject
 type JavaString = C.jstring
@@ -25,6 +26,9 @@ struct C.jstring {}
 
 [typedef]
 struct C.JNIEnv {}
+
+[typedef]
+struct C.JavaVM {}
 
 [typedef]
 struct C.jobject {}
@@ -59,6 +63,12 @@ fn C.ObjectToClass(obj C.jobject) C.jclazz
 fn C.ClassToObject(cls C.jclazz) C.jobject
 
 fn C.jniGetEnv() &C.JNIEnv
+
+fn C.jniSetJavaVM(vm &JavaVM)
+
+fn C.jniFindClass(name charptr) C.jclass
+
+fn C.jniSetupAndroid(name charptr)
 
 // jni_wrapper.h
 fn C.FindClass(env &JNIEnv, name charptr) C.jclass
