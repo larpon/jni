@@ -28,7 +28,8 @@ pub fn set_java_vm(vm &JavaVM) {
 }
 
 pub fn setup_android(fq_activity_name string) {
-	C.jniSetupAndroid(fq_activity_name.str)
+	activity_name := fq_activity_name.replace('.','/')
+	C.jniSetupAndroid(activity_name.str)
 }
 
 // sig builds a V `jni` style signature from the supplied arguments.
