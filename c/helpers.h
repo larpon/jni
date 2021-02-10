@@ -4,11 +4,11 @@
 #include <stdio.h>
 
 #ifdef __ANDROID__
-#define V_ANDROID_LOG_TAG "V_ANDROID"
-#define V_ANDROID_LOG_I(...) __android_log_print(ANDROID_LOG_INFO, V_ANDROID_LOG_TAG, __VA_ARGS__)
-#define V_ANDROID_LOG_W(...) __android_log_print(ANDROID_LOG_WARN, V_ANDROID_LOG_TAG, __VA_ARGS__)
-#define V_ANDROID_LOG_E(...) __android_log_print(ANDROID_LOG_ERROR, V_ANDROID_LOG_TAG, __VA_ARGS__)
-#define V_ANDROID_LOG_D(...) __android_log_print(ANDROID_LOG_DEBUG, V_ANDROID_LOG_TAG, __VA_ARGS__)
+#define V_JNI_ANDROID_LOG_TAG "V_ANDROID"
+#define V_JNI_ANDROID_LOG_I(...) __android_log_print(ANDROID_LOG_INFO, V_JNI_ANDROID_LOG_TAG, __VA_ARGS__)
+#define V_JNI_ANDROID_LOG_W(...) __android_log_print(ANDROID_LOG_WARN, V_JNI_ANDROID_LOG_TAG, __VA_ARGS__)
+#define V_JNI_ANDROID_LOG_E(...) __android_log_print(ANDROID_LOG_ERROR, V_JNI_ANDROID_LOG_TAG, __VA_ARGS__)
+#define V_JNI_ANDROID_LOG_D(...) __android_log_print(ANDROID_LOG_DEBUG, V_JNI_ANDROID_LOG_TAG, __VA_ARGS__)
 #endif
 
 static JavaVM* gJavaVM;
@@ -20,7 +20,7 @@ void __v_jni_log_i(const char *fmt, ...) {
 	va_list args;
     va_start(args, fmt);
 	#ifdef __ANDROID__
-		V_ANDROID_LOG_I(fmt, args);
+		V_JNI_ANDROID_LOG_I(fmt, args);
 	#else
 		vprintf(fmt, args);
 	#endif
@@ -31,7 +31,7 @@ void __v_jni_log_w(const char *fmt, ...) {
 	va_list args;
     va_start(args, fmt);
 	#ifdef __ANDROID__
-		V_ANDROID_LOG_W(fmt, args);
+		V_JNI_ANDROID_LOG_W(fmt, args);
 	#else
 		vprintf(fmt, args);
 	#endif
@@ -42,7 +42,7 @@ void __v_jni_log_e(const char *fmt, ...) {
 	va_list args;
     va_start(args, fmt);
 	#ifdef __ANDROID__
-		V_ANDROID_LOG_E(fmt, args);
+		V_JNI_ANDROID_LOG_E(fmt, args);
 	#else
 		vprintf(fmt, args);
 	#endif
@@ -55,7 +55,7 @@ void __v_jni_log_d(const char *fmt, ...) {
 		va_list args;
 		va_start(args, fmt);
 		#ifdef __ANDROID__
-			V_ANDROID_LOG_D(fmt, args);
+			V_JNI_ANDROID_LOG_D(fmt, args);
 		#else
 			vprintf(fmt, args);
 		#endif
@@ -104,6 +104,7 @@ void jniSetupAndroid(const char *fqActivityName) {
 	__v_jni_log_d(fqActivityName);
 	JNIEnv *env = jniGetEnv();
 	//replace with one of your classes in the line below
+	__v_jni_log_d("jniSetupAndroid() finding activity class...");
 	jclass randomClass = (*env)->FindClass(env, fqActivityName);
 	__v_jni_log_d("FindClass %p", randomClass);
 	if (ExceptionCheck(env) == JNI_TRUE) { ExceptionDescribe(env); }
