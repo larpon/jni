@@ -11,11 +11,11 @@ struct CallResult {
 pub:
 	call      string
 	call_type ObjectType
-	bool_      bool
-	int_       int
-	f32_       f32
-	f64_       f64
-	string_    string
+	bool_     bool
+	int_      int
+	f32_      f32
+	f64_      f64
+	string_   string
 	void      bool
 }
 
@@ -28,7 +28,7 @@ pub fn set_java_vm(vm &JavaVM) {
 }
 
 pub fn setup_android(fq_activity_name string) {
-	activity_name := fq_activity_name.replace('.','/')
+	activity_name := fq_activity_name.replace('.', '/')
 	C.jniSetupAndroid(activity_name.str)
 }
 
@@ -43,7 +43,8 @@ pub fn sig(pkg string, f_name string, rt Type, args ...Type) string {
 	is_void := match rt {
 		string {
 			rt == 'void'
-		} else {
+		}
+		else {
 			false
 		}
 	}

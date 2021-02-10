@@ -4,7 +4,7 @@
 	android:versionCode="0"
 	android:versionName="@string/v_app_name"
 	android:installLocation="auto"
-	package="io.v.android">
+	package="io.v.android.ex">
 
 	<uses-sdk android:minSdkVersion="21" />
 
