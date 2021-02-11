@@ -1,0 +1,4 @@
+VAB {
+	activity_name: 'VToastActivity'
+	package_id: 'io.v.android.ex'
+}
