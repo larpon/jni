@@ -1,0 +1,4 @@
+# javac class files
+*.class
+# resulting shared object library
+*.so
