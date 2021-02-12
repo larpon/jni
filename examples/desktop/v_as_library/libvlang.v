@@ -18,16 +18,16 @@ fn jni_on_load(vm &jni.JavaVM, reserved voidptr) int {
 fn call_static_methods(env &jni.Env, thiz jni.JavaObject) {
 	// Object call style
 	jo := jni.object(env, thiz, pkg)
-	jor := jo.call(.@static, 'getInt() int').int_
+	jor := jo.call(.@static, 'getInt() int').val as int
 	println('V jni.CallResult.int: $jor')
 
 	// flat call style
 	r := jni.call_static_method(env, 'io.vlang.V.getInt() int')
-	println('V: $r.int_')
+	println('V: $r.val')
 	r2 := jni.call_static_method(env, 'io.vlang.V.getBool() bool')
-	println('V: $r2.bool_')
+	println('V: $r2.val')
 	r3 := jni.call_static_method(env, 'io.vlang.V.mixedArguments(bool, int) int', true, 2)
-	println('V: $r3.int_')
+	println('V: $r3.val')
 
 	vprintln('vprintln')
 
@@ -53,7 +53,7 @@ fn get_v_string(env &jni.Env, thiz jni.JavaObject) jni.JavaString {
 	r := jni.call_static_method(env, 'io.vlang.V.getInt() int')
 	r2 := jni.call_static_method(env, 'io.vlang.V.getBool() bool')
 
-	s := 'V: values obtained from Java: ${r.int_}, ${r2.bool_}'
+	s := 'V: values obtained from Java: ${r.val}, ${r2.val}'
 	return jni.jstring(env, s)
 }
 
@@ -87,7 +87,7 @@ fn vprintln(text string) {
 */
 // java_float_func is "reflected" from "public static float javaFloatFunc(String s, int i)" in "io.vlang.V"
 fn java_float_func(text string, i int) f32 {
-	return auto.call_static_method(jni.sig(pkg,@FN,f32(0),text,i),text,i).f32_
+	return auto.call_static_method(jni.sig(pkg,@FN,f32(0),text,i),text,i).val as f32
 }
 
 fn java_void_func(text string, i int) {

@@ -7,16 +7,13 @@ import jni.c
 // TODO
 pub const used_import = c.used_import
 
+type ResultType = bool | int | f32 | f64 | string
+
 struct CallResult {
 pub:
 	call      string
 	call_type ObjectType
-	bool_     bool
-	int_      int
-	f32_      f32
-	f64_      f64
-	string_   string
-	void      bool
+	val       ResultType
 }
 
 pub fn auto_env() &Env {
@@ -99,39 +96,38 @@ pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 		'bool' {
 			CallResult{
 				call: signature
-				bool_: C.CallStaticBooleanMethodA(env, class, mid, jv_args.data) == jboolean(true)
+				val: C.CallStaticBooleanMethodA(env, class, mid, jv_args.data) == jboolean(true)
 			}
 		}
 		'f32' {
 			CallResult{
 				call: signature
-				f32_: f32(C.CallStaticFloatMethodA(env, class, mid, jv_args.data))
+				val: f32(C.CallStaticFloatMethodA(env, class, mid, jv_args.data))
 			}
 		}
 		'f64' {
 			CallResult{
 				call: signature
-				f64_: f64(C.CallStaticDoubleMethodA(env, class, mid, jv_args.data))
+				val: f64(C.CallStaticDoubleMethodA(env, class, mid, jv_args.data))
 			}
 		}
 		'int' {
 			CallResult{
 				call: signature
-				int_: int(C.CallStaticIntMethodA(env, class, mid, jv_args.data))
+				val: int(C.CallStaticIntMethodA(env, class, mid, jv_args.data))
 			}
 		}
 		'string' {
 			jstr := C.jstring(C.CallStaticObjectMethodA(env, class, mid, jv_args.data))
 			CallResult{
 				call: signature
-				string_: j2v_string(env, jstr)
+				val: j2v_string(env, jstr)
 			}
 		}
 		'void' {
 			C.CallStaticVoidMethodA(env, class, mid, jv_args.data)
 			CallResult{
 				call: signature
-				void: true
 			}
 		}
 		else {
@@ -169,39 +165,38 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 		'bool' {
 			CallResult{
 				call: signature
-				bool_: C.CallBooleanMethodA(env, obj, mid, jv_args.data) == jboolean(true)
+				val: C.CallBooleanMethodA(env, obj, mid, jv_args.data) == jboolean(true)
 			}
 		}
 		'f32' {
 			CallResult{
 				call: signature
-				f32_: f32(C.CallFloatMethodA(env, obj, mid, jv_args.data))
+				val: f32(C.CallFloatMethodA(env, obj, mid, jv_args.data))
 			}
 		}
 		'f64' {
 			CallResult{
 				call: signature
-				f64_: f64(C.CallDoubleMethodA(env, obj, mid, jv_args.data))
+				val: f64(C.CallDoubleMethodA(env, obj, mid, jv_args.data))
 			}
 		}
 		'int' {
 			CallResult{
 				call: signature
-				int_: int(C.CallIntMethodA(env, obj, mid, jv_args.data))
+				val: int(C.CallIntMethodA(env, obj, mid, jv_args.data))
 			}
 		}
 		'string' {
 			jstr := C.ObjectToString(C.CallObjectMethodA(env, obj, mid, jv_args.data))
 			CallResult{
 				call: signature
-				string_: j2v_string(env, jstr)
+				val: j2v_string(env, jstr)
 			}
 		}
 		'void' {
 			C.CallVoidMethodA(env, obj, mid, jv_args.data)
 			CallResult{
 				call: signature
-				void: true
 			}
 		}
 		else {
