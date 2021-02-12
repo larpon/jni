@@ -1,6 +1,7 @@
 module jni
 
-type Type = JavaObject | bool | f32 | f64 | int | string
+type Void = bool
+type Type = JavaObject | bool | f32 | f64 | int | string | Void
 
 // pub type Any = string | int | i64 | f32 | f64 | bool | []Any | map[voidptr]Any
 enum ObjectType {
@@ -51,6 +52,7 @@ fn v2j_signature_type(vt Type) string {
 		f64 { 'D' }
 		int { 'I' }
 		string { 'Ljava/lang/String;' }
+		JavaObject { 'Ljava/lang/Object;' }
 		else { 'V' } // void
 	}
 }
@@ -91,6 +93,11 @@ fn v2j_value(vt Type) C.jvalue {
 		string { // TODO
 			C.jvalue{
 				l: C.StringToObject(jstring(C.jniGetEnv(), vt))
+			}
+		}
+		JavaObject {
+			C.jvalue{
+				l: C.jobject(vt)
 			}
 		}
 		else {

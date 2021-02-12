@@ -122,6 +122,13 @@ pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 				val: j2v_string(env, jstr)
 			}
 		}
+		'object' {
+			jobj := JavaObject(C.CallStaticObjectMethodA(env, class, mid, jv_args.data))
+			CallResult{
+				call: signature
+				val: jobj
+			}
+		}
 		'void' {
 			C.CallStaticVoidMethodA(env, class, mid, jv_args.data)
 			CallResult{
@@ -189,6 +196,13 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 			CallResult{
 				call: signature
 				val: j2v_string(env, jstr)
+			}
+		}
+		'object' {
+			jobj := JavaObject(C.CallObjectMethodA(env, obj, mid, jv_args.data))
+			CallResult{
+				call: signature
+				val: jobj
 			}
 		}
 		'void' {
