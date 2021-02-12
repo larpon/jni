@@ -7,13 +7,11 @@ import jni.c
 // TODO
 pub const used_import = c.used_import
 
-type ResultType = bool | int | f32 | f64 | string
-
 struct CallResult {
 pub:
 	call      string
 	call_type ObjectType
-	val       ResultType
+	val       Type
 }
 
 pub fn auto_env() &Env {
