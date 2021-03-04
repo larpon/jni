@@ -344,11 +344,11 @@ pub fn get_class_static_method_id(env &Env, fqn_sig string) ?(JavaClass, C.jmeth
 	mut jclazz := JavaClass{}
 	// Find the Java class
 	$if android {
-		jclazz = auto_find_class(clazz) or { panic(@FN + ' ' + err) }
+		jclazz = auto_find_class(clazz) or { panic(@FN + ' ' + err.msg) }
 	} $else {
-		jclazz = find_class(env, clazz) or { panic(@FN + ' ' + err) }
+		jclazz = find_class(env, clazz) or { panic(@FN + ' ' + err.msg) }
 	}
-	mid := get_static_method_id(env, jclazz, fn_sig) or { panic(@FN + ' ' + err) }
+	mid := get_static_method_id(env, jclazz, fn_sig) or { panic(@FN + ' ' + err.msg) }
 	return jclazz, mid
 }
 
@@ -389,7 +389,7 @@ pub fn get_object_method_id(env &Env, obj C.jobject, fqn_sig string) ?(C.jclass,
 		// throw_exception(env, excp)
 		panic(excp)
 	}
-	mid := get_method_id(env, jclazz, fn_sig) or { panic(@FN + ' ' + err) }
+	mid := get_method_id(env, jclazz, fn_sig) or { panic(@FN + ' ' + err.msg) }
 	return jclazz, mid
 }
 

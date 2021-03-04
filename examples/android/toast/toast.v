@@ -50,7 +50,7 @@ fn (a App) show_toast(text string) {
 	println(@FN+': "$text"')
 	$if android {
 		jor := auto.call_static_method(jni.sig(pkg,@FN,'void',text),text)
-		//println('V jni.CallResult: $jor')
+		println('V jni.CallResult: $jor showing toast')
 	}
 }
 
@@ -105,7 +105,7 @@ fn cleanup(mut app App) {
 	gfx.shutdown()
 }
 
-fn event(mut ev sapp.Event, mut app App) {
+fn event(ev &gg.Event, mut app App) {
 	if ev.typ == .mouse_move {
 		app.mouse_x = int(ev.mouse_x)
 		app.mouse_y = int(ev.mouse_y)
