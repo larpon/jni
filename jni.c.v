@@ -2,14 +2,6 @@
 // Use of this source code is governed by an MIT license file distributed with this software package
 module jni
 
-type JavaVM = C.JavaVM
-type Env = C.JNIEnv
-type JavaObject = C.jobject
-type JavaString = C.jstring
-type JavaClass = C.jclass
-type JavaMethodID = C.jmethodID
-type JavaValue = C.jvalue
-
 /*
 typedef unsigned char   jboolean;
 typedef unsigned short  jchar;
@@ -52,15 +44,25 @@ union C.jvalue {
 	l C.jobject
 }
 
+type JavaVM = C.JavaVM
+type Env = C.JNIEnv
+type JavaObject = C.jobject
+type JavaString = C.jstring
+type JavaClass = C.jclass
+type JavaMethodID = C.jmethodID
+type JavaValue = C.jvalue
+
 // helpers.h
 // fn C.vc_cast(from voidptr, to voidptr) voidptr
 fn C.StringToObject(str C.jstring) C.jobject
 
 fn C.ObjectToString(obj C.jobject) C.jstring
 
-fn C.ObjectToClass(obj C.jobject) C.jclazz
+fn C.ObjectToClass(obj C.jobject) C.jclass
 
-fn C.ClassToObject(cls C.jclazz) C.jobject
+fn C.ClassToObject(cls C.jclass) C.jobject
+
+fn C.MethodIDToObject(cls C.jmethodID) C.jobject
 
 fn C.jniGetEnv() &C.JNIEnv
 
@@ -71,7 +73,7 @@ fn C.jniFindClass(name charptr) C.jclass
 fn C.jniSetupAndroid(name charptr)
 
 // jni_wrapper.h
-fn C.FindClass(env &JNIEnv, name charptr) C.jclass
+fn C.FindClass(env &C.JNIEnv, name charptr) C.jclass
 
 fn C.DeleteLocalRef(env &C.JNIEnv, obj C.jobject)
 
@@ -132,7 +134,7 @@ fn C.CallFloatMethodA(env &C.JNIEnv, obj C.jobject, method_id C.jmethodID, args 
 fn C.CallDoubleMethodA(env &C.JNIEnv, obj C.jobject, method_id C.jmethodID, args &C.jvalue) C.jdouble
 
 // Static method calling (calling static methods on Java classes)
-fn C.CallStaticVoidMethodA(env &C.JNIEnv, clazz C.jclass, method_id C.jmethodID)
+fn C.CallStaticVoidMethodA(env &C.JNIEnv, clazz C.jclass, method_id C.jmethodID, args &C.jvalue)
 
 fn C.CallStaticObjectMethodA(env &C.JNIEnv, clazz C.jclass, method_id C.jmethodID, args &C.jvalue) JavaObject
 

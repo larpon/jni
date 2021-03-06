@@ -109,7 +109,7 @@ fn v2j_value(vt Type) C.jvalue {
 pub fn j2v_string(env &Env, jstr C.jstring) string {
 	mut cn := ''
 	unsafe {
-		native_string := C.GetStringUTFChars(env, jstr, C.JNI_FALSE)
+		native_string := C.GetStringUTFChars(env, jstr, C.jboolean(C.JNI_FALSE))
 		cn = '' + native_string.vstring()
 		C.ReleaseStringUTFChars(env, jstr, native_string)
 	}

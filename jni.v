@@ -234,7 +234,8 @@ pub fn auto_find_class(clazz string) ?JavaClass {
 	if env_has_exception(env) {
 		C.ExceptionDescribe(env)
 		if !isnil(cls) {
-			C.DeleteLocalRef(env, cls)
+			o := C.ClassToObject(cls)
+			C.DeleteLocalRef(env, o)
 		}
 		excp := 'An exception occured. Couldn\'t auto find class "$clazz" in JNIEnv (${ptr_str(env)})'
 		$if debug {
@@ -253,7 +254,8 @@ pub fn find_class(env &Env, clazz string) ?JavaClass {
 	if env_has_exception(env) {
 		C.ExceptionDescribe(env)
 		if !isnil(cls) {
-			C.DeleteLocalRef(env, cls)
+			o := C.ClassToObject(cls)
+			C.DeleteLocalRef(env, o)
 		}
 		excp := 'An exception occured. Couldn\'t find class "$clazz" in JNIEnv (${ptr_str(env)})'
 		$if debug {
@@ -274,7 +276,8 @@ pub fn get_object_class_name(env &Env, obj JavaObject) string {
 	if env_has_exception(env) {
 		C.ExceptionDescribe(env)
 		if !isnil(classclass) {
-			C.DeleteLocalRef(env, classclass)
+			o := C.ClassToObject(classclass)
+			C.DeleteLocalRef(env, o)
 		}
 		excp := "An exception occured. Couldn\'t get object class in JNIEnv (${ptr_str(env)})"
 		$if debug {
@@ -318,7 +321,8 @@ pub fn raw_get_static_method_id(env &Env, clazz C.jclass, fn_name string, sig st
 	if env_has_exception(env) {
 		C.ExceptionDescribe(env)
 		if !isnil(mid) {
-			C.DeleteLocalRef(env, mid)
+			o := C.MethodIDToObject(mid)
+			C.DeleteLocalRef(env, o)
 		}
 		clsn := get_class_name(env, clazz)
 		excp := 'An exception occured. ' + @FN +
@@ -360,7 +364,8 @@ pub fn get_method_id(env &Env, clazz C.jclass, signature string) ?C.jmethodID {
 	if env_has_exception(env) {
 		C.ExceptionDescribe(env)
 		if !isnil(mid) {
-			C.DeleteLocalRef(env, mid)
+			o := C.MethodIDToObject(mid)
+			C.DeleteLocalRef(env, o)
 		}
 		// n := get_class_name(env, clazz)
 		excp := 'An exception occured. Couldn\'t find method "$signature" on class "?" in JNIEnv (${ptr_str(env)})'
@@ -380,7 +385,8 @@ pub fn get_object_method_id(env &Env, obj C.jobject, fqn_sig string) ?(C.jclass,
 	if env_has_exception(env) {
 		C.ExceptionDescribe(env)
 		if !isnil(jclazz) {
-			C.DeleteLocalRef(env, jclazz)
+			o := C.ClassToObject(jclazz)
+			C.DeleteLocalRef(env, o)
 		}
 		excp := 'An exception occured. Couldn\'t find class "$clazz" of signature "$fqn_sig" JNIEnv (${ptr_str(env)})'
 		$if debug {
