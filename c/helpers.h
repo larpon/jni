@@ -178,3 +178,7 @@ jclass ObjectToClass(jobject obj) {
 jobject ClassToObject(jclass cls) {
     return (jobject)cls;
 }
+
+jobject MethodIDToObject(jmethodID meth) {
+	return (jobject)meth;
+}
