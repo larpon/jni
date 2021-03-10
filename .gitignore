@@ -2,3 +2,5 @@
 *.class
 # resulting shared object library
 *.so
+
+*.directory
