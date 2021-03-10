@@ -1,0 +1,4 @@
+Vab {
+	activity_name: 'VKeyboardActivity'
+	package_id: 'io.v.android.ex'
+}

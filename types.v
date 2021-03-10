@@ -116,6 +116,10 @@ pub fn j2v_string(env &Env, jstr C.jstring) string {
 	return cn
 }
 
+pub fn j2v_boolean(jbool C.jboolean) bool {
+	return jbool == C.jboolean(C.JNI_TRUE)
+}
+
 //
 pub fn jboolean(val bool) C.jboolean {
 	if val {

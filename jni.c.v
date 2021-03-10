@@ -12,6 +12,15 @@ typedef double          jdouble;
 typedef jint            jsize;
 */
 
+type JavaVM = C.JavaVM
+type Env = C.JNIEnv
+type JavaObject = C.jobject
+type JavaString = C.jstring
+type JavaClass = C.jclass
+type JavaMethodID = C.jmethodID
+type JavaFieldID = C.jfieldID
+type JavaValue = C.jvalue
+
 // jni.h
 [typedef]
 struct C.jstring {}
@@ -32,6 +41,9 @@ struct C.jclass {}
 struct C.jmethodID {}
 
 [typedef]
+struct C.jfieldID {}
+
+[typedef]
 union C.jvalue {
 	z C.jboolean
 	b C.jbyte
@@ -43,14 +55,6 @@ union C.jvalue {
 	d C.jdouble
 	l C.jobject
 }
-
-type JavaVM = C.JavaVM
-type Env = C.JNIEnv
-type JavaObject = C.jobject
-type JavaString = C.jstring
-type JavaClass = C.jclass
-type JavaMethodID = C.jmethodID
-type JavaValue = C.jvalue
 
 // helpers.h
 // fn C.vc_cast(from voidptr, to voidptr) voidptr
@@ -106,7 +110,29 @@ fn C.GetStringUTFChars(env &C.JNIEnv, jstr C.jstring, b C.jboolean) charptr
 
 fn C.ReleaseStringUTFChars(env &C.JNIEnv, jstr C.jstring, chars charptr)
 
+//
 fn C.GetMethodID(env &C.JNIEnv, clazz C.jclass, name charptr, sig charptr) C.jmethodID
+
+fn C.GetStaticFieldID(env &C.JNIEnv, clazz C.jclass, name charptr, sig charptr) C.jfieldID
+fn C.GetStaticObjectField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID) C.jobject
+// jboolean GetStaticBooleanField(JNIEnv *env, jclass clazz, jfieldID fieldID)
+// jbyte GetStaticByteField(JNIEnv *env, jclass clazz, jfieldID fieldID)
+// jchar GetStaticCharField(JNIEnv *env, jclass clazz, jfieldID fieldID)
+// jshort GetStaticShortField(JNIEnv *env, jclass clazz, jfieldID fieldID)
+// jint GetStaticIntField(JNIEnv *env, jclass clazz, jfieldID fieldID)
+// jlong GetStaticLongField(JNIEnv *env, jclass clazz, jfieldID fieldID)
+// jfloat GetStaticFloatField(JNIEnv *env, jclass clazz, jfieldID fieldID)
+// jdouble GetStaticDoubleField(JNIEnv *env, jclass clazz, jfieldID fieldID)
+
+// void SetStaticObjectField(JNIEnv *env, jclass clazz, jfieldID fieldID, jobject value)
+// void SetStaticBooleanField(JNIEnv *env, jclass clazz, jfieldID fieldID, jboolean value)
+// void SetStaticByteField(JNIEnv *env, jclass clazz, jfieldID fieldID, jbyte value)
+// void SetStaticCharField(JNIEnv *env, jclass clazz, jfieldID fieldID, jchar value)
+// void SetStaticShortField(JNIEnv *env, jclass clazz, jfieldID fieldID, jshort value)
+// void SetStaticIntField(JNIEnv *env, jclass clazz, jfieldID fieldID, jint value)
+// void SetStaticLongField(JNIEnv *env, jclass clazz, jfieldID fieldID, jlong value)
+// void SetStaticFloatField(JNIEnv *env, jclass clazz, jfieldID fieldID, jfloat value)
+// void SetStaticDoubleField(JNIEnv *env, jclass clazz, jfieldID fieldID, jdouble value)
 
 fn C.GetObjectClass(env &C.JNIEnv, obj C.jobject) C.jclass
 

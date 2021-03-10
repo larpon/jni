@@ -226,6 +226,14 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 }
 
 //
+pub fn die_on_exception(env &Env) {
+	if env_has_exception(env) {
+		C.ExceptionDescribe(env)
+		panic('An exception occured in JNIEnv (${ptr_str(env)})')
+	}
+}
+
+//
 pub fn auto_find_class(clazz string) ?JavaClass {
 	jclazz := clazz.replace('.', '/')
 	mut cls := C.jniFindClass(jclazz.str)
