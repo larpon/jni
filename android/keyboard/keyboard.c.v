@@ -1,3 +1,5 @@
+// Copyright(C) 2021 Lars Pontoppidan. All rights reserved.
+// Use of this source code is governed by an MIT license file distributed with this software package
 module keyboard
 
 import jni
@@ -19,11 +21,11 @@ pub fn visibility(soft_visibility SoftKeyboardVisibility) bool {
 
 		activity := android.activity() or { panic(@MOD+'.'+@FN+': '+err.msg) }
 
-		activity_class := C.GetObjectClass(env, activity.clazz)
+		activity_class := jni.get_object_class(env, activity.clazz)
 
 		// Retrieve Context.INPUT_METHOD_SERVICE
 		class_context := jni.auto_find_class('android.content.Context') or { panic(@MOD+'.'+@FN+': '+err.msg) }
-		fld_input_method_service := C.GetStaticFieldID(env, class_context, c'INPUT_METHOD_SERVICE', c'Ljava/lang/String;')
+		fld_input_method_service := jni.get_static_field_id(env, class_context, 'INPUT_METHOD_SERVICE', 'Ljava/lang/String;')
 
 		input_method_service := C.GetStaticObjectField(env, class_context, fld_input_method_service)
 		jni.die_on_exception(env)

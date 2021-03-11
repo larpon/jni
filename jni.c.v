@@ -12,6 +12,15 @@ typedef double          jdouble;
 typedef jint            jsize;
 */
 
+pub fn env() &Env {
+	return C.jniGetEnv()
+}
+
+pub fn vm() &JavaVM {
+	return C.jniGetJavaVM()
+}
+
+
 type JavaVM = C.JavaVM
 type Env = C.JNIEnv
 type JavaObject = C.jobject
@@ -70,6 +79,7 @@ fn C.MethodIDToObject(cls C.jmethodID) C.jobject
 
 fn C.jniGetEnv() &C.JNIEnv
 
+fn C.jniGetJavaVM() &C.JavaVM
 fn C.jniSetJavaVM(vm &JavaVM)
 
 fn C.jniFindClass(name charptr) C.jclass
@@ -114,6 +124,10 @@ fn C.ReleaseStringUTFChars(env &C.JNIEnv, jstr C.jstring, chars charptr)
 fn C.GetMethodID(env &C.JNIEnv, clazz C.jclass, name charptr, sig charptr) C.jmethodID
 
 fn C.GetStaticFieldID(env &C.JNIEnv, clazz C.jclass, name charptr, sig charptr) C.jfieldID
+pub fn get_static_field_id(env &Env, clazz JavaClass, name string, signature string) JavaFieldID {
+	return C.GetStaticFieldID(env, clazz, name.str, signature.str)
+}
+
 fn C.GetStaticObjectField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID) C.jobject
 // jboolean GetStaticBooleanField(JNIEnv *env, jclass clazz, jfieldID fieldID)
 // jbyte GetStaticByteField(JNIEnv *env, jclass clazz, jfieldID fieldID)
@@ -135,6 +149,9 @@ fn C.GetStaticObjectField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID) C.j
 // void SetStaticDoubleField(JNIEnv *env, jclass clazz, jfieldID fieldID, jdouble value)
 
 fn C.GetObjectClass(env &C.JNIEnv, obj C.jobject) C.jclass
+pub fn get_object_class(env &Env, obj JavaObject) JavaClass {
+	return C.GetObjectClass(env, obj)
+}
 
 fn C.GetStaticMethodID(env &C.JNIEnv, clazz C.jclass, name charptr, signature charptr) C.jmethodID
 
