@@ -106,6 +106,7 @@ fn v2j_value(vt Type) C.jvalue {
 	}
 }
 
+[inline]
 pub fn j2v_string(env &Env, jstr C.jstring) string {
 	mut cn := ''
 	unsafe {
@@ -116,11 +117,17 @@ pub fn j2v_string(env &Env, jstr C.jstring) string {
 	return cn
 }
 
+[inline]
 pub fn j2v_boolean(jbool C.jboolean) bool {
 	return jbool == C.jboolean(C.JNI_TRUE)
 }
 
-//
+[inline]
+pub fn j2v_int(jint C.jint) int {
+	return int(jint)
+}
+
+[inline]
 pub fn jboolean(val bool) C.jboolean {
 	if val {
 		return C.jboolean(C.JNI_TRUE)
@@ -128,18 +135,22 @@ pub fn jboolean(val bool) C.jboolean {
 	return C.jboolean(C.JNI_FALSE)
 }
 
+[inline]
 pub fn jfloat(val f32) C.jfloat {
 	return C.jfloat(val)
 }
 
+[inline]
 pub fn jdouble(val f64) C.jdouble {
 	return C.jdouble(val)
 }
 
+[inline]
 pub fn jint(val int) C.jint {
 	return C.jint(val)
 }
 
+[inline]
 pub fn jstring(env &Env, val string) C.jstring {
 	return C.NewStringUTF(env, val.str)
 }

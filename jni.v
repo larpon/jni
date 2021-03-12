@@ -116,7 +116,7 @@ pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 			}
 		}
 		'string' {
-			jstr := C.jstring(C.CallStaticObjectMethodA(env, class, mid, jv_args.data))
+			jstr := C.ObjectToString(C.CallStaticObjectMethodA(env, class, mid, jv_args.data))
 			CallResult{
 				call: signature
 				val: j2v_string(env, jstr)
@@ -256,7 +256,7 @@ pub fn auto_find_class(clazz string) ?JavaClass {
 }
 
 //
-pub fn find_class(env &Env, clazz string) ?JavaClass {
+pub fn checked_find_class(env &Env, clazz string) ?JavaClass {
 	jclazz := clazz.replace('.', '/')
 	mut cls := C.FindClass(env, jclazz.str)
 	if env_has_exception(env) {
@@ -358,7 +358,7 @@ pub fn get_class_static_method_id(env &Env, fqn_sig string) ?(JavaClass, C.jmeth
 	$if android {
 		jclazz = auto_find_class(clazz) or { panic(@FN + ' ' + err.msg) }
 	} $else {
-		jclazz = find_class(env, clazz) or { panic(@FN + ' ' + err.msg) }
+		jclazz = checked_find_class(env, clazz) or { panic(@FN + ' ' + err.msg) }
 	}
 	mid := get_static_method_id(env, jclazz, fn_sig) or { panic(@FN + ' ' + err.msg) }
 	return jclazz, mid
