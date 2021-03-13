@@ -26,12 +26,13 @@ if javahome == '' || javac == '' {
 	exit(1)
 }
 
-os.setenv('JAVA_HOME',javahome,false)
-os.setenv('LD_LIBRARY_PATH',os.getenv('LD_LIBRARY_PATH')+os.path_delimiter+os.getwd(),true)
+os.setenv('JAVA_HOME', javahome, false)
+os.setenv('LD_LIBRARY_PATH', os.getenv('LD_LIBRARY_PATH') + os.path_delimiter + os.getwd(),
+	true)
 
 eprintln('Compiling shared libvlang.o')
 os.system('v -prod -shared libvlang.v')
 eprintln('Compiling Java sources')
-os.system(javac+' io/vlang/V.java')
+os.system(javac + ' io/vlang/V.java')
 eprintln('Running Java application')
-os.system(java+' io.vlang.V')
+os.system(java + ' io.vlang.V')

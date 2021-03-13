@@ -2,25 +2,22 @@
 // Use of this source code is governed by an MIT license file distributed with this software package
 import gg
 import gx
-//import math
-
+// import math
 import sokol.sapp
 import sokol.gfx
 import sokol.sgl
-
 import time
-
 import jni
 import jni.auto
 
 const (
-	pkg = 'io.v.android.ex.VToastActivity'
-	bg_color   = gx.white
+	pkg      = 'io.v.android.ex.VToastActivity'
+	bg_color = gx.white
 )
 
 [export: 'JNI_OnLoad']
 fn jni_on_load(vm &jni.JavaVM, reserved voidptr) int {
-	println(@FN+' called')
+	println(@FN + ' called')
 	jni.set_java_vm(vm)
 	$if android {
 		// V consts - can't be used since `JNI_OnLoad`
@@ -33,36 +30,37 @@ fn jni_on_load(vm &jni.JavaVM, reserved voidptr) int {
 
 struct App {
 mut:
-	gg            &gg.Context
+	gg &gg.Context
 
-	pip_3d        C.sgl_pipeline
-	texture       C.sg_image
-	init_flag     bool
-	frame_count   int
+	pip_3d      C.sgl_pipeline
+	texture     C.sg_image
+	init_flag   bool
+	frame_count int
 
-	mouse_x       int = -1
-	mouse_y       int = -1
+	mouse_x int = -1
+	mouse_y int = -1
 	// time
-	ticks         i64
+	ticks i64
 }
 
 fn (a App) show_toast(text string) {
-	println(@FN+': "$text"')
+	println(@FN + ': "$text"')
 	$if android {
-		jor := auto.call_static_method(jni.sig(pkg,@FN,'void',text),text)
+		jor := auto.call_static_method(jni.sig(pkg, @FN, 'void', text), text)
 		println('V jni.CallResult: $jor showing toast')
 	}
 }
 
 fn frame(mut app App) {
 	ws := gg.window_size()
-	
+
 	min := if ws.width < ws.height { f32(ws.width) } else { f32(ws.height) }
 
 	app.gg.begin()
 	sgl.defaults()
 
-	sgl.viewport(int((f32(ws.width)*0.5)-(min*0.5)), int((f32(ws.height)*0.5)-(min*0.5)), int(min), int(min), true)
+	sgl.viewport(int((f32(ws.width) * 0.5) - (min * 0.5)), int((f32(ws.height) * 0.5) - (min * 0.5)),
+		int(min), int(min), true)
 	draw_triangle()
 
 	app.gg.end()
@@ -71,9 +69,9 @@ fn frame(mut app App) {
 fn draw_triangle() {
 	sgl.defaults()
 	sgl.begin_triangles()
-	sgl.v2f_c3b( 0.0,  0.5, 255, 0, 0)
+	sgl.v2f_c3b(0.0, 0.5, 255, 0, 0)
 	sgl.v2f_c3b(-0.5, -0.5, 0, 0, 255)
-	sgl.v2f_c3b( 0.5, -0.5, 0, 255, 0)
+	sgl.v2f_c3b(0.5, -0.5, 0, 255, 0)
 	sgl.end()
 }
 
@@ -87,15 +85,15 @@ fn init(mut app App) {
 
 	// 3d pipeline
 	mut pipdesc := C.sg_pipeline_desc{}
-	unsafe {C.memset(&pipdesc, 0, sizeof(pipdesc))}
+	unsafe { C.memset(&pipdesc, 0, sizeof(pipdesc)) }
 	pipdesc.blend.enabled = true
 	pipdesc.blend.src_factor_rgb = gfx.BlendFactor(C.SG_BLENDFACTOR_SRC_ALPHA)
 	pipdesc.blend.dst_factor_rgb = gfx.BlendFactor(C.SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA)
-	pipdesc.depth_stencil  = C.sg_depth_stencil_state{
+	pipdesc.depth_stencil = C.sg_depth_stencil_state{
 		depth_write_enabled: true
-		depth_compare_func : gfx.CompareFunc(C.SG_COMPAREFUNC_LESS_EQUAL)
+		depth_compare_func: gfx.CompareFunc(C.SG_COMPAREFUNC_LESS_EQUAL)
 	}
-	pipdesc.rasterizer  = C.sg_rasterizer_state {
+	pipdesc.rasterizer = C.sg_rasterizer_state{
 		cull_mode: .back
 	}
 	app.pip_3d = sgl.make_pipeline(&pipdesc)
@@ -122,17 +120,17 @@ fn event(ev &gg.Event, mut app App) {
 			app.show_toast('Hello from V in toast!')
 		}
 	}
-	//println('$app.mouse_x,$app.mouse_y')
+	// println('$app.mouse_x,$app.mouse_y')
 }
 
 //[console]
-fn main(){
+fn main() {
 	// App init
 	mut app := &App{
 		gg: 0
 	}
 
-	app.gg = gg.new_context({
+	app.gg = gg.new_context(
 		width: 200
 		height: 400
 		use_ortho: true // This is needed for 2D drawing
@@ -144,7 +142,7 @@ fn main(){
 		init_fn: init
 		cleanup_fn: cleanup
 		event_fn: event
-	})
+	)
 
 	app.ticks = time.ticks()
 	app.gg.run()

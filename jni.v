@@ -9,22 +9,9 @@ pub const used_import = c.used_import
 
 struct CallResult {
 pub:
-	call      string
-	call_type ObjectType
-	val       Type
-}
-
-pub fn auto_env() &Env {
-	return C.jniGetEnv()
-}
-
-pub fn set_java_vm(vm &JavaVM) {
-	C.jniSetJavaVM(vm)
-}
-
-pub fn setup_android(fq_activity_name string) {
-	activity_name := fq_activity_name.replace('.', '/')
-	C.jniSetupAndroid(activity_name.str)
+	call        string
+	method_type MethodType
+	val         Type // TODO = Void ??
 }
 
 // sig builds a V `jni` style signature from the supplied arguments.
@@ -140,8 +127,8 @@ pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 		}
 	}
 	// Check for any exceptions
-	if env_has_exception(env) {
-		C.ExceptionDescribe(env)
+	if exception_check(env) {
+		exception_describe(env)
 		excp := 'An exception occured while executing "$signature" in JNIEnv (${ptr_str(env)})'
 		$if debug {
 			println(excp)
@@ -156,7 +143,7 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 	// println(@FN+': $signature')
 	fqn, return_type := parse_signature(signature)
 
-	mut jv_args := []C.jvalue{}
+	mut jv_args := []JavaValue{}
 	mut jargs := ''
 
 	for vt in args {
@@ -164,31 +151,31 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 		jv_args << v2j_value(vt)
 	}
 	jdef := fqn + '(' + jargs + ')' + v2j_string_signature_type(return_type)
-	_, mid := get_object_method_id(env, obj, jdef) or { panic(err) }
+	_, mid := checked_get_object_method_id(env, obj, jdef) or { panic(err) }
 
 	call_result := match return_type {
 		'bool' {
 			CallResult{
 				call: signature
-				val: C.CallBooleanMethodA(env, obj, mid, jv_args.data) == jboolean(true)
+				val: call_boolean_method_a(env, obj, mid, jv_args.data)
 			}
 		}
 		'f32' {
 			CallResult{
 				call: signature
-				val: f32(C.CallFloatMethodA(env, obj, mid, jv_args.data))
+				val: call_float_method_a(env, obj, mid, jv_args.data)
 			}
 		}
 		'f64' {
 			CallResult{
 				call: signature
-				val: f64(C.CallDoubleMethodA(env, obj, mid, jv_args.data))
+				val: call_double_method_a(env, obj, mid, jv_args.data)
 			}
 		}
 		'int' {
 			CallResult{
 				call: signature
-				val: int(C.CallIntMethodA(env, obj, mid, jv_args.data))
+				val: call_int_method_a(env, obj, mid, jv_args.data)
 			}
 		}
 		'string' {
@@ -199,14 +186,13 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 			}
 		}
 		'object' {
-			jobj := JavaObject(C.CallObjectMethodA(env, obj, mid, jv_args.data))
 			CallResult{
 				call: signature
-				val: jobj
+				val: call_object_method_a(env, obj, mid, jv_args.data)
 			}
 		}
 		'void' {
-			C.CallVoidMethodA(env, obj, mid, jv_args.data)
+			call_void_method_a(env, obj, mid, jv_args.data)
 			CallResult{
 				call: signature
 			}
@@ -216,8 +202,8 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 		}
 	}
 	// Check for any exceptions
-	if env_has_exception(env) {
-		C.ExceptionDescribe(env)
+	if exception_check(env) {
+		exception_describe(env)
 		excp := 'An exception occured while executing "$signature" in JNIEnv (${ptr_str(env)})'
 		// throw_exception(env, excp)
 		panic(excp)
@@ -226,41 +212,19 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 }
 
 //
-pub fn die_on_exception(env &Env) {
-	if env_has_exception(env) {
-		C.ExceptionDescribe(env)
-		panic('An exception occured in JNIEnv (${ptr_str(env)})')
+pub fn panic_on_exception(env &Env) {
+	if exception_check(env) {
+		exception_describe(env)
+		panic('An exception occured in jni.Env (${ptr_str(env)})')
 	}
-}
-
-//
-pub fn auto_find_class(clazz string) ?JavaClass {
-	jclazz := clazz.replace('.', '/')
-	mut cls := C.jniFindClass(jclazz.str)
-	//
-	env := jni.auto_env()
-	if env_has_exception(env) {
-		C.ExceptionDescribe(env)
-		if !isnil(cls) {
-			o := C.ClassToObject(cls)
-			C.DeleteLocalRef(env, o)
-		}
-		excp := 'An exception occured. Couldn\'t auto find class "$clazz" in JNIEnv (${ptr_str(env)})'
-		$if debug {
-			println(excp)
-		}
-		// throw_exception(env, excp)
-		panic(excp)
-	}
-	return cls
 }
 
 //
 pub fn checked_find_class(env &Env, clazz string) ?JavaClass {
 	jclazz := clazz.replace('.', '/')
 	mut cls := C.FindClass(env, jclazz.str)
-	if env_has_exception(env) {
-		C.ExceptionDescribe(env)
+	if exception_check(env) {
+		exception_describe(env)
 		if !isnil(cls) {
 			o := C.ClassToObject(cls)
 			C.DeleteLocalRef(env, o)
@@ -275,14 +239,10 @@ pub fn checked_find_class(env &Env, clazz string) ?JavaClass {
 	return cls
 }
 
-pub fn env_has_exception(env &Env) bool {
-	return C.ExceptionCheck(env) == C.jboolean(C.JNI_TRUE)
-}
-
 pub fn get_object_class_name(env &Env, obj JavaObject) string {
 	classclass := C.GetObjectClass(env, obj)
-	if env_has_exception(env) {
-		C.ExceptionDescribe(env)
+	if exception_check(env) {
+		exception_describe(env)
 		if !isnil(classclass) {
 			o := C.ClassToObject(classclass)
 			C.DeleteLocalRef(env, o)
@@ -304,8 +264,8 @@ pub fn get_object_class_name(env &Env, obj JavaObject) string {
 		panic(excp)
 	}
 	jstr_class_name := C.CallObjectMethodA(env, obj, mid_get_name, 0)
-	if env_has_exception(env) {
-		C.ExceptionDescribe(env)
+	if exception_check(env) {
+		exception_describe(env)
 		if !isnil(jstr_class_name) {
 			C.DeleteLocalRef(env, jstr_class_name)
 		}
@@ -324,10 +284,10 @@ pub fn get_class_name(env &Env, jclazz C.jclass) string {
 	return get_object_class_name(env, o)
 }
 
-pub fn raw_get_static_method_id(env &Env, clazz C.jclass, fn_name string, sig string) ?C.jmethodID {
+pub fn raw_get_static_method_id(env &Env, clazz C.jclass, fn_name string, sig string) ?JavaMethodID {
 	mid := C.GetStaticMethodID(env, clazz, fn_name.str, sig.str)
-	if env_has_exception(env) {
-		C.ExceptionDescribe(env)
+	if exception_check(env) {
+		exception_describe(env)
 		if !isnil(mid) {
 			o := C.MethodIDToObject(mid)
 			C.DeleteLocalRef(env, o)
@@ -343,20 +303,20 @@ pub fn raw_get_static_method_id(env &Env, clazz C.jclass, fn_name string, sig st
 	return mid
 }
 
-pub fn get_static_method_id(env &Env, clazz C.jclass, signature string) ?C.jmethodID {
+pub fn get_static_method_id(env &Env, clazz C.jclass, signature string) ?JavaMethodID {
 	fn_name := signature.all_before('(')
 	fn_sig := '(' + signature.all_after('(')
 	mid := raw_get_static_method_id(env, clazz, fn_name, fn_sig) ?
 	return mid
 }
 
-pub fn get_class_static_method_id(env &Env, fqn_sig string) ?(JavaClass, C.jmethodID) {
+pub fn get_class_static_method_id(env &Env, fqn_sig string) ?(JavaClass, JavaMethodID) {
 	clazz := fqn_sig.all_before_last('.')
 	fn_sig := fqn_sig.all_after_last('.')
 	mut jclazz := JavaClass{}
 	// Find the Java class
 	$if android {
-		jclazz = auto_find_class(clazz) or { panic(@FN + ' ' + err.msg) }
+		jclazz = checked_find_class(default_env(), clazz) or { panic(@FN + ' ' + err.msg) }
 	} $else {
 		jclazz = checked_find_class(env, clazz) or { panic(@FN + ' ' + err.msg) }
 	}
@@ -365,12 +325,12 @@ pub fn get_class_static_method_id(env &Env, fqn_sig string) ?(JavaClass, C.jmeth
 }
 
 //
-pub fn get_method_id(env &Env, clazz C.jclass, signature string) ?C.jmethodID {
+pub fn checked_get_method_id(env &Env, clazz C.jclass, signature string) ?JavaMethodID {
 	f_name := signature.all_before('(')
 	f_sig := '(' + signature.all_after('(')
 	mid := C.GetMethodID(env, clazz, f_name.str, f_sig.str)
-	if env_has_exception(env) {
-		C.ExceptionDescribe(env)
+	if exception_check(env) {
+		exception_describe(env)
 		if !isnil(mid) {
 			o := C.MethodIDToObject(mid)
 			C.DeleteLocalRef(env, o)
@@ -385,13 +345,13 @@ pub fn get_method_id(env &Env, clazz C.jclass, signature string) ?C.jmethodID {
 	return mid
 }
 
-pub fn get_object_method_id(env &Env, obj C.jobject, fqn_sig string) ?(C.jclass, C.jmethodID) {
+pub fn checked_get_object_method_id(env &Env, obj C.jobject, fqn_sig string) ?(JavaClass, JavaMethodID) {
 	clazz := fqn_sig.all_before_last('.')
 	fn_sig := fqn_sig.all_after_last('.')
 	// Find the class of the object
 	jclazz := C.GetObjectClass(env, obj)
-	if env_has_exception(env) {
-		C.ExceptionDescribe(env)
+	if exception_check(env) {
+		exception_describe(env)
 		if !isnil(jclazz) {
 			o := C.ClassToObject(jclazz)
 			C.DeleteLocalRef(env, o)
@@ -403,33 +363,6 @@ pub fn get_object_method_id(env &Env, obj C.jobject, fqn_sig string) ?(C.jclass,
 		// throw_exception(env, excp)
 		panic(excp)
 	}
-	mid := get_method_id(env, jclazz, fn_sig) or { panic(@FN + ' ' + err.msg) }
+	mid := checked_get_method_id(env, jclazz, fn_sig) or { panic(@FN + ' ' + err.msg) }
 	return jclazz, mid
 }
-
-/*
-// io/vlang/V.java:
-package io.vlang;
-
-public class V
-{
-	static {
-		System.loadLibrary("vlang");
-	}
-
-	public static void main(String[] args) {
-		V vj = new V();
-
-		String from_v = v.stringFromV();
-		System.out.println(from_v);
-	}
-
-	public native String stringFromV();
-
-	public native String  unimplementedStringFromV();
-
-	public static int getAnswer() {
-        return 42;
-    }
-}
-*/

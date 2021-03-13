@@ -2,22 +2,20 @@
 // Use of this source code is governed by an MIT license file distributed with this software package
 import gg
 import gx
-
 import sokol.sapp
 import sokol.gfx
 import sokol.sgl
-
 import jni
 import jni.android.keyboard
 
 const (
-	pkg = 'io.v.android.ex.VKeyboardActivity'
-	bg_color   = gx.white
+	pkg      = 'io.v.android.ex.VKeyboardActivity'
+	bg_color = gx.white
 )
 
 [export: 'JNI_OnLoad']
 fn jni_on_load(vm &jni.JavaVM, reserved voidptr) int {
-	println(@FN+' called')
+	println(@FN + ' called')
 	jni.set_java_vm(vm)
 	$if android {
 		// V consts - can't be used since `JNI_OnLoad`
@@ -30,14 +28,14 @@ fn jni_on_load(vm &jni.JavaVM, reserved voidptr) int {
 
 struct App {
 mut:
-	gg            &gg.Context
+	gg &gg.Context
 
-	init_flag     bool
-	
-	mouse_x       int = -1
-	mouse_y       int = -1
+	init_flag bool
 
-	ticks         i64
+	mouse_x int = -1
+	mouse_y int = -1
+
+	ticks i64
 
 	keyboard_visible bool
 }
@@ -60,16 +58,16 @@ fn (mut a App) hide_keyboard() {
 	}
 }
 
-
 fn frame(mut app App) {
 	ws := gg.window_size()
-	
+
 	min := if ws.width < ws.height { f32(ws.width) } else { f32(ws.height) }
 
 	app.gg.begin()
 	sgl.defaults()
 
-	sgl.viewport(int((f32(ws.width)*0.5)-(min*0.5)), int((f32(ws.height)*0.5)-(min*0.5)), int(min), int(min), true)
+	sgl.viewport(int((f32(ws.width) * 0.5) - (min * 0.5)), int((f32(ws.height) * 0.5) - (min * 0.5)),
+		int(min), int(min), true)
 	draw_triangle()
 
 	app.gg.end()
@@ -78,9 +76,9 @@ fn frame(mut app App) {
 fn draw_triangle() {
 	sgl.defaults()
 	sgl.begin_triangles()
-	sgl.v2f_c3b( 0.0,  0.5, 255, 0, 0)
+	sgl.v2f_c3b(0.0, 0.5, 255, 0, 0)
 	sgl.v2f_c3b(-0.5, -0.5, 0, 0, 255)
-	sgl.v2f_c3b( 0.5, -0.5, 0, 255, 0)
+	sgl.v2f_c3b(0.5, -0.5, 0, 255, 0)
 	sgl.end()
 }
 
@@ -114,20 +112,24 @@ fn event(ev &gg.Event, mut app App) {
 	}
 	if ev.typ == .touches_ended || ev.typ == .mouse_up {
 		if ev.num_touches > 0 {
-			if app.keyboard_visible { app.hide_keyboard() } else { app.show_keyboard() }
+			if app.keyboard_visible {
+				app.hide_keyboard()
+			} else {
+				app.show_keyboard()
+			}
 		}
 	}
 
-	//println('$app.mouse_x,$app.mouse_y')
+	// println('$app.mouse_x,$app.mouse_y')
 }
 
-fn main(){
+fn main() {
 	// App init
 	mut app := &App{
 		gg: 0
 	}
 
-	app.gg = gg.new_context({
+	app.gg = gg.new_context(
 		width: 200
 		height: 400
 		use_ortho: true // This is needed for 2D drawing
@@ -139,7 +141,7 @@ fn main(){
 		init_fn: init
 		cleanup_fn: cleanup
 		event_fn: event
-	})
+	)
 
 	app.gg.run()
 }

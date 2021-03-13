@@ -2,15 +2,21 @@
 // Use of this source code is governed by an MIT license file distributed with this software package
 module android
 
-//import jni
+// import jni
 
 type NativeActivity = C.ANativeActivity
+
+/*
+pub fn env() &jni.Env {
+	return jni.default_env()
+}
+*/
 
 pub fn activity() ?&NativeActivity {
 	actvty := &C.ANativeActivity(C.sapp_android_get_native_activity())
 	if isnil(actvty) {
-		return error(@MOD+'.'+@FN+': could not get reference to Android native activity')
-		//panic(@MOD+'.'+@FN+': could not get reference to Android native activity')
+		return error(@MOD + '.' + @FN + ': could not get reference to Android native activity')
+		// panic(@MOD+'.'+@FN+': could not get reference to Android native activity')
 	}
 	return actvty
 }

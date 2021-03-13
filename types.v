@@ -1,40 +1,41 @@
 module jni
 
 type Void = bool
-type Type = JavaObject | bool | f32 | f64 | int | string | Void
+type Type = JavaObject | Void | bool | f32 | f64 | int | string //| rune | i16 | int | i64 | byte
 
 // pub type Any = string | int | i64 | f32 | f64 | bool | []Any | map[voidptr]Any
-enum ObjectType {
+enum MethodType {
 	@static
 	instance
 }
 
 /*
-JNI signature table
+Signature table
 
-Signature                 | Java Type
---------------------------------------------------
-Z                         | boolean
---------------------------------------------------
-B                         | byte
---------------------------------------------------
-C                         | char
---------------------------------------------------
-S                         | short
---------------------------------------------------
-I                         | int
---------------------------------------------------
-J                         | long
---------------------------------------------------
-F                         | float
---------------------------------------------------
-D                         | double
---------------------------------------------------
-L fully-qualified-class ; | fully-qualified-class
---------------------------------------------------
-[ type                    | type[]
---------------------------------------------------
-( arg-types ) ret-type    | method type
+Signature                 | Java Type             | V Type
+---------------------------------------------------------------------------
+Z                         | boolean               | bool
+---------------------------------------------------------------------------
+B                         | byte                  | byte
+---------------------------------------------------------------------------
+C                         | char                  | rune
+---------------------------------------------------------------------------
+S                         | short                 | i16
+---------------------------------------------------------------------------
+I                         | int                   | int
+---------------------------------------------------------------------------
+J                         | long                  | i64
+---------------------------------------------------------------------------
+F                         | float                 | f32
+---------------------------------------------------------------------------
+D                         | double                | f64
+---------------------------------------------------------------------------
+L fully-qualified-class ; | fully-qualified-class |
+---------------------------------------------------------------------------
+[ type                    | type[]                |
+---------------------------------------------------------------------------
+( arg-types ) ret-type    | method type           |
+---------------------------------------------------------------------------
 */
 pub fn v2j_fn_name(v_func_name string) string {
 	splt := v_func_name.split('_')
@@ -118,6 +119,16 @@ pub fn j2v_string(env &Env, jstr C.jstring) string {
 }
 
 [inline]
+pub fn j2v_char(jchar C.jchar) rune {
+	return rune(u16(jchar))
+}
+
+[inline]
+pub fn j2v_byte(jbyte C.jbyte) byte {
+	return byte(i8(jbyte))
+}
+
+[inline]
 pub fn j2v_boolean(jbool C.jboolean) bool {
 	return jbool == C.jboolean(C.JNI_TRUE)
 }
@@ -125,6 +136,26 @@ pub fn j2v_boolean(jbool C.jboolean) bool {
 [inline]
 pub fn j2v_int(jint C.jint) int {
 	return int(jint)
+}
+
+[inline]
+pub fn j2v_short(jshort C.jshort) i16 {
+	return i16(jshort)
+}
+
+[inline]
+pub fn j2v_long(jlong C.jlong) i64 {
+	return i64(jlong)
+}
+
+[inline]
+pub fn j2v_float(jfloat C.jfloat) f32 {
+	return f32(jfloat)
+}
+
+[inline]
+pub fn j2v_double(jdouble C.jdouble) f64 {
+	return f64(jdouble)
 }
 
 [inline]
