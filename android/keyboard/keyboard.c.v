@@ -42,8 +42,8 @@ pub fn visibility(soft_visibility SoftKeyboardVisibility) bool {
 		method_get_system_service := C.GetMethodID(env, activity_class, c'getSystemService',
 			c'(Ljava/lang/String;)Ljava/lang/Object;')
 
-		mut jv_args := []JavaValue{}
-		jv_args << JavaValue{
+		mut jv_args := []jni.JavaValue{}
+		jv_args << jni.JavaValue{
 			l: input_method_service
 		}
 		input_method_manager := jni.call_object_method_a(env, activity.clazz, method_get_system_service,
@@ -69,10 +69,10 @@ pub fn visibility(soft_visibility SoftKeyboardVisibility) bool {
 			method_show_soft_input := C.GetMethodID(env, class_input_method_manager, c'showSoftInput',
 				c'(Landroid/view/View;I)Z')
 
-			jv_args << JavaValue{
+			jv_args << jni.JavaValue{
 				l: decor_view
 			}
-			jv_args << JavaValue{
+			jv_args << jni.JavaValue{
 				i: jni.jint(0)
 			}
 			return jni.call_boolean_method_a(env, input_method_manager, method_show_soft_input,
@@ -89,10 +89,10 @@ pub fn visibility(soft_visibility SoftKeyboardVisibility) bool {
 			method_hide_soft_input := C.GetMethodID(env, class_input_method_manager, c'hideSoftInputFromWindow',
 				c'(Landroid/os/IBinder;I)Z')
 
-			jv_args << JavaValue{
+			jv_args << jni.JavaValue{
 				l: binder
 			}
-			jv_args << JavaValue{
+			jv_args << jni.JavaValue{
 				i: jni.jint(0)
 			}
 			return jni.call_boolean_method_a(env, input_method_manager, method_hide_soft_input,

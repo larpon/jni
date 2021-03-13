@@ -12,7 +12,7 @@ type JavaClass = C.jclass
 type JavaMethodID = C.jmethodID
 type JavaFieldID = C.jfieldID
 type JavaThrowable = C.jthrowable
-type JavaValue = C.jvalue
+pub type JavaValue = C.jvalue
 
 // jni.h
 [typedef]
