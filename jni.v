@@ -244,35 +244,8 @@ pub fn get_class_name(env &Env, jclazz JavaClass) string {
 	return get_object_class_name(env, o)
 }
 
-pub fn raw_get_static_method_id(env &Env, clazz JavaClass, fn_name string, sig string) ?JavaMethodID {
-	mid := C.GetStaticMethodID(env, clazz, fn_name.str, sig.str)
-	if exception_check(env) {
-		exception_describe(env)
-		if !isnil(mid) {
-			o := C.MethodIDToObject(mid)
-			delete_local_ref(env, o)
-		}
-		clsn := get_class_name(env, clazz)
-		excp := 'An exception occured. ' + @FN +
-			': JNIEnv (${ptr_str(env)} couldn\'t find method "$fn_name" with signature "$sig" on class "$clsn")'
-		$if debug {
-			println(excp)
-		}
-		panic(excp)
-	}
-	return mid
-}
-
-pub fn get_static_method_id(env &Env, clazz JavaClass, signature string) ?JavaMethodID {
-	fn_name := signature.all_before('(')
-	fn_sig := '(' + signature.all_after('(')
-	mid := raw_get_static_method_id(env, clazz, fn_name, fn_sig) ?
-	return mid
-}
-
 pub fn get_class_static_method_id(env &Env, fqn_sig string) ?(JavaClass, JavaMethodID) {
-	clazz := fqn_sig.all_before_last('.')
-	fn_sig := fqn_sig.all_after_last('.')
+	clazz, fn_name, fn_sig := v2j_signature(fqn_sig)
 	mut jclazz := JavaClass{}
 	// Find the Java class
 	$if android {
@@ -280,7 +253,7 @@ pub fn get_class_static_method_id(env &Env, fqn_sig string) ?(JavaClass, JavaMet
 	} $else {
 		jclazz = find_class(env, clazz)
 	}
-	mid := get_static_method_id(env, jclazz, fn_sig) or { panic(@FN + ' ' + err.msg) }
+	mid := get_static_method_id(env, jclazz, fn_name, fn_sig)
 	return jclazz, mid
 }
 

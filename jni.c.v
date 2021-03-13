@@ -553,6 +553,23 @@ fn C.SetFloatField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID, val C.jfloa
 fn C.SetDoubleField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID, val C.jdouble)
 
 fn C.GetStaticMethodID(env &C.JNIEnv, clazz C.jclass, name charptr, sig charptr) C.jmethodID
+pub fn get_static_method_id(env &Env, clazz JavaClass, name string, sig string) JavaMethodID {
+	$if debug {
+		mid := C.GetStaticMethodID(env, clazz, name.str, sig.str)
+		if exception_check(env) {
+			exception_describe(env)
+			if !isnil(mid) {
+				o := C.MethodIDToObject(mid)
+				delete_local_ref(env, o)
+			}
+			//clsn := get_class_name(env, clazz)
+			panic(@MOD + '.' + @FN + ': an exception occured in jni.Env (${ptr_str(env)} couldn\'t find method "$name" with signature "$sig" on class "$clazz")')
+		}
+		return mid
+	}
+	return C.GetStaticMethodID(env, clazz, name.str, sig.str)
+}
+
 
 // fn C.CallStaticObjectMethod(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, ...) C.jobject
 // fn C.CallStaticObjectMethodV(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jobject
