@@ -96,7 +96,20 @@ pub fn define_class(env &Env, name string, loader JavaObject, buf byteptr, len i
 
 fn C.FindClass(env &C.JNIEnv, name charptr) C.jclass
 pub fn find_class(env &Env, name string) JavaClass {
-	return C.FindClass(env, name.str)
+	n := name.replace('.', '/')
+	$if debug {
+		cls := C.FindClass(env, n.str)
+		if exception_check(env) {
+			exception_describe(env)
+			if !isnil(cls) {
+				o := C.ClassToObject(cls)
+				delete_local_ref(env, o)
+			}
+			panic(@MOD + '.' + @FN + ': an exception occured in the Java VM while trying to find class "$n" in jni.Env(${ptr_str(env)})')
+		}
+		return cls
+	}
+	return C.FindClass(env, n.str)
 }
 
 fn C.FromReflectedMethod(env &C.JNIEnv, method C.jobject) C.jmethodID
@@ -219,6 +232,17 @@ pub fn new_object_a(env &Env, clazz JavaClass, methodID JavaMethodID, args &Java
 
 fn C.GetObjectClass(env &C.JNIEnv, obj C.jobject) C.jclass
 pub fn get_object_class(env &Env, obj JavaObject) JavaClass {
+	$if debug {
+		clazz := C.GetObjectClass(env, obj)
+		if exception_check(env) {
+			exception_describe(env)
+			if !isnil(obj) {
+				delete_local_ref(env, obj)
+			}
+			panic(@MOD + '.' + @FN + ': an exception occured in the Java VM while trying to find class of object "$obj" in jni.Env (${ptr_str(env)})')
+		}
+		return clazz
+	}
 	return C.GetObjectClass(env, obj)
 }
 
@@ -229,6 +253,18 @@ pub fn is_instance_of(env &Env, obj JavaObject, clazz JavaClass) bool {
 
 fn C.GetMethodID(env &C.JNIEnv, clazz C.jclass, name charptr, sig charptr) C.jmethodID
 pub fn get_method_id(env &Env, clazz JavaClass, name string, sig string) JavaMethodID {
+	$if debug {
+		mid := C.GetMethodID(env, clazz, name.str, sig.str)
+		if exception_check(env) {
+			exception_describe(env)
+			if !isnil(mid) {
+				o := C.MethodIDToObject(mid)
+				delete_local_ref(env, o)
+			}
+			panic(@MOD + '.' + @FN + ': an exception occured in the JavaVM while trying to find method "$name'+'($sig)" on class "$clazz" in jni.Env (${ptr_str(env)})')
+		}
+		return mid
+	}
 	return C.GetMethodID(env, clazz, name.str, sig.str)
 }
 

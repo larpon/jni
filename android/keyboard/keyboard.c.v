@@ -24,9 +24,7 @@ pub fn visibility(soft_visibility SoftKeyboardVisibility) bool {
 		activity_class := jni.get_object_class(env, activity.clazz)
 
 		// Retrieve Context.INPUT_METHOD_SERVICE
-		class_context := jni.checked_find_class(env, 'android.content.Context') or {
-			panic(@MOD + '.' + @FN + ': ' + err.msg)
-		}
+		class_context := jni.find_class(env, 'android.content.Context')
 		fld_input_method_service := jni.get_static_field_id(env, class_context, 'INPUT_METHOD_SERVICE',
 			'Ljava/lang/String;')
 
@@ -35,9 +33,7 @@ pub fn visibility(soft_visibility SoftKeyboardVisibility) bool {
 
 		// Runs getSystemService(Context.INPUT_METHOD_SERVICE)
 
-		class_input_method_manager := jni.checked_find_class(env, 'android.view.inputmethod.InputMethodManager') or {
-			panic(@MOD + '.' + @FN + ': ' + err.msg)
-		}
+		class_input_method_manager := jni.find_class(env, 'android.view.inputmethod.InputMethodManager')
 
 		method_get_system_service := C.GetMethodID(env, activity_class, c'getSystemService',
 			c'(Ljava/lang/String;)Ljava/lang/Object;')
@@ -56,9 +52,7 @@ pub fn visibility(soft_visibility SoftKeyboardVisibility) bool {
 		method_get_window := C.GetMethodID(env, activity_class, c'getWindow', c'()Landroid/view/Window;')
 		window := jni.call_object_method_a(env, activity.clazz, method_get_window, jv_args.data)
 
-		class_window := jni.checked_find_class(env, 'android.view.Window') or {
-			panic(@MOD + '.' + @FN + ': ' + err.msg)
-		}
+		class_window := jni.find_class(env, 'android.view.Window')
 
 		method_get_decor_view := C.GetMethodID(env, class_window, c'getDecorView', c'()Landroid/view/View;')
 
@@ -79,7 +73,7 @@ pub fn visibility(soft_visibility SoftKeyboardVisibility) bool {
 				jv_args.data)
 		} else {
 			// Runs lWindow.getViewToken()
-			class_view := jni.checked_find_class(env, 'android.view.View') or { panic(err) }
+			class_view := jni.find_class(env, 'android.view.View')
 			method_get_window_token := C.GetMethodID(env, class_view, c'getWindowToken',
 				c'()Landroid/os/IBinder;')
 			binder := jni.call_object_method_a(env, decor_view, method_get_window_token,

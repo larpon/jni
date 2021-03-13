@@ -108,6 +108,15 @@ fn v2j_value(vt Type) C.jvalue {
 }
 
 [inline]
+pub fn v2j_signature(fqn_signature string) (string, string, string) {
+	clazz := fqn_signature.all_before_last('.')
+	fn_sig := fqn_signature.all_after_last('.')
+	f_name := fn_sig.all_before('(')
+	f_sig := '(' + fn_sig.all_after('(')
+	return clazz, f_name, f_sig
+}
+
+[inline]
 pub fn j2v_string(env &Env, jstr C.jstring) string {
 	mut cn := ''
 	unsafe {
