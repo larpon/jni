@@ -112,6 +112,12 @@ pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 				val: int(C.CallStaticIntMethodA(env, class, mid, jv_args.data))
 			}
 		}
+		'i64' {
+			CallResult{
+				call: signature
+				val: i64(C.CallStaticLongMethodA(env, class, mid, jv_args.data))
+			}
+		}
 		'string' {
 			jstr := C.ObjectToString(C.CallStaticObjectMethodA(env, class, mid, jv_args.data))
 			CallResult{
@@ -186,6 +192,12 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 			CallResult{
 				call: signature
 				val: call_int_method_a(env, obj, mid, jv_args.data)
+			}
+		}
+		'i64' {
+			CallResult{
+				call: signature
+				val: call_long_method_a(env, obj, mid, jv_args.data)
 			}
 		}
 		'string' {

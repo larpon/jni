@@ -98,7 +98,12 @@ fn C.FindClass(env &C.JNIEnv, name charptr) C.jclass
 pub fn find_class(env &Env, name string) JavaClass {
 	n := name.replace('.', '/')
 	$if debug {
-		cls := C.FindClass(env, n.str)
+		mut cls := C.jclass{}
+		$if android {
+			cls = C.jniFindClass(n.str)
+		} $else {
+			cls = C.FindClass(env, n.str)
+		}
 		if exception_check(env) {
 			exception_describe(env)
 			if !isnil(cls) {
@@ -108,6 +113,9 @@ pub fn find_class(env &Env, name string) JavaClass {
 			panic(@MOD + '.' + @FN + ': an exception occured in the Java VM while trying to find class "$n" in jni.Env(${ptr_str(env)})')
 		}
 		return cls
+	}
+	$if android {
+		return C.jniFindClass(n.str)
 	}
 	return C.FindClass(env, n.str)
 }
