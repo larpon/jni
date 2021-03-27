@@ -27,7 +27,8 @@ fn jni_on_load(vm &jni.JavaVM, reserved voidptr) int {
 	return C.JNI_VERSION_1_6
 }
 
-// This method is called in Java to notify you that:
+// on_soft_keyboard_input is exported to the Java activity "VKeyboardActivity".
+// The method is called in Java to notify you that:
 // within `jstr`, the `count` characters beginning at `start` have just replaced old text that had `length` before.
 [export: 'JNICALL Java_io_v_android_ex_VKeyboardActivity_onSoftKeyboardInput']
 fn on_soft_keyboard_input(env &jni.Env, thiz jni.JavaObject, app_ptr i64, jstr jni.JavaString, start int, before int, count int) {
@@ -84,8 +85,6 @@ mut:
 
 	keyboard_visible bool
 
-	//mtx &sync.Mutex
-
 	buffer string
 	parsed_char string
 
@@ -141,7 +140,7 @@ fn draw_triangle() {
 }
 
 fn init(mut app App) {
-	// Pass app reference off to Java to we
+	// Pass app reference off to Java so we
 	// can get it back in the V callback (on_soft_keyboard_input)
 	app_ref := i64(voidptr(app))
 	auto.call_static_method(pkg+'.setVAppPointer(long) void',app_ref)
