@@ -95,7 +95,7 @@ fn v2j_value(vt Type) C.jvalue {
 		}
 		i64 {
 			C.jvalue{
-				i: jlong(vt)
+				j: jlong(vt)
 			}
 		}
 		string { // TODO

@@ -18,6 +18,7 @@
 		>
 
 		<activity android:name="io.v.android.ex.VKeyboardActivity"
+			android:windowSoftInputMode="stateHidden"
 			android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
 			android:launchMode="singleTask"
 			>

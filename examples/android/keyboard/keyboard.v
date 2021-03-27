@@ -6,7 +6,8 @@ import sokol.sapp
 import sokol.gfx
 import sokol.sgl
 import jni
-import jni.android.keyboard
+import jni.auto
+//import jni.android.keyboard
 
 const (
 	pkg      = 'io.v.android.ex.VKeyboardActivity'
@@ -26,6 +27,50 @@ fn jni_on_load(vm &jni.JavaVM, reserved voidptr) int {
 	return C.JNI_VERSION_1_6
 }
 
+// This method is called in Java to notify you that:
+// within `jstr`, the `count` characters beginning at `start` have just replaced old text that had `length` before.
+[export: 'JNICALL Java_io_v_android_ex_VKeyboardActivity_onSoftKeyboardInput']
+fn on_soft_keyboard_input(env &jni.Env, thiz jni.JavaObject, app_ptr i64, jstr jni.JavaString, start int, before int, count int) {
+	if app_ptr == 0 { return }
+
+	mut app := &App(app_ptr)
+
+	buffer := jni.j2v_string(env, jstr)
+	println(@MOD + '.' + @FN + ': "$buffer" ($start,$before,$count)')
+
+	mut char_code := byte(0)
+	mut char_literal := ''
+
+	mut pos := start + before
+	if pos < 0 {
+		println(@MOD + '.' + @FN + ': $pos is negative')
+	} else if pos > buffer.len {
+		// Backspace
+		println(@MOD + '.' + @FN + ': $start > $buffer.len')
+
+	} else {
+		char_code = byte(buffer[pos])
+		char_literal = char_code.ascii_str()
+	}
+
+	println(@MOD + '.' + @FN + ': input "$char_literal"')
+
+	app.buffer = buffer
+	app.parsed_char = char_literal
+
+	// TODO sort out this
+	/*
+	mut e := gg.Event{
+		typ: sapp.EventType.key_down
+		key_code: gg.KeyCode(char_code)
+		char_code: u32(char_code)
+		//char_literal
+	}
+
+	event(&e, mut app)
+	*/
+}
+
 struct App {
 mut:
 	gg &gg.Context
@@ -38,35 +83,48 @@ mut:
 	ticks i64
 
 	keyboard_visible bool
+
+	//mtx &sync.Mutex
+
+	buffer string
+	parsed_char string
+
 }
 
 fn (mut a App) show_keyboard() {
 	println(@FN)
 	$if android {
-		if keyboard.visibility(.visible) {
+		auto.call_static_method(pkg+'.showSoftKeyboard()')
+		a.keyboard_visible = true
+		/*if keyboard.visibility(.visible) {
 			a.keyboard_visible = true
-		}
+		}*/
 	}
 }
 
 fn (mut a App) hide_keyboard() {
 	println(@FN)
 	$if android {
-		if keyboard.visibility(.hidden) {
+		auto.call_static_method(pkg+'.hideSoftKeyboard()')
+		a.keyboard_visible = false
+		/*if keyboard.visibility(.hidden) {
 			a.keyboard_visible = false
-		}
+		}*/
 	}
 }
 
 fn frame(mut app App) {
 	ws := gg.window_size()
+	rws := gg.window_size_real_pixels()
 
-	min := if ws.width < ws.height { f32(ws.width) } else { f32(ws.height) }
+	min := if rws.width < rws.height { f32(rws.width) } else { f32(rws.height) }
 
 	app.gg.begin()
-	sgl.defaults()
 
-	sgl.viewport(int((f32(ws.width) * 0.5) - (min * 0.5)), int((f32(ws.height) * 0.5) - (min * 0.5)),
+	app.gg.draw_text_def(int(f32(ws.width)*0.1),int(f32(ws.height)*0.2), 'Java buffer: "$app.buffer"')
+	app.gg.draw_text_def(int(f32(ws.width)*0.1),int(f32(ws.height)*0.25), 'Last char parsed in V: "$app.parsed_char"')
+
+	sgl.viewport(int((f32(rws.width) * 0.5) - (min * 0.5)), int((f32(rws.height) * 0.5) - (min * 0.5)),
 		int(min), int(min), true)
 	draw_triangle()
 
@@ -83,12 +141,10 @@ fn draw_triangle() {
 }
 
 fn init(mut app App) {
-	desc := sapp.create_desc()
-	gfx.setup(&desc)
-	sgl_desc := C.sgl_desc_t{
-		max_vertices: 50 * 65536
-	}
-	sgl.setup(&sgl_desc)
+	// Pass app reference off to Java to we
+	// can get it back in the V callback (on_soft_keyboard_input)
+	app_ref := i64(voidptr(app))
+	auto.call_static_method(pkg+'.setVAppPointer(long) void',app_ref)
 }
 
 fn cleanup(mut app App) {
@@ -100,9 +156,12 @@ fn event(ev &gg.Event, mut app App) {
 		app.mouse_x = int(ev.mouse_x)
 		app.mouse_y = int(ev.mouse_y)
 	}
-	if ev.typ == .key_down {
-		println('Key down: $ev.key_code')
+	$if debug ? {
+		if ev.typ == .char ||ev.typ == .key_down || ev.typ == .key_up {
+			println('$ev.typ : $ev.char_code, $ev.key_code')
+		}
 	}
+
 	if ev.typ == .touches_began || ev.typ == .touches_moved {
 		if ev.num_touches > 0 {
 			touch_point := ev.touches[0]
@@ -119,12 +178,10 @@ fn event(ev &gg.Event, mut app App) {
 			}
 		}
 	}
-
-	// println('$app.mouse_x,$app.mouse_y')
 }
 
 fn main() {
-	// App init
+
 	mut app := &App{
 		gg: 0
 	}
@@ -132,7 +189,7 @@ fn main() {
 	app.gg = gg.new_context(
 		width: 200
 		height: 400
-		use_ortho: true // This is needed for 2D drawing
+		use_ortho: true
 		create_window: true
 		window_title: 'Keyboard Demo'
 		user_data: app
@@ -141,6 +198,7 @@ fn main() {
 		init_fn: init
 		cleanup_fn: cleanup
 		event_fn: event
+		font_path: gg.system_font_path()
 	)
 
 	app.gg.run()

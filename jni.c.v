@@ -56,6 +56,10 @@ union C.jvalue {
 
 // helpers.h
 // fn C.vc_cast(from voidptr, to voidptr) voidptr
+
+fn C.VoidToLong(vp voidptr) i64
+fn C.LongToVoid(l i64) voidptr
+
 fn C.StringToObject(str C.jstring) C.jobject
 
 fn C.ObjectToString(obj C.jobject) C.jstring
