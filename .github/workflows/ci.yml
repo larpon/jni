@@ -1,0 +1,45 @@
+name: Code CI
+
+on:
+  push:
+    paths-ignore:
+      - "**.md"
+  pull_request:
+    paths-ignore:
+      - "**.md"
+
+jobs:
+  ubuntu-18_04-apk:
+    runs-on: ubuntu-18.04
+    timeout-minutes: 30
+    steps:
+
+    - name: Checkout V
+      uses: actions/checkout@v2
+      with:
+        repository: vlang/v
+
+    - name: Build local v
+      run: make -j4
+
+    - name: Run tests
+      run: ./v test jni
+
+    - name: Checkout V jni
+      uses: actions/checkout@v2
+      with:
+        repository: Larpon/jni
+        path: $HOME/.vmodules/jni
+
+    - name: Install and run V jni examples
+      run: |
+        git clone --depth 1 https://github.com/Larpon/jni
+        cd jni
+        mkdir -p $HOME/.vmodules
+        ln -s $(pwd) $HOME/.vmodules/jni
+        cd ..
+        export VEXE="$(pwd)/v"
+        export JAVA_HOME=$JAVA_HOME_8_X64
+        cd $HOME/.vmodules/jni/examples/desktop/v_as_library
+        LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)
+        $VEXE -cc gcc -cg  -shared libvlang.v && javac io/vlang/V.java && java io.vlang.V
