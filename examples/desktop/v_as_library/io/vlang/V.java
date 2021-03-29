@@ -1,5 +1,7 @@
 package io.vlang;
 
+import java.lang.StackWalker;
+
 public class V
 {
 	int m_int_test;
