@@ -105,11 +105,14 @@ union C.jvalue {
 // TODO this currently work: &JavaString(voidptr(&jobj))
 //fn C.ObjectToString(obj C.jobject) C.jstring
 
-fn C.ObjectToClass(obj C.jobject) C.jclass
+// TODO this currently work: &JavaClass(voidptr(&jobj))
+//fn C.ObjectToClass(obj C.jobject) C.jclass
 
-fn C.ClassToObject(cls C.jclass) C.jobject
+// TODO this currently work: &JavaObject(voidptr(&jcls))
+//fn C.ClassToObject(cls C.jclass) C.jobject
 
-fn C.MethodIDToObject(cls C.jmethodID) C.jobject
+// TODO this currently work: o := &JavaObject(voidptr(&mid)) //o := C.MethodIDToObject(mid)
+//fn C.MethodIDToObject(cls C.jmethodID) C.jobject
 
 fn C.jniGetEnv() &C.JNIEnv
 
@@ -147,7 +150,8 @@ pub fn find_class(env &Env, name string) JavaClass {
 		if exception_check(env) {
 			exception_describe(env)
 			if !isnil(cls) {
-				o := C.ClassToObject(cls)
+				o := &JavaObject(voidptr(&cls)) //o := C.ClassToObject(cls)
+				//o := C.ClassToObject(cls)
 				delete_local_ref(env, o)
 			}
 			panic(@MOD + '.' + @FN + ': an exception occured in the Java VM while trying to find class "$n" in jni.Env(${ptr_str(env)})')
@@ -306,7 +310,7 @@ pub fn get_method_id(env &Env, clazz JavaClass, name string, sig string) JavaMet
 		if exception_check(env) {
 			exception_describe(env)
 			if !isnil(mid) {
-				o := C.MethodIDToObject(mid)
+				o := &JavaObject(voidptr(&mid)) //o := C.MethodIDToObject(mid)
 				delete_local_ref(env, o)
 			}
 			panic(@MOD + '.' + @FN + ': an exception occured in the JavaVM while trying to find method "$name'+'($sig)" on class "$clazz" in jni.Env (${ptr_str(env)})')
@@ -666,7 +670,7 @@ pub fn get_static_method_id(env &Env, clazz JavaClass, name string, sig string) 
 		if exception_check(env) {
 			exception_describe(env)
 			if !isnil(mid) {
-				o := C.MethodIDToObject(mid)
+				o := &JavaObject(voidptr(&mid)) //o := C.MethodIDToObject(mid)
 				delete_local_ref(env, o)
 			}
 			//clsn := get_class_name(env, clazz)

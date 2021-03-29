@@ -275,7 +275,7 @@ pub fn get_object_class_name(env &Env, obj JavaObject) string {
 }
 
 pub fn get_class_name(env &Env, jclazz JavaClass) string {
-	o := C.ClassToObject(jclazz)
+	o := &JavaObject(voidptr(&jclazz)) //o := C.ClassToObject(jclazz)
 	return get_object_class_name(env, o)
 }
 

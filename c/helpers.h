@@ -179,14 +179,14 @@ jclass jniFindClass(const char *name) {
 //    return (jstring)obj;
 //}
 
-jclass ObjectToClass(jobject obj) {
-    return (jclass)obj;
-}
+//jclass ObjectToClass(jobject obj) {
+//    return (jclass)obj;
+//}
 
-jobject ClassToObject(jclass cls) {
-    return (jobject)cls;
-}
+//jobject ClassToObject(jclass cls) {
+//    return (jobject)cls;
+//}
 
-jobject MethodIDToObject(jmethodID meth) {
-	return (jobject)meth;
-}
+//jobject MethodIDToObject(jmethodID meth) {
+//	return (jobject)meth;
+//}
