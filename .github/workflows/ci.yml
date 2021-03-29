@@ -41,5 +41,7 @@ jobs:
         export VEXE="$(pwd)/v"
         export JAVA_HOME=$JAVA_HOME_11_X64
         cd $HOME/.vmodules/jni/examples/desktop/v_as_library
-        LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(pwd)
-        $VEXE -cc gcc -cg  -shared libvlang.v && javac io/vlang/V.java && java io.vlang.V
+        LD_LIBRARY_PATH=$(pwd):.
+        $VEXE -cc gcc -cg  -shared libvlang.v
+        javac io/vlang/V.java
+        java io.vlang.V
