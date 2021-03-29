@@ -12,6 +12,7 @@ public class V
 	*/
 	static {
 		System.loadLibrary("vlang");
+		//System.out.println(System.getProperty("java.library.path"));
 	}
 
 	public static void main(String[] args) {
