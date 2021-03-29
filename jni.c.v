@@ -79,11 +79,6 @@ fn C.jniFindClass(name charptr) C.jclass
 
 fn C.jniSetupAndroid(name charptr)
 
-// TODO
-pub fn get_static_field_id(env &Env, clazz JavaClass, name string, signature string) JavaFieldID {
-	return C.GetStaticFieldID(env, clazz, name.str, signature.str)
-}
-
 // jni.h / jni_wrapper.h
 
 fn C.GetVersion(env &C.JNIEnv) C.jint
@@ -774,25 +769,84 @@ pub fn call_static_void_method_a(env &Env, cls JavaClass, method_id JavaMethodID
 
 //
 fn C.GetStaticFieldID(env &C.JNIEnv, clazz C.jclass, name charptr, sig charptr) C.jfieldID
+pub fn get_static_field_id(env &Env, clazz JavaClass, name string, sig string) JavaFieldID {
+	return C.GetStaticFieldID(env, clazz, name.str, sig.str)
+}
 fn C.GetStaticObjectField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID) C.jobject
+pub fn get_static_object_field(env &Env, clazz JavaClass, field_id JavaFieldID) JavaObject {
+	return C.GetStaticObjectField(env, clazz, field_id)
+}
 fn C.GetStaticBooleanField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID) C.jboolean
+pub fn get_static_boolean_field(env &Env, clazz JavaClass, field_id JavaFieldID) bool {
+	return j2v_boolean(C.GetStaticBooleanField(env, clazz, field_id))
+}
 fn C.GetStaticByteField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID) C.jbyte
+pub fn get_static_byte_field(env &Env, clazz JavaClass, field_id JavaFieldID) byte {
+	return j2v_byte(C.GetStaticByteField(env, clazz, field_id))
+}
 fn C.GetStaticCharField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID) C.jchar
+pub fn get_static_char_field(env &Env, clazz JavaClass, field_id JavaFieldID) rune {
+	return j2v_char(C.GetStaticCharField(env, clazz, field_id))
+}
 fn C.GetStaticShortField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID) C.jshort
+pub fn get_static_short_field(env &Env, clazz JavaClass, field_id JavaFieldID) i16 {
+	return j2v_short(C.GetStaticShortField(env, clazz, field_id))
+}
 fn C.GetStaticIntField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID) C.jint
+pub fn get_static_int_field(env &Env, clazz JavaClass, field_id JavaFieldID) int {
+	return j2v_int(C.GetStaticIntField(env, clazz, field_id))
+}
 fn C.GetStaticLongField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID) C.jlong
+pub fn get_static_long_field(env &Env, clazz JavaClass, field_id JavaFieldID) i64 {
+	return j2v_long(C.GetStaticLongField(env, clazz, field_id))
+}
 fn C.GetStaticFloatField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID) C.jfloat
+pub fn get_static_float_field(env &Env, clazz JavaClass, field_id JavaFieldID) f32 {
+	return j2v_float(C.GetStaticFloatField(env, clazz, field_id))
+}
 fn C.GetStaticDoubleField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID) C.jdouble
+pub fn get_static_double_field(env &Env, clazz JavaClass, field_id JavaFieldID) f64 {
+	return j2v_double(C.GetStaticDoubleField(env, clazz, field_id))
+}
 
+//
 fn C.SetStaticObjectField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID, value C.jobject)
+pub fn set_static_object_field(env &Env, clazz JavaClass, field_id JavaFieldID, value JavaObject) {
+	C.SetStaticObjectField(env, clazz, field_id, value)
+}
 fn C.SetStaticBooleanField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID, value C.jboolean)
+pub fn set_static_boolean_field(env &Env, clazz JavaClass, field_id JavaFieldID, value bool) {
+	C.SetStaticBooleanField(env, clazz, field_id, jboolean(value))
+}
 fn C.SetStaticByteField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID, value C.jbyte)
+pub fn set_static_byte_field(env &Env, clazz JavaClass, field_id JavaFieldID, value byte) {
+	C.SetStaticByteField(env, clazz, field_id, jbyte(value))
+}
 fn C.SetStaticCharField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID, value C.jchar)
+pub fn set_static_char_field(env &Env, clazz JavaClass, field_id JavaFieldID, value rune) {
+	C.SetStaticCharField(env, clazz, field_id, jchar(value))
+}
 fn C.SetStaticShortField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID, value C.jshort)
+pub fn set_static_short_field(env &Env, clazz JavaClass, field_id JavaFieldID, value i16) {
+	C.SetStaticShortField(env, clazz, field_id, jshort(value))
+}
 fn C.SetStaticIntField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID, value C.jint)
+pub fn set_static_int_field(env &Env, clazz JavaClass, field_id JavaFieldID, value int) {
+	C.SetStaticIntField(env, clazz, field_id, jint(value))
+}
 fn C.SetStaticLongField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID, value C.jlong)
+pub fn set_static_long_field(env &Env, clazz JavaClass, field_id JavaFieldID, value i64) {
+	C.SetStaticLongField(env, clazz, field_id, jlong(value))
+}
 fn C.SetStaticFloatField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID, value C.jfloat)
+pub fn set_static_float_field(env &Env, clazz JavaClass, field_id JavaFieldID, value f32) {
+	C.SetStaticFloatField(env, clazz, field_id, jfloat(value))
+}
 fn C.SetStaticDoubleField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID, value C.jdouble)
+pub fn set_static_double_field(env &Env, clazz JavaClass, field_id JavaFieldID, value f64) {
+	C.SetStaticDoubleField(env, clazz, field_id, jdouble(value))
+}
+
 
 fn C.NewString(env &C.JNIEnv, unicode &C.jchar, len C.jsize) C.jstring
 fn C.GetStringLength(env &C.JNIEnv, str C.jstring) C.jsize
