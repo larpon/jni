@@ -154,6 +154,12 @@ pub fn j2v_int(jint C.jint) int {
 	return int(jint)
 }
 
+
+[inline]
+pub fn j2v_size(jsize C.jsize) int {
+	return int(jsize)
+}
+
 [inline]
 pub fn j2v_short(jshort C.jshort) i16 {
 	return i16(jshort)
@@ -200,6 +206,11 @@ pub fn jdouble(val f64) C.jdouble {
 [inline]
 pub fn jint(val int) C.jint {
 	return C.jint(val)
+}
+
+[inline]
+pub fn jsize(val int) C.jsize {
+	return C.jsize(val)
 }
 
 [inline]

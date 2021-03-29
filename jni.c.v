@@ -9,9 +9,23 @@ type Env = C.JNIEnv
 type JavaObject = C.jobject
 type JavaString = C.jstring
 type JavaClass = C.jclass
+//type JavaSize = C.jsize
 type JavaMethodID = C.jmethodID
 type JavaFieldID = C.jfieldID
 type JavaThrowable = C.jthrowable
+
+//
+type JavaArray = C.jarray
+type JavaByteArray = C.jbyteArray
+type JavaCharArray = C.jcharArray
+type JavaShortArray = C.jshortArray
+type JavaIntArray = C.jintArray
+type JavaLongArray = C.jlongArray
+type JavaFloatArray = C.jfloatArray
+type JavaDoubleArray = C.jdoubleArray
+type JavaObjectArray = C.jobjectArray
+
+
 pub type JavaValue = C.jvalue
 
 // jni.h
@@ -39,6 +53,34 @@ struct C.jfieldID {}
 [typedef]
 struct C.jthrowable {}
 
+// Arrays
+[typedef]
+struct C.jarray {}
+
+[typedef]
+struct C.jbyteArray {}
+
+[typedef]
+struct C.jcharArray {}
+
+[typedef]
+struct C.jshortArray {}
+
+[typedef]
+struct C.jintArray {}
+
+[typedef]
+struct C.jlongArray {}
+
+[typedef]
+struct C.jfloatArray {}
+
+[typedef]
+struct C.jdoubleArray {}
+
+[typedef]
+struct C.jobjectArray {}
+
 [typedef]
 union C.jvalue {
 	z C.jboolean
@@ -56,9 +98,6 @@ union C.jvalue {
 
 // helpers.h
 // fn C.vc_cast(from voidptr, to voidptr) voidptr
-
-fn C.VoidToLong(vp voidptr) i64
-fn C.LongToVoid(l i64) voidptr
 
 fn C.StringToObject(str C.jstring) C.jobject
 
@@ -86,11 +125,11 @@ pub fn get_version(env &Env) int {
 	return int(C.GetVersion(env))
 }
 
-fn C.DefineClass(env &C.JNIEnv, name charptr, loader C.jobject, buf &C.jbyte, len int) C.jclass
+fn C.DefineClass(env &C.JNIEnv, name charptr, loader C.jobject, buf &C.jbyte, bufLen C.jsize) C.jclass
 
 // NOTE: unsure about `buf` (C.jbyte -> signed char) and `len` (C.jsize -> C.jint) types.
 pub fn define_class(env &Env, name string, loader JavaObject, buf byteptr, len int) JavaClass {
-	return C.DefineClass(env, name.str, loader, buf, len)
+	return C.DefineClass(env, name.str, loader, buf, jsize(len))
 }
 
 fn C.FindClass(env &C.JNIEnv, name charptr) C.jclass
@@ -847,23 +886,70 @@ pub fn set_static_double_field(env &Env, clazz JavaClass, field_id JavaFieldID, 
 	C.SetStaticDoubleField(env, clazz, field_id, jdouble(value))
 }
 
-
+//
 fn C.NewString(env &C.JNIEnv, unicode &C.jchar, len C.jsize) C.jstring
+pub fn new_string(env &Env, unicode string /*, len int*/) JavaString {
+	// TODO
+	//mut uc := []rune{}
+	return C.NewString(env, unicode.str, jsize(unicode.len))
+}
 fn C.GetStringLength(env &C.JNIEnv, str C.jstring) C.jsize
+pub fn get_string_length(env &Env, str JavaString) int {
+	return j2v_size(C.GetStringLength(env, str))
+}
 fn C.GetStringChars(env &C.JNIEnv, str C.jstring, isCopy &C.jboolean) &C.jchar
+pub fn get_string_chars(env &Env, str JavaString) ([]rune, bool) {
+	// TODO
+	return []rune{}, false
+	//return C.GetStringChars(env, str, &is_copy)
+}
 fn C.ReleaseStringChars(env &C.JNIEnv, str C.jstring, chars &C.jchar)
+pub fn release_string_chars(env &Env, str JavaString, chars []rune) {
+	// TODO
+	C.ReleaseStringChars(env, str, chars.data)
+}
 
 fn C.NewStringUTF(env &C.JNIEnv, utf charptr) C.jstring
+pub fn new_string_utf(env &Env, utf string) JavaString {
+	return C.NewStringUTF(env, utf.str)
+}
 fn C.GetStringUTFLength(env &C.JNIEnv, str C.jstring) C.jsize
+pub fn get_string_utf_length(env &Env, str JavaString) int {
+	return j2v_size(C.GetStringUTFLength(env, str))
+}
 fn C.GetStringUTFChars(env &C.JNIEnv, str C.jstring, isCopy &C.jboolean) charptr
+pub fn get_string_utf_chars(env &Env, str JavaString) (charptr, bool) {
+	// TODO
+	is_cp := false
+	is_copy := jboolean(is_cp)
+	return C.GetStringUTFChars(env, str, &is_copy), j2v_boolean(is_copy)
+}
 fn C.ReleaseStringUTFChars(env &C.JNIEnv, str C.jstring, chars charptr)
+pub fn release_string_utf_chars(env &Env, str JavaString, chars charptr) {
+	C.ReleaseStringUTFChars(env, str, chars)
+}
 
+// Arrays
+//
 fn C.GetArrayLength(env &C.JNIEnv, array C.jarray) C.jsize
+pub fn get_array_length(env &Env, array JavaArray) int {
+	return j2v_size(C.GetArrayLength(env, array))
+}
 
 fn C.NewObjectArray(env &C.JNIEnv, len C.jsize, clazz C.jclass, init C.jobject) C.jobjectArray
+pub fn new_object_array(env &Env, len int, clazz JavaClass, init JavaObject) JavaObjectArray {
+	return C.NewObjectArray(env, jsize(len), clazz, init)
+}
 fn C.GetObjectArrayElement(env &C.JNIEnv, array C.jobjectArray, index C.jsize) C.jobject
+pub fn get_object_array_element(env &Env, array JavaObjectArray, index int) JavaObject {
+	return C.GetObjectArrayElement(env, array, jsize(index))
+}
 fn C.SetObjectArrayElement(env &C.JNIEnv, array C.jobjectArray, index C.jsize, val C.jobject)
+pub fn set_object_array_element(env &Env, array JavaObjectArray, index int, val JavaObject) {
+	C.SetObjectArrayElement(env, array, jsize(index), val)
+}
 
+//
 fn C.NewBooleanArray(env &C.JNIEnv, len C.jsize) C.jbooleanArray
 fn C.NewByteArray(env &C.JNIEnv, len C.jsize) C.jbyteArray
 fn C.NewCharArray(env &C.JNIEnv, len C.jsize) C.jcharArray
