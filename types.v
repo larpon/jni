@@ -183,6 +183,11 @@ pub fn jboolean(val bool) C.jboolean {
 }
 
 [inline]
+pub fn jbyte(val byte) C.jbyte {
+	return C.jbyte(val)
+}
+
+[inline]
 pub fn jfloat(val f32) C.jfloat {
 	return C.jfloat(val)
 }
@@ -198,8 +203,19 @@ pub fn jint(val int) C.jint {
 }
 
 [inline]
+pub fn jshort(val i16) C.jshort {
+	return C.jshort(val)
+}
+
+
+[inline]
 pub fn jlong(val i64) C.jlong {
 	return C.jlong(val)
+}
+
+[inline]
+pub fn jchar(val rune) C.jchar {
+	return C.jchar(val)
 }
 
 [inline]

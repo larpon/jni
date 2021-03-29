@@ -540,30 +540,89 @@ pub fn call_nonvirtual_void_method_a(env &Env, obj JavaObject, clazz JavaClass, 
 	C.CallNonvirtualVoidMethodA(env, obj, clazz, method_id, args)
 }
 
-// NEXT BATCH
-
+//
 fn C.GetFieldID(env &C.JNIEnv, clazz C.jclass, name charptr, sig charptr) C.jfieldID
+pub fn get_field_id(env &Env, clazz JavaClass, name string, sig string) JavaFieldID {
+	return C.GetFieldID(env, clazz, name.str, sig.str)
+}
 
+//
 fn C.GetObjectField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID) C.jobject
+pub fn get_object_field(env &Env, obj JavaObject, field_id JavaFieldID) JavaObject {
+	return C.GetObjectField(env, obj, field_id)
+}
 fn C.GetBooleanField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID) C.jboolean
+pub fn get_boolean_field(env &Env, obj JavaObject, field_id JavaFieldID) bool {
+	return j2v_boolean(C.GetBooleanField(env, obj, field_id))
+}
 fn C.GetByteField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID) C.jbyte
+pub fn get_byte_field(env &Env, obj JavaObject, field_id JavaFieldID) byte {
+	return j2v_byte(C.GetByteField(env, obj, field_id))
+}
 fn C.GetCharField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID) C.jchar
+pub fn get_char_field(env &Env, obj JavaObject, field_id JavaFieldID) rune {
+	return j2v_char(C.GetCharField(env, obj, field_id))
+}
 fn C.GetShortField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID) C.jshort
+pub fn get_short_field(env &Env, obj JavaObject, field_id JavaFieldID) i16 {
+	return j2v_short(C.GetShortField(env, obj, field_id))
+}
 fn C.GetIntField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID) C.jint
+pub fn get_int_field(env &Env, obj JavaObject, field_id JavaFieldID) int {
+	return j2v_int(C.GetIntField(env, obj, field_id))
+}
 fn C.GetLongField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID) C.jlong
+pub fn get_long_field(env &Env, obj JavaObject, field_id JavaFieldID) i64 {
+	return j2v_long(C.GetLongField(env, obj, field_id))
+}
 fn C.GetFloatField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID) C.jfloat
+pub fn get_float_field(env &Env, obj JavaObject, field_id JavaFieldID) f32 {
+	return j2v_float(C.GetFloatField(env, obj, field_id))
+}
 fn C.GetDoubleField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID) C.jdouble
+pub fn get_double_field(env &Env, obj JavaObject, field_id JavaFieldID) f64 {
+	return j2v_double(C.GetDoubleField(env, obj, field_id))
+}
 
+//
 fn C.SetObjectField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID, val C.jobject)
+pub fn set_object_field(env &Env, obj JavaObject, field_id JavaFieldID, val JavaObject) {
+	C.SetObjectField(env, obj, field_id, val)
+}
 fn C.SetBooleanField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID, val C.jboolean)
+pub fn set_boolean_field(env &Env, obj JavaObject, field_id JavaFieldID, val bool) {
+	C.SetBooleanField(env, obj, field_id, jboolean(val))
+}
 fn C.SetByteField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID, val C.jbyte)
+pub fn set_byte_field(env &Env, obj JavaObject, field_id JavaFieldID, val byte) {
+	C.SetByteField(env, obj, field_id, jbyte(val))
+}
 fn C.SetCharField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID, val C.jchar)
+pub fn set_char_field(env &Env, obj JavaObject, field_id JavaFieldID, val rune) {
+	C.SetCharField(env, obj, field_id, jchar(val))
+}
 fn C.SetShortField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID, val C.jshort)
+pub fn set_short_field(env &Env, obj JavaObject, field_id JavaFieldID, val i16) {
+	C.SetShortField(env, obj, field_id, jshort(val))
+}
 fn C.SetIntField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID, val C.jint)
+pub fn set_int_field(env &Env, obj JavaObject, field_id JavaFieldID, val int) {
+	C.SetIntField(env, obj, field_id, jint(val))
+}
 fn C.SetLongField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID, val C.jlong)
+pub fn set_long_field(env &Env, obj JavaObject, field_id JavaFieldID, val i64) {
+	C.SetLongField(env, obj, field_id, jlong(val))
+}
 fn C.SetFloatField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID, val C.jfloat)
+pub fn set_float_field(env &Env, obj JavaObject, field_id JavaFieldID, val f32) {
+	C.SetFloatField(env, obj, field_id, jfloat(val))
+}
 fn C.SetDoubleField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID, val C.jdouble)
+pub fn set_double_field(env &Env, obj JavaObject, field_id JavaFieldID, val f64) {
+	C.SetDoubleField(env, obj, field_id, jdouble(val))
+}
 
+//
 fn C.GetStaticMethodID(env &C.JNIEnv, clazz C.jclass, name charptr, sig charptr) C.jmethodID
 pub fn get_static_method_id(env &Env, clazz JavaClass, name string, sig string) JavaMethodID {
 	$if debug {
@@ -582,7 +641,7 @@ pub fn get_static_method_id(env &Env, clazz JavaClass, name string, sig string) 
 	return C.GetStaticMethodID(env, clazz, name.str, sig.str)
 }
 
-
+//
 // fn C.CallStaticObjectMethod(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, ...) C.jobject
 // fn C.CallStaticObjectMethodV(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jobject
 fn C.CallStaticObjectMethodA(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jobject
