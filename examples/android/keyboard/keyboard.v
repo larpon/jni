@@ -94,6 +94,7 @@ fn (mut a App) show_keyboard() {
 	println(@FN)
 	$if android {
 		auto.call_static_method(pkg+'.showSoftKeyboard()')
+		auto.call_static_method(pkg+'.setSoftKeyboardBuffer(string)','')
 		a.keyboard_visible = true
 		/*if keyboard.visibility(.visible) {
 			a.keyboard_visible = true

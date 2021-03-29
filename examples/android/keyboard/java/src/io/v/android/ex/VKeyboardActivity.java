@@ -4,21 +4,14 @@ import java.lang.CharSequence;
 import java.lang.String;
 
 import android.os.Bundle;
-import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import android.view.ViewGroup.LayoutParams;
-
 import android.view.inputmethod.InputMethodManager;
 import android.content.Context;
-
 import android.text.TextWatcher;
-
 import android.text.Editable;
-
-import android.view.WindowManager;
 
 import android.util.Log; // Log.v(), //Log.d(), //Log.d(), Log.w(), and Log.e()
 
@@ -32,12 +25,12 @@ public class VKeyboardActivity extends io.v.android.VActivity {
 	private long vApp;
 	public VKeyboardActivity() { thiz = this; }
 
-	// This is the "on_soft_keyboard_input" function in V (keyboard.v)
-	public native void onSoftKeyboardInput(long app, String s, int start, int before, int count);
-
 	public static void setVAppPointer(long ptr) {
 		thiz.vApp = ptr;
 	}
+
+	// This is the "on_soft_keyboard_input" function in V (keyboard.v)
+	public native void onSoftKeyboardInput(long app, String s, int start, int before, int count);
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,25 +44,24 @@ public class VKeyboardActivity extends io.v.android.VActivity {
 		setContentView(myLayout);
 	}
 
+	// Example of how to entangle soft input visibility into the Activity life-cycle.
+	// Needs better handling but it illustrate what can be done.
 	@Override
 	protected void onStop(){
 		super.onStop();
 		thiz.hideSoftKeyboard();
-		thiz.getWindow().getDecorView().clearFocus();
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		thiz.hideSoftKeyboard();
-		thiz.getWindow().getDecorView().clearFocus();
 	}
 
 	@Override
 	protected void onPause(){
 		super.onPause();
 		thiz.hideSoftKeyboard();
-		thiz.getWindow().getDecorView().clearFocus();
     }
 
     @Override
@@ -81,15 +73,30 @@ public class VKeyboardActivity extends io.v.android.VActivity {
 		thiz.showSoftKeyboard();
     }
 
+    public static void setSoftKeyboardBuffer(String text) {
+		if(thiz.hiddenEditText == null) {
+			Log.e(TAG,"No keyboard initalized");
+			return;
+		}
+		final EditText editText = thiz.hiddenEditText;
+		editText.setText(text);
+		editText.post(new Runnable() {
+				@Override
+				public void run() {
+					editText.setSelection(editText.getText().length());
+				}
+		});
+	}
+
     public static void showSoftKeyboard() {
 		//Log.d(TAG,"showSoftKeyboard called");
+
+		final EditText editText = new EditText(thiz);
+		thiz.hiddenEditText = editText;
 
 		thiz.runOnUiThread(new Runnable() {
 			public void run() {
 				//Log.d(TAG,"showSoftKeyboard IN UI THREAD called");
-
-				final EditText editText = new EditText(thiz);
-				thiz.hiddenEditText = editText;
 
 				// Pass two args; must be LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, or an integer pixel value.
 				editText.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
@@ -146,6 +153,7 @@ public class VKeyboardActivity extends io.v.android.VActivity {
 				if(thiz.hiddenEditText != null) {
 					thiz.hiddenEditText = null;
 				}
+				thiz.getWindow().getDecorView().clearFocus();
 			}
 		});
 	}
