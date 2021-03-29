@@ -286,7 +286,7 @@ pub fn get_method_id(env &Env, clazz JavaClass, name string, sig string) JavaMet
 //}
 // fn C.CallObjectMethodV(env &C.JNIEnv, obj C.jobject, methodID C.jmethodID, args C.va_list) C.jobject
 // pub fn call_object_method_v(env &Env, obj JavaObject, method_id JavaMethodID, args C.va_list) JavaObject {
-//	return C.CallObjectMethodV(env, obj, method_id, args C.va_list)
+//	return C.CallObjectMethodV(env, obj, method_id, args)
 //}
 fn C.CallObjectMethodA(env &C.JNIEnv, obj C.jobject, methodID C.jmethodID, args &C.jvalue) C.jobject
 pub fn call_object_method_a(env &Env, obj JavaObject, method_id JavaMethodID, args &JavaValue) JavaObject {
@@ -299,7 +299,7 @@ pub fn call_object_method_a(env &Env, obj JavaObject, method_id JavaMethodID, ar
 //}
 // fn C.CallBooleanMethodV(env &C.JNIEnv, obj C.jobject, methodID C.jmethodID, args C.va_list) C.jboolean
 // pub fn call_boolean_method_v(env &Env, obj JavaObject, method_id JavaMethodID, args C.va_list) bool {
-//	return C.CallBooleanMethodV(env, obj, method_id, args C.va_list)
+//	return C.CallBooleanMethodV(env, obj, method_id, args)
 //}
 fn C.CallBooleanMethodA(env &C.JNIEnv, obj C.jobject, methodID C.jmethodID, args &C.jvalue) C.jboolean
 pub fn call_boolean_method_a(env &Env, obj JavaObject, method_id JavaMethodID, args &JavaValue) bool {
@@ -312,7 +312,7 @@ pub fn call_boolean_method_a(env &Env, obj JavaObject, method_id JavaMethodID, a
 //}
 // fn C.CallByteMethodV(env &C.JNIEnv, obj C.jobject, methodID C.jmethodID, args C.va_list) C.jbyte
 // pub fn call_byte_method_v(env &Env, obj JavaObject, method_id JavaMethodID, args C.va_list) C.jbyte {
-//	return C.CallByteMethodV(env, obj, method_id, args C.va_list)
+//	return C.CallByteMethodV(env, obj, method_id, args)
 //}
 fn C.CallByteMethodA(env &C.JNIEnv, obj C.jobject, methodID C.jmethodID, args &C.jvalue) C.jbyte
 pub fn call_byte_method_a(env &Env, obj JavaObject, method_id JavaMethodID, args &JavaValue) byte {
@@ -325,7 +325,7 @@ pub fn call_byte_method_a(env &Env, obj JavaObject, method_id JavaMethodID, args
 //}
 // fn C.CallCharMethodV(env &C.JNIEnv, obj C.jobject, methodID C.jmethodID, args C.va_list) C.jchar
 // pub fn call_char_method_v(env &Env, obj JavaObject, method_id JavaMethodID, args C.va_list) C.jchar {
-//	return C.CallCharMethodV(env, obj, method_id, args C.va_list)
+//	return C.CallCharMethodV(env, obj, method_id, args)
 //}
 fn C.CallCharMethodA(env &C.JNIEnv, obj C.jobject, methodID C.jmethodID, args &C.jvalue) C.jchar
 pub fn call_char_method_a(env &Env, obj JavaObject, method_id JavaMethodID, args &JavaValue) rune {
@@ -338,7 +338,7 @@ pub fn call_char_method_a(env &Env, obj JavaObject, method_id JavaMethodID, args
 //}
 // fn C.CallShortMethodV(env &C.JNIEnv, obj C.jobject, methodID C.jmethodID, args C.va_list) C.jshort
 // pub fn call_short_method_v(env &Env, obj JavaObject, method_id JavaMethodID, args C.va_list) i16 {
-//	return C.CallShortMethodV(env, obj, method_id, args C.va_list)
+//	return C.CallShortMethodV(env, obj, method_id, args)
 //}
 fn C.CallShortMethodA(env &C.JNIEnv, obj C.jobject, methodID C.jmethodID, args &C.jvalue) C.jshort
 pub fn call_short_method_a(env &Env, obj JavaObject, method_id JavaMethodID, args &JavaValue) i16 {
@@ -351,7 +351,7 @@ pub fn call_short_method_a(env &Env, obj JavaObject, method_id JavaMethodID, arg
 //}
 // fn C.CallIntMethodV(env &C.JNIEnv, obj C.jobject, methodID C.jmethodID, args C.va_list) C.jint
 // pub fn call_int_method_v(env &Env, obj JavaObject, method_id JavaMethodID, args C.va_list) int {
-//	return C.CallIntMethodV(env, obj, method_id, args C.va_list)
+//	return C.CallIntMethodV(env, obj, method_id, args)
 //}
 fn C.CallIntMethodA(env &C.JNIEnv, obj C.jobject, methodID C.jmethodID, args &C.jvalue) C.jint
 pub fn call_int_method_a(env &Env, obj JavaObject, method_id JavaMethodID, args &JavaValue) int {
@@ -364,7 +364,7 @@ pub fn call_int_method_a(env &Env, obj JavaObject, method_id JavaMethodID, args 
 //}
 // fn C.CallLongMethodV(env &C.JNIEnv, obj C.jobject, methodID C.jmethodID, args C.va_list) C.jlong
 // pub fn call_long_method_v(env &Env, obj JavaObject, method_id JavaMethodID, args C.va_list) i64 {
-//	return C.CallLongMethodV(env, obj, method_id, args C.va_list)
+//	return C.CallLongMethodV(env, obj, method_id, args)
 //}
 fn C.CallLongMethodA(env &C.JNIEnv, obj C.jobject, methodID C.jmethodID, args &C.jvalue) C.jlong
 pub fn call_long_method_a(env &Env, obj JavaObject, method_id JavaMethodID, args &JavaValue) i64 {
@@ -377,7 +377,7 @@ pub fn call_long_method_a(env &Env, obj JavaObject, method_id JavaMethodID, args
 //}
 // fn C.CallFloatMethodV(env &C.JNIEnv, obj C.jobject, methodID C.jmethodID, args C.va_list) C.jfloat
 // pub fn call_float_method_v(env &Env, obj JavaObject, method_id JavaMethodID, args C.va_list) f32 {
-//	return C.CallFloatMethodV(env, obj, method_id, args C.va_list)
+//	return C.CallFloatMethodV(env, obj, method_id, args)
 //}
 fn C.CallFloatMethodA(env &C.JNIEnv, obj C.jobject, methodID C.jmethodID, args &C.jvalue) C.jfloat
 pub fn call_float_method_a(env &Env, obj JavaObject, method_id JavaMethodID, args &JavaValue) f32 {
@@ -390,7 +390,7 @@ pub fn call_float_method_a(env &Env, obj JavaObject, method_id JavaMethodID, arg
 //}
 // fn C.CallDoubleMethodV(env &C.JNIEnv, obj C.jobject, methodID C.jmethodID, args C.va_list) C.jdouble
 // pub fn call_double_method_v(env &Env, obj JavaObject, method_id JavaMethodID, args C.va_list) f64 {
-//	return C.CallDoubleMethodV(env, obj, method_id, args C.va_list)
+//	return C.CallDoubleMethodV(env, obj, method_id, args)
 //}
 fn C.CallDoubleMethodA(env &C.JNIEnv, obj C.jobject, methodID C.jmethodID, args &C.jvalue) C.jdouble
 pub fn call_double_method_a(env &Env, obj JavaObject, method_id JavaMethodID, args &JavaValue) f64 {
@@ -403,7 +403,7 @@ pub fn call_double_method_a(env &Env, obj JavaObject, method_id JavaMethodID, ar
 //}
 // fn C.CallVoidMethodV(env &C.JNIEnv, obj C.jobject, methodID C.jmethodID, args C.va_list)
 // pub fn call_void_method_v(env &Env, obj JavaObject, method_id JavaMethodID, args C.va_list) {
-//	return C.CallVoidMethodV(env, obj, method_id, args C.va_list)
+//	return C.CallVoidMethodV(env, obj, method_id, args)
 //}
 fn C.CallVoidMethodA(env &C.JNIEnv, obj C.jobject, methodID C.jmethodID, args &C.jvalue)
 pub fn call_void_method_a(env &Env, obj JavaObject, method_id JavaMethodID, args &JavaValue) {
@@ -416,7 +416,7 @@ pub fn call_void_method_a(env &Env, obj JavaObject, method_id JavaMethodID, args
 //}
 // fn C.CallNonvirtualObjectMethodV(env &C.JNIEnv, obj C.jobject, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jobject
 // pub fn call_nonvirtual_object_method_v(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args C.va_list) JavaObject {
-//	return C.CallNonvirtualObjectMethodV(env, obj, clazz, method_id, args C.va_list)
+//	return C.CallNonvirtualObjectMethodV(env, obj, clazz, method_id, args)
 //}
 fn C.CallNonvirtualObjectMethodA(env &C.JNIEnv, obj C.jobject, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jobject
 pub fn call_nonvirtual_object_method_a(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args &JavaValue) JavaObject {
@@ -429,7 +429,7 @@ pub fn call_nonvirtual_object_method_a(env &Env, obj JavaObject, clazz JavaClass
 //}
 // fn C.CallNonvirtualBooleanMethodV(env &C.JNIEnv, obj C.jobject, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jboolean
 // pub fn call_nonvirtual_boolean_method_v(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args C.va_list) bool {
-//	return C.CallNonvirtualBooleanMethodV(env, obj, clazz, method_id, args C.va_list)
+//	return C.CallNonvirtualBooleanMethodV(env, obj, clazz, method_id, args)
 //}
 fn C.CallNonvirtualBooleanMethodA(env &C.JNIEnv, obj C.jobject, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jboolean
 pub fn call_nonvirtual_boolean_method_a(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args &JavaValue) bool {
@@ -442,7 +442,7 @@ pub fn call_nonvirtual_boolean_method_a(env &Env, obj JavaObject, clazz JavaClas
 //}
 // fn C.CallNonvirtualByteMethodV(env &C.JNIEnv, obj C.jobject, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jbyte
 // pub fn call_nonvirtual_byte_method_v(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args C.va_list) C.jbyte {
-//	return C.CallNonvirtualByteMethodV(env, obj, clazz, method_id, args C.va_list)
+//	return C.CallNonvirtualByteMethodV(env, obj, clazz, method_id, args)
 //}
 fn C.CallNonvirtualByteMethodA(env &C.JNIEnv, obj C.jobject, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jbyte
 pub fn call_nonvirtual_byte_method_a(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args &JavaValue) byte {
@@ -455,7 +455,7 @@ pub fn call_nonvirtual_byte_method_a(env &Env, obj JavaObject, clazz JavaClass, 
 //}
 // fn C.CallNonvirtualCharMethodV(env &C.JNIEnv, obj C.jobject, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jchar
 // pub fn call_nonvirtual_char_method_v(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args C.va_list) C.jchar {
-//	return C.CallNonvirtualCharMethodV(env, obj, clazz, method_id, args C.va_list)
+//	return C.CallNonvirtualCharMethodV(env, obj, clazz, method_id, args)
 //}
 fn C.CallNonvirtualCharMethodA(env &C.JNIEnv, obj C.jobject, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jchar
 pub fn call_nonvirtual_char_method_a(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args &JavaValue) rune {
@@ -468,7 +468,7 @@ pub fn call_nonvirtual_char_method_a(env &Env, obj JavaObject, clazz JavaClass, 
 //}
 // fn C.CallNonvirtualShortMethodV(env &C.JNIEnv, obj C.jobject, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jshort
 // pub fn call_nonvirtual_short_method_v(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args C.va_list) i16 {
-//	return C.CallNonvirtualShortMethodV(env, obj, clazz, method_id, args C.va_list)
+//	return C.CallNonvirtualShortMethodV(env, obj, clazz, method_id, args)
 //}
 fn C.CallNonvirtualShortMethodA(env &C.JNIEnv, obj C.jobject, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jshort
 pub fn call_nonvirtual_short_method_a(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args &JavaValue) i16 {
@@ -481,7 +481,7 @@ pub fn call_nonvirtual_short_method_a(env &Env, obj JavaObject, clazz JavaClass,
 //}
 // fn C.CallNonvirtualIntMethodV(env &C.JNIEnv, obj C.jobject, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jint
 // pub fn call_nonvirtual_int_method_v(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args C.va_list) int {
-//	return C.CallNonvirtualIntMethodV(env, obj, clazz, method_id, args C.va_list)
+//	return C.CallNonvirtualIntMethodV(env, obj, clazz, method_id, args)
 //}
 fn C.CallNonvirtualIntMethodA(env &C.JNIEnv, obj C.jobject, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jint
 pub fn call_nonvirtual_int_method_a(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args &JavaValue) int {
@@ -494,7 +494,7 @@ pub fn call_nonvirtual_int_method_a(env &Env, obj JavaObject, clazz JavaClass, m
 //}
 // fn C.CallNonvirtualLongMethodV(env &C.JNIEnv, obj C.jobject, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jlong
 // pub fn call_nonvirtual_long_method_v(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args C.va_list) i64 {
-//	return C.CallNonvirtualLongMethodV(env, obj, clazz, method_id, args C.va_list)
+//	return C.CallNonvirtualLongMethodV(env, obj, clazz, method_id, args)
 //}
 fn C.CallNonvirtualLongMethodA(env &C.JNIEnv, obj C.jobject, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jlong
 pub fn call_nonvirtual_long_method_a(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args &JavaValue) i64 {
@@ -507,7 +507,7 @@ pub fn call_nonvirtual_long_method_a(env &Env, obj JavaObject, clazz JavaClass, 
 //}
 // fn C.CallNonvirtualFloatMethodV(env &C.JNIEnv, obj C.jobject, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jfloat
 // pub fn call_nonvirtual_float_method_v(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args C.va_list) f32 {
-//	return C.CallNonvirtualFloatMethodV(env, obj, clazz, method_id, args C.va_list)
+//	return C.CallNonvirtualFloatMethodV(env, obj, clazz, method_id, args)
 //}
 fn C.CallNonvirtualFloatMethodA(env &C.JNIEnv, obj C.jobject, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jfloat
 pub fn call_nonvirtual_float_method_a(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args &JavaValue) f32 {
@@ -520,7 +520,7 @@ pub fn call_nonvirtual_float_method_a(env &Env, obj JavaObject, clazz JavaClass,
 //}
 // fn C.CallNonvirtualDoubleMethodV(env &C.JNIEnv, obj C.jobject, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jdouble
 // pub fn call_nonvirtual_double_method_v(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args C.va_list) f64 {
-//	return C.CallNonvirtualDoubleMethodV(env, obj, clazz, method_id, args C.va_list)
+//	return C.CallNonvirtualDoubleMethodV(env, obj, clazz, method_id, args)
 //}
 fn C.CallNonvirtualDoubleMethodA(env &C.JNIEnv, obj C.jobject, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jdouble
 pub fn call_nonvirtual_double_method_a(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args &JavaValue) f64 {
@@ -533,7 +533,7 @@ pub fn call_nonvirtual_double_method_a(env &Env, obj JavaObject, clazz JavaClass
 //}
 // fn C.CallNonvirtualVoidMethodV(env &C.JNIEnv, obj C.jobject, clazz C.jclass, methodID C.jmethodID, args C.va_list)
 // pub fn call_nonvirtual_void_method_v(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args C.va_list) {
-//	return C.CallNonvirtualVoidMethodV(env, obj, clazz, method_id, args C.va_list)
+//	return C.CallNonvirtualVoidMethodV(env, obj, clazz, method_id, args)
 //}
 fn C.CallNonvirtualVoidMethodA(env &C.JNIEnv, obj C.jobject, clazz C.jclass, methodID C.jmethodID, args &C.jvalue)
 pub fn call_nonvirtual_void_method_a(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args &JavaValue) {
@@ -643,45 +643,136 @@ pub fn get_static_method_id(env &Env, clazz JavaClass, name string, sig string) 
 
 //
 // fn C.CallStaticObjectMethod(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, ...) C.jobject
+//pub fn call_static_object_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) JavaObject {
+//	return C.CallStaticObjectMethod(env, clazz, method_id, ...)
+//}
 // fn C.CallStaticObjectMethodV(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jobject
+//pub fn call_static_object_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) JavaObject {
+//	return C.CallStaticObjectMethodV(env, clazz, method_id, args)
+//}
 fn C.CallStaticObjectMethodA(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jobject
+pub fn call_static_object_method_a(env &Env, clazz JavaClass, method_id JavaMethodID, args &JavaValue) JavaObject {
+	return C.CallStaticObjectMethodA(env, clazz, method_id, args)
+}
 
 // fn C.CallStaticBooleanMethod(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, ...) C.jboolean
+//pub fn call_static_boolean_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) bool {
+//	return C.CallStaticBooleanMethod(env, clazz, method_id, ...)
+//}
 // fn C.CallStaticBooleanMethodV(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jboolean
+//pub fn call_static_boolean_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) bool {
+//	return C.CallStaticBooleanMethodV(env, clazz, method_id, args)
+//}
 fn C.CallStaticBooleanMethodA(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jboolean
+pub fn call_static_boolean_method_a(env &Env, clazz JavaClass, method_id JavaMethodID, args &JavaValue) bool {
+	return j2v_boolean(C.CallStaticBooleanMethodA(env, clazz, method_id, args))
+}
 
 // fn C.CallStaticByteMethod(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, ...) C.jbyte
+//pub fn call_static_byte_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) C.jbyte {
+//	return C.CallStaticByteMethod(env, clazz, method_id, ...)
+//}
 // fn C.CallStaticByteMethodV(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jbyte
+//pub fn call_static_byte_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) C.jbyte {
+//	return C.CallStaticByteMethodV(env, clazz, method_id, args)
+//}
 fn C.CallStaticByteMethodA(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jbyte
+pub fn call_static_byte_method_a(env &Env, clazz JavaClass, method_id JavaMethodID, args &JavaValue) byte {
+	return j2v_byte(C.CallStaticByteMethodA(env, clazz, method_id, args))
+}
 
 // fn C.CallStaticCharMethod(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, ...) C.jchar
+//pub fn call_static_char_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) C.jchar {
+//	return C.CallStaticCharMethod(env, clazz, method_id, ...)
+//}
 // fn C.CallStaticCharMethodV(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jchar
+//pub fn call_static_char_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) C.jchar {
+//	return C.CallStaticCharMethodV(env, clazz, method_id, args)
+//}
 fn C.CallStaticCharMethodA(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jchar
+pub fn call_static_char_method_a(env &Env, clazz JavaClass, method_id JavaMethodID, args &JavaValue) rune {
+	return j2v_char(C.CallStaticCharMethodA(env, clazz, method_id, args))
+}
 
 // fn C.CallStaticShortMethod(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, ...) C.jshort
+//pub fn call_static_short_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) i16 {
+//	return C.CallStaticShortMethod(env, clazz, method_id, ...)
+//}
 // fn C.CallStaticShortMethodV(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jshort
+//pub fn call_static_short_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) i16 {
+//	return C.CallStaticShortMethodV(env, clazz, method_id, args)
+//}
 fn C.CallStaticShortMethodA(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jshort
+pub fn call_static_short_method_a(env &Env, clazz JavaClass, method_id JavaMethodID, args &JavaValue) i16 {
+	return j2v_short(C.CallStaticShortMethodA(env, clazz, method_id, args))
+}
 
 // fn C.CallStaticIntMethod(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, ...) C.jint
+//pub fn call_static_int_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) int {
+//	return C.CallStaticIntMethod(env, clazz, method_id, ...)
+//}
 // fn C.CallStaticIntMethodV(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jint
+//pub fn call_static_int_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) int {
+//	return C.CallStaticIntMethodV(env, clazz, method_id, args)
+//}
 fn C.CallStaticIntMethodA(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jint
+pub fn call_static_int_method_a(env &Env, clazz JavaClass, method_id JavaMethodID, args &JavaValue) int {
+	return j2v_int(C.CallStaticIntMethodA(env, clazz, method_id, args))
+}
 
 // fn C.CallStaticLongMethod(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, ...) C.jlong
+//pub fn call_static_long_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) i64 {
+//	return C.CallStaticLongMethod(env, clazz, method_id, ...)
+//}
 // fn C.CallStaticLongMethodV(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jlong
+//pub fn call_static_long_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) i64 {
+//	return C.CallStaticLongMethodV(env, clazz, method_id, args)
+//}
 fn C.CallStaticLongMethodA(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jlong
+pub fn call_static_long_method_a(env &Env, clazz JavaClass, method_id JavaMethodID, args &JavaValue) i64 {
+	return j2v_long(C.CallStaticLongMethodA(env, clazz, method_id, args))
+}
 
 // fn C.CallStaticFloatMethod(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, ...) C.jfloat
+//pub fn call_static_float_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) f32 {
+//	return C.CallStaticFloatMethod(env, clazz, method_id, ...)
+//}
 // fn C.CallStaticFloatMethodV(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jfloat
+//pub fn call_static_float_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) f32 {
+//	return C.CallStaticFloatMethodV(env, clazz, method_id, args)
+//}
 fn C.CallStaticFloatMethodA(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jfloat
+pub fn call_static_float_method_a(env &Env, clazz JavaClass, method_id JavaMethodID, args &JavaValue) f32 {
+	return j2v_float(C.CallStaticFloatMethodA(env, clazz, method_id, args))
+}
 
 // fn C.CallStaticDoubleMethod(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, ...) C.jdouble
+//pub fn call_static_double_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) f64 {
+//	return C.CallStaticDoubleMethod(env, clazz, method_id, ...)
+//}
 // fn C.CallStaticDoubleMethodV(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jdouble
+//pub fn call_static_double_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) f64 {
+//	return C.CallStaticDoubleMethodV(env, clazz, method_id, args)
+//}
 fn C.CallStaticDoubleMethodA(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jdouble
+pub fn call_static_double_method_a(env &Env, clazz JavaClass, method_id JavaMethodID, args &JavaValue) f64 {
+	return j2v_double(C.CallStaticDoubleMethodA(env, clazz, method_id, args))
+}
 
 // fn C.CallStaticVoidMethod(env &C.JNIEnv, cls C.jclass, methodID C.jmethodID, ...)
+//pub fn call_static_void_method(env &Env, cls JavaClass, method_id JavaMethodID, ...) {
+//	return C.CallStaticVoidMethod(env, cls, method_id, ...)
+//}
 // fn C.CallStaticVoidMethodV(env &C.JNIEnv, cls C.jclass, methodID C.jmethodID, args C.va_list)
+//pub fn call_static_void_method_v(env &Env, cls JavaClass, method_id JavaMethodID, args C.va_list) {
+//	return C.CallStaticVoidMethodV(env, cls, method_id, args)
+//}
 fn C.CallStaticVoidMethodA(env &C.JNIEnv, cls C.jclass, methodID C.jmethodID, args &C.jvalue)
+pub fn call_static_void_method_a(env &Env, cls JavaClass, method_id JavaMethodID, args &JavaValue) {
+	C.CallStaticVoidMethodA(env, cls, method_id, args)
+}
 
+//
 fn C.GetStaticFieldID(env &C.JNIEnv, clazz C.jclass, name charptr, sig charptr) C.jfieldID
 fn C.GetStaticObjectField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID) C.jobject
 fn C.GetStaticBooleanField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID) C.jboolean
