@@ -22,14 +22,14 @@ jobs:
     - name: Build local v
       run: make -j4
 
-    - name: Run tests
-      run: ./v test jni
-
     - name: Checkout V jni
       uses: actions/checkout@v2
       with:
         repository: Larpon/jni
         path: $HOME/.vmodules/jni
+
+    - name: Run tests
+      run: ./v test $HOME/.vmodules/jni
 
     - name: Install and run V jni examples
       run: |
