@@ -74,50 +74,56 @@ fn v2j_string_signature_type(vt string) string {
 	}
 }
 
-fn v2j_value(vt Type) C.jvalue {
+fn v2j_value(vt Type) JavaValue {
 	return match vt {
 		bool {
-			C.jvalue{
+			JavaValue{
 				z: jboolean(vt)
 			}
 		}
 		f32 {
-			C.jvalue{
+			JavaValue{
 				i: jfloat(vt)
 			}
 		}
 		f64 {
-			C.jvalue{
+			JavaValue{
 				i: jdouble(vt)
 			}
 		}
 		i16 {
-			C.jvalue{
+			JavaValue{
 				s: jshort(vt)
 			}
 		}
 		int {
-			C.jvalue{
+			JavaValue{
 				i: jint(vt)
 			}
 		}
 		i64 {
-			C.jvalue{
+			JavaValue{
 				j: jlong(vt)
 			}
 		}
-		string { // TODO
-			C.jvalue{
-				l: C.StringToObject(jstring(C.jniGetEnv(), vt))
+		string {
+			// TODO this assumes default env AND allocates resources
+			jstr := jstring(C.jniGetEnv(), vt)
+			jobj := &JavaObject(voidptr(&jstr))
+			JavaValue{
+				l: jobj
 			}
+			//JavaValue{
+			//	l: C.StringToObject(jstring(C.jniGetEnv(), vt))
+			//}
 		}
 		JavaObject {
-			C.jvalue{
-				l: C.jobject(vt)
+			JavaValue{
+				l: vt //JavaObject(vt)
 			}
 		}
 		else {
-			C.jvalue{}
+			JavaValue{}
 		}
 	}
 }
@@ -132,7 +138,7 @@ pub fn v2j_signature(fqn_signature string) (string, string, string) {
 }
 
 [inline]
-pub fn j2v_string(env &Env, jstr C.jstring) string {
+pub fn j2v_string(env &Env, jstr JavaString) string {
 	mut cn := ''
 	unsafe {
 		native_string := C.GetStringUTFChars(env, jstr, C.jboolean(C.JNI_FALSE))

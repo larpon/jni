@@ -31,7 +31,7 @@ os.setenv('LD_LIBRARY_PATH', os.getenv('LD_LIBRARY_PATH') + os.path_delimiter + 
 	true)
 
 eprintln('Compiling shared libvlang.o')
-os.system('v -prod -shared libvlang.v')
+os.system('v -cg -prod -shared libvlang.v')
 eprintln('Compiling Java sources')
 os.system(javac + ' io/vlang/V.java')
 eprintln('Running Java application')

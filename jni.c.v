@@ -99,9 +99,11 @@ union C.jvalue {
 // helpers.h
 // fn C.vc_cast(from voidptr, to voidptr) voidptr
 
-fn C.StringToObject(str C.jstring) C.jobject
+// TODO this currently work: &JavaObject(voidptr(&jstr))
+//fn C.StringToObject(str C.jstring) C.jobject
 
-fn C.ObjectToString(obj C.jobject) C.jstring
+// TODO this currently work: &JavaString(voidptr(&jobj))
+//fn C.ObjectToString(obj C.jobject) C.jstring
 
 fn C.ObjectToClass(obj C.jobject) C.jclass
 

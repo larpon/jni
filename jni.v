@@ -77,7 +77,7 @@ fn parse_signature(fqn_sig string) (string, string) {
 pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 	fqn, return_type := parse_signature(signature)
 
-	mut jv_args := []C.jvalue{}
+	mut jv_args := []JavaValue{}
 	mut jargs := ''
 
 	for vt in args {
@@ -125,7 +125,9 @@ pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 			}
 		}
 		'string' {
-			jstr := C.ObjectToString(call_static_object_method_a(env, class, mid, jv_args.data))
+			jobject := call_static_object_method_a(env, class, mid, jv_args.data)
+			jstr := &JavaString(voidptr(&jobject))
+			//jstr :=  C.ObjectToString(call_static_object_method_a(env, class, mid, jv_args.data))
 			CallResult{
 				call: signature
 				val: j2v_string(env, jstr)
@@ -215,7 +217,9 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 			}
 		}
 		'string' {
-			jstr := C.ObjectToString(call_object_method_a(env, obj, mid, jv_args.data))
+			jobject := call_object_method_a(env, obj, mid, jv_args.data)
+			jstr := &JavaString(voidptr(&jobject))
+			//jstr := C.ObjectToString(call_object_method_a(env, obj, mid, jv_args.data))
 			CallResult{
 				call: signature
 				val: j2v_string(env, jstr)
@@ -264,7 +268,10 @@ pub fn get_object_class_name(env &Env, obj JavaObject) string {
 			panic("An exception occured. Couldn't call \"getName\" method on object \"$obj\" in jni.Env (${ptr_str(env)})")
 		}
 	}
-	return j2v_string(env, C.ObjectToString(jstr_class_name))
+	// TODO NOTE
+	jstr := &JavaString(voidptr(&jstr_class_name))
+	return j2v_string(env, jstr)
+	//return j2v_string(env, C.ObjectToString(jstr_class_name))
 }
 
 pub fn get_class_name(env &Env, jclazz JavaClass) string {

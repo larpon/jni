@@ -99,6 +99,11 @@ public class V
 		return 42.5f;
 	}
 
+	public static String getString() {
+		System.out.println("Java: "+V.class.getName()+'.'+getCurrentMethodName()+"() called by "+getCallerMethodName());
+		return "Test string";
+	}
+
 	// Utils for debugging - don't use in production
 	public static String getCurrentMethodName() {
 		return StackWalker.getInstance()

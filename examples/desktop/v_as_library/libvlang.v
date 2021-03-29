@@ -53,7 +53,9 @@ fn get_v_string(env &jni.Env, thiz jni.JavaObject) jni.JavaString {
 	r := jni.call_static_method(env, 'io.vlang.V.getInt() int')
 	r2 := jni.call_static_method(env, 'io.vlang.V.getBool() bool')
 
-	s := 'V: values obtained from Java: ${r.val}, ${r2.val}'
+	r3 := jni.call_static_method(env, 'io.vlang.V.getString() string')
+
+	s := 'V: values obtained from Java: ${r.val}, ${r2.val}, ${r3.val}'
 	return jni.jstring(env, s)
 }
 

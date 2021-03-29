@@ -163,21 +163,21 @@ jclass jniFindClass(const char *name) {
 	return (*env)->CallObjectMethod(env, gClassLoader, gFindClassMethod, (*env)->NewStringUTF(env, name));
 }
 
-long VoidToLong(void* vp) {
-    return (long)vp;
-}
+//long VoidToLong(void* vp) {
+//    return (long)vp;
+//}
 
-void* LongToVoid(long l) {
-    return (void*)l;
-}
+//void* LongToVoid(long l) {
+//    return (void*)l;
+//}
 
-jobject StringToObject(jstring str) {
-    return (jobject)str;
-}
+//jobject StringToObject(jstring str) {
+//    return (jobject)str;
+//}
 
-jstring ObjectToString(jobject obj) {
-    return (jstring)obj;
-}
+//jstring ObjectToString(jobject obj) {
+//    return (jstring)obj;
+//}
 
 jclass ObjectToClass(jobject obj) {
     return (jclass)obj;
