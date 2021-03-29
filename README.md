@@ -41,7 +41,7 @@ java io.vlang.V
 
 ### Android
 
-The `jni` module also supports interoperability with both Java on Android.
+The `jni` module supports Java interoperability with both Desktop and Android platforms.
 
 To build the Android example you'll need a working version of [`vab`](https://github.com/vlang/vab).
 

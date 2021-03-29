@@ -11,8 +11,8 @@ public class V
 	* "/data/data/io.vlang/lib/libvlang.so" at installation time.
 	*/
 	static {
+		System.out.println("Library look-up path(s):"+System.getProperty("java.library.path"));
 		System.loadLibrary("vlang");
-		//System.out.println(System.getProperty("java.library.path"));
 	}
 
 	public static void main(String[] args) {
