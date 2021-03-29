@@ -1,7 +1,7 @@
 module jni
 
 type Void = bool
-type Type = JavaObject | Void | bool | f32 | f64 | int | i64 | string //| rune | i16 |  byte
+type Type = JavaObject | Void | bool | f32 | f64| i16 | int | i64 | string //| rune |  byte
 
 // pub type Any = string | int | i64 | f32 | f64 | bool | []Any | map[voidptr]Any
 enum MethodType {
@@ -51,8 +51,9 @@ fn v2j_signature_type(vt Type) string {
 		bool { 'Z' }
 		f32 { 'F' }
 		f64 { 'D' }
-		i64 { 'J' }
+		i16 { 'S' }
 		int { 'I' }
+		i64 { 'J' }
 		string { 'Ljava/lang/String;' }
 		JavaObject { 'Ljava/lang/Object;' }
 		else { 'V' } // void
@@ -62,11 +63,13 @@ fn v2j_signature_type(vt Type) string {
 fn v2j_string_signature_type(vt string) string {
 	return match vt {
 		'bool' { 'Z' }
+		'i16' { 'S' }
 		'int' { 'I' }
 		'i64' { 'J' }
 		'f32' { 'F' }
 		'f64' { 'D' }
 		'string' { 'Ljava/lang/String;' }
+		'object' { 'Ljava/lang/Object;' }
 		else { 'V' } // void
 	}
 }
@@ -86,6 +89,11 @@ fn v2j_value(vt Type) C.jvalue {
 		f64 {
 			C.jvalue{
 				i: jdouble(vt)
+			}
+		}
+		i16 {
+			C.jvalue{
+				s: jshort(vt)
 			}
 		}
 		int {

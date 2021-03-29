@@ -91,51 +91,57 @@ pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 		'bool' {
 			CallResult{
 				call: signature
-				val: C.CallStaticBooleanMethodA(env, class, mid, jv_args.data) == jboolean(true)
+				val: call_static_boolean_method_a(env, class, mid, jv_args.data)
 			}
 		}
-		'f32' {
+		'i16' {
 			CallResult{
 				call: signature
-				val: f32(C.CallStaticFloatMethodA(env, class, mid, jv_args.data))
-			}
-		}
-		'f64' {
-			CallResult{
-				call: signature
-				val: f64(C.CallStaticDoubleMethodA(env, class, mid, jv_args.data))
+				val: call_static_short_method_a(env, class, mid, jv_args.data)
 			}
 		}
 		'int' {
 			CallResult{
 				call: signature
-				val: int(C.CallStaticIntMethodA(env, class, mid, jv_args.data))
+				val: call_static_int_method_a(env, class, mid, jv_args.data)
 			}
 		}
 		'i64' {
 			CallResult{
 				call: signature
-				val: i64(C.CallStaticLongMethodA(env, class, mid, jv_args.data))
+				val: call_static_long_method_a(env, class, mid, jv_args.data)
+			}
+		}
+		'f32' {
+			CallResult{
+				call: signature
+				val: call_static_float_method_a(env, class, mid, jv_args.data)
+			}
+		}
+		'f64' {
+			CallResult{
+				call: signature
+				val: call_static_double_method_a(env, class, mid, jv_args.data)
 			}
 		}
 		'string' {
-			jstr := C.ObjectToString(C.CallStaticObjectMethodA(env, class, mid, jv_args.data))
+			jstr := C.ObjectToString(call_static_object_method_a(env, class, mid, jv_args.data))
 			CallResult{
 				call: signature
 				val: j2v_string(env, jstr)
 			}
 		}
 		'object' {
-			jobj := JavaObject(C.CallStaticObjectMethodA(env, class, mid, jv_args.data))
 			CallResult{
 				call: signature
-				val: jobj
+				val: call_static_object_method_a(env, class, mid, jv_args.data)
 			}
 		}
 		'void' {
-			C.CallStaticVoidMethodA(env, class, mid, jv_args.data)
+			call_static_void_method_a(env, class, mid, jv_args.data)
 			CallResult{
 				call: signature
+				//val: Void{}
 			}
 		}
 		else {
@@ -143,14 +149,16 @@ pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 		}
 	}
 	// Check for any exceptions
-	if exception_check(env) {
-		exception_describe(env)
-		excp := 'An exception occured while executing "$signature" in JNIEnv (${ptr_str(env)})'
-		$if debug {
-			println(excp)
+	$if debug {
+		if exception_check(env) {
+			exception_describe(env)
+			excp := 'An exception occured while executing "$signature" in JNIEnv (${ptr_str(env)})'
+			$if debug {
+				println(excp)
+			}
+			// throw_exception(env, excp)
+			panic(excp)
 		}
-		// throw_exception(env, excp)
-		panic(excp)
 	}
 	return call_result
 }
@@ -176,16 +184,10 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 				val: call_boolean_method_a(env, obj, mid, jv_args.data)
 			}
 		}
-		'f32' {
+		'i16' {
 			CallResult{
 				call: signature
-				val: call_float_method_a(env, obj, mid, jv_args.data)
-			}
-		}
-		'f64' {
-			CallResult{
-				call: signature
-				val: call_double_method_a(env, obj, mid, jv_args.data)
+				val: call_short_method_a(env, obj, mid, jv_args.data)
 			}
 		}
 		'int' {
@@ -200,8 +202,20 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 				val: call_long_method_a(env, obj, mid, jv_args.data)
 			}
 		}
+		'f32' {
+			CallResult{
+				call: signature
+				val: call_float_method_a(env, obj, mid, jv_args.data)
+			}
+		}
+		'f64' {
+			CallResult{
+				call: signature
+				val: call_double_method_a(env, obj, mid, jv_args.data)
+			}
+		}
 		'string' {
-			jstr := C.ObjectToString(C.CallObjectMethodA(env, obj, mid, jv_args.data))
+			jstr := C.ObjectToString(call_object_method_a(env, obj, mid, jv_args.data))
 			CallResult{
 				call: signature
 				val: j2v_string(env, jstr)
@@ -224,11 +238,13 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 		}
 	}
 	// Check for any exceptions
-	if exception_check(env) {
-		exception_describe(env)
-		excp := 'An exception occured while executing "$signature" in JNIEnv (${ptr_str(env)})'
-		// throw_exception(env, excp)
-		panic(excp)
+	$if debug {
+		if exception_check(env) {
+			exception_describe(env)
+			excp := 'An exception occured while executing "$signature" in JNIEnv (${ptr_str(env)})'
+			// throw_exception(env, excp)
+			panic(excp)
+		}
 	}
 	return call_result
 }
