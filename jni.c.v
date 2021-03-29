@@ -936,17 +936,27 @@ pub fn get_array_length(env &Env, array JavaArray) int {
 	return j2v_size(C.GetArrayLength(env, array))
 }
 
+//
 fn C.NewObjectArray(env &C.JNIEnv, len C.jsize, clazz C.jclass, init C.jobject) C.jobjectArray
 pub fn new_object_array(env &Env, len int, clazz JavaClass, init JavaObject) JavaObjectArray {
 	return C.NewObjectArray(env, jsize(len), clazz, init)
 }
+
 fn C.GetObjectArrayElement(env &C.JNIEnv, array C.jobjectArray, index C.jsize) C.jobject
 pub fn get_object_array_element(env &Env, array JavaObjectArray, index int) JavaObject {
 	return C.GetObjectArrayElement(env, array, jsize(index))
 }
+pub fn (a JavaObjectArray) at(env &Env, index int) JavaObject {
+	return get_object_array_element(env, a, index)
+}
+
+//
 fn C.SetObjectArrayElement(env &C.JNIEnv, array C.jobjectArray, index C.jsize, val C.jobject)
 pub fn set_object_array_element(env &Env, array JavaObjectArray, index int, val JavaObject) {
 	C.SetObjectArrayElement(env, array, jsize(index), val)
+}
+pub fn (a JavaObjectArray) insert(env &Env, index int, val JavaObject) {
+	set_object_array_element(env, a, index , val)
 }
 
 //
