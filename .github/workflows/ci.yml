@@ -44,4 +44,4 @@ jobs:
         LD_LIBRARY_PATH=$(pwd):.
         $VEXE -cc gcc -cg  -shared libvlang.v
         javac io/vlang/V.java
-        java io.vlang.V
+        #java io.vlang.V
