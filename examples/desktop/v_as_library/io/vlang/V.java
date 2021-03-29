@@ -1,6 +1,6 @@
 package io.vlang;
 
-import java.lang.StackWalker;
+//import java.lang.StackWalker;
 
 public class V
 {
@@ -108,19 +108,19 @@ public class V
 
 	// Utils for debugging - don't use in production
 	public static String getCurrentMethodName() {
-		return StackWalker.getInstance()
+		return "";/* StackWalker.getInstance()
 						.walk(s -> s.skip(1).findFirst())
 						.get()
-						.getMethodName();
+						.getMethodName();*/
 	}
 
 	public static String getCallerMethodName() {
-		return StackWalker.getInstance()
+		return "";/* StackWalker.getInstance()
 						.walk(s -> s.skip(2).findFirst())
 						.get()
 						.getClassName()+'.'+StackWalker.getInstance()
 						.walk(s -> s.skip(2).findFirst())
 						.get()
-						.getMethodName();
+						.getMethodName();*/
 	}
 }
