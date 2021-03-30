@@ -45,5 +45,5 @@ jobs:
         $VEXE -cc gcc -cg  -shared libvlang.v
         javac io/vlang/V.java
         java io.vlang.V
-#        cd $HOME/.vmodules/jni/examples/desktop/simple
-#        $VEXE run ./build.vsh
+        cd $HOME/.vmodules/jni/examples/desktop/simple
+        $VEXE run ./build.vsh
