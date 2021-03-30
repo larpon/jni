@@ -13,7 +13,7 @@ struct CallResult {
 pub:
 	call        string
 	method_type MethodType
-	val         Type // TODO = Void ??
+	result      Type // TODO = Void ??
 }
 
 //
@@ -95,56 +95,56 @@ pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 	if return_type.contains('/') || return_type.contains('.') {
 		call_result = CallResult{
 			call: signature
-			val: call_static_boolean_method_a(env, class, mid, jv_args.data)
+			result: call_static_boolean_method_a(env, class, mid, jv_args.data)
 		}
 	} else {
 		call_result = match return_type {
 			'bool' {
 				CallResult{
 					call: signature
-					val: call_static_boolean_method_a(env, class, mid, jv_args.data)
+					result: call_static_boolean_method_a(env, class, mid, jv_args.data)
 				}
 			}
 			'byte' {
 				CallResult{
 					call: signature
-					val: call_static_byte_method_a(env, class, mid, jv_args.data)
+					result: call_static_byte_method_a(env, class, mid, jv_args.data)
 				}
 			}
 			'rune' {
 				CallResult{
 					call: signature
-					val: call_static_char_method_a(env, class, mid, jv_args.data)
+					result: call_static_char_method_a(env, class, mid, jv_args.data)
 				}
 			}
 			'i16' {
 				CallResult{
 					call: signature
-					val: call_static_short_method_a(env, class, mid, jv_args.data)
+					result: call_static_short_method_a(env, class, mid, jv_args.data)
 				}
 			}
 			'int' {
 				CallResult{
 					call: signature
-					val: call_static_int_method_a(env, class, mid, jv_args.data)
+					result: call_static_int_method_a(env, class, mid, jv_args.data)
 				}
 			}
 			'i64' {
 				CallResult{
 					call: signature
-					val: call_static_long_method_a(env, class, mid, jv_args.data)
+					result: call_static_long_method_a(env, class, mid, jv_args.data)
 				}
 			}
 			'f32' {
 				CallResult{
 					call: signature
-					val: call_static_float_method_a(env, class, mid, jv_args.data)
+					result: call_static_float_method_a(env, class, mid, jv_args.data)
 				}
 			}
 			'f64' {
 				CallResult{
 					call: signature
-					val: call_static_double_method_a(env, class, mid, jv_args.data)
+					result: call_static_double_method_a(env, class, mid, jv_args.data)
 				}
 			}
 			'string' {
@@ -153,20 +153,20 @@ pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 				//jstr :=  C.ObjectToString(call_static_object_method_a(env, class, mid, jv_args.data))
 				CallResult{
 					call: signature
-					val: j2v_string(env, jstr)
+					result: j2v_string(env, jstr)
 				}
 			}
 			'object' {
 				CallResult{
 					call: signature
-					val: call_static_object_method_a(env, class, mid, jv_args.data)
+					result: call_static_object_method_a(env, class, mid, jv_args.data)
 				}
 			}
 			'void' {
 				call_static_void_method_a(env, class, mid, jv_args.data)
 				CallResult{
 					call: signature
-					//val: Void{}
+					//result: Void{}
 				}
 			}
 			else {
@@ -210,56 +210,56 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 	if return_type.contains('/') || return_type.contains('.') {
 		call_result = CallResult{
 			call: signature
-			val: call_object_method_a(env, obj, mid, jv_args.data)
+			result: call_object_method_a(env, obj, mid, jv_args.data)
 		}
 	} else {
 		call_result = match return_type {
 			'bool' {
 				CallResult{
 					call: signature
-					val: call_boolean_method_a(env, obj, mid, jv_args.data)
+					result: call_boolean_method_a(env, obj, mid, jv_args.data)
 				}
 			}
 			'byte' {
 				CallResult{
 					call: signature
-					val: call_byte_method_a(env, obj, mid, jv_args.data)
+					result: call_byte_method_a(env, obj, mid, jv_args.data)
 				}
 			}
 			'rune' {
 				CallResult{
 					call: signature
-					val: call_char_method_a(env, obj, mid, jv_args.data)
+					result: call_char_method_a(env, obj, mid, jv_args.data)
 				}
 			}
 			'i16' {
 				CallResult{
 					call: signature
-					val: call_short_method_a(env, obj, mid, jv_args.data)
+					result: call_short_method_a(env, obj, mid, jv_args.data)
 				}
 			}
 			'int' {
 				CallResult{
 					call: signature
-					val: call_int_method_a(env, obj, mid, jv_args.data)
+					result: call_int_method_a(env, obj, mid, jv_args.data)
 				}
 			}
 			'i64' {
 				CallResult{
 					call: signature
-					val: call_long_method_a(env, obj, mid, jv_args.data)
+					result: call_long_method_a(env, obj, mid, jv_args.data)
 				}
 			}
 			'f32' {
 				CallResult{
 					call: signature
-					val: call_float_method_a(env, obj, mid, jv_args.data)
+					result: call_float_method_a(env, obj, mid, jv_args.data)
 				}
 			}
 			'f64' {
 				CallResult{
 					call: signature
-					val: call_double_method_a(env, obj, mid, jv_args.data)
+					result: call_double_method_a(env, obj, mid, jv_args.data)
 				}
 			}
 			'string' {
@@ -268,13 +268,13 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 				//jstr := C.ObjectToString(call_object_method_a(env, obj, mid, jv_args.data))
 				CallResult{
 					call: signature
-					val: j2v_string(env, jstr)
+					result: j2v_string(env, jstr)
 				}
 			}
 			'object' {
 				CallResult{
 					call: signature
-					val: call_object_method_a(env, obj, mid, jv_args.data)
+					result: call_object_method_a(env, obj, mid, jv_args.data)
 				}
 			}
 			'void' {
