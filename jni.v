@@ -322,34 +322,6 @@ fn get_object_class_and_method_id(env &Env, obj JavaObject, fqn_sig string) (Jav
 	return jclazz, mid
 }
 
-
-// pub fn get_object_class_name(env &Env, obj JavaObject) string {
-// 	classclass := get_object_class(env, obj)
-//
-// 	mid_get_name := get_method_id(env, classclass, 'getName', '()Ljava/lang/String;')
-//
-// 	jstr_class_name := call_object_method_a(env, obj, mid_get_name, void_arg.data)
-// 	$if debug {
-// 		if exception_check(env) {
-// 			exception_describe(env)
-// 			if !isnil(jstr_class_name) {
-// 				delete_local_ref(env, jstr_class_name)
-// 			}
-// 			panic(@MOD + '.' + @FN + " an exception occured. Couldn't call \"getName\" method on object \"$obj\" in jni.Env (${ptr_str(env)})")
-// 		}
-// 	}
-// 	// TODO NOTE current way of casting
-// 	jstr := &JavaString(voidptr(&jstr_class_name))
-// 	return j2v_string(env, jstr)
-// 	//return j2v_string(env, C.ObjectToString(jstr_class_name))
-// }
-
-
-// pub fn get_class_name(env &Env, jclazz JavaClass) string {
-// 	o := &JavaObject(voidptr(&jclazz)) //o := C.ClassToObject(jclazz)
-// 	return get_object_class_name(env, o)
-// }
-
 [inline]
 pub fn (jo JavaObject) class_name(env &Env) string {
 	obj := jo
