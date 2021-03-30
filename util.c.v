@@ -3,20 +3,20 @@
 module jni
 
 pub fn default_vm() &JavaVM {
-	return C.jniGetJavaVM()
+	return C.gGetJavaVM()
 }
 
 pub fn default_env() &Env {
-	return C.jniGetEnv()
+	return C.gGetEnv()
 }
 
 pub fn set_java_vm(vm &JavaVM) {
-	C.jniSetJavaVM(vm)
+	C.gSetJavaVM(vm)
 }
 
 pub fn setup_android(fq_activity_name string) {
 	$if android {
 		activity_name := fq_activity_name.replace('.', '/')
-		C.jniSetupAndroid(activity_name.str)
+		C.gSetupAndroid(activity_name.str)
 	}
 }
