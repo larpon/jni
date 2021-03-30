@@ -114,14 +114,14 @@ union C.jvalue {
 // TODO this currently work: o := &JavaObject(voidptr(&mid)) //o := C.MethodIDToObject(mid)
 //fn C.MethodIDToObject(cls C.jmethodID) C.jobject
 
-fn C.jniGetEnv() &C.JNIEnv
+fn C.gGetEnv() &C.JNIEnv
 
-fn C.jniGetJavaVM() &C.JavaVM
-fn C.jniSetJavaVM(vm &JavaVM)
+fn C.gGetJavaVM() &C.JavaVM
+fn C.gSetJavaVM(vm &JavaVM)
 
-fn C.jniFindClass(name charptr) C.jclass
+fn C.gFindClass(name charptr) C.jclass
 
-fn C.jniSetupAndroid(name charptr)
+fn C.gSetupAndroid(name charptr)
 
 // jni.h / jni_wrapper.h
 
@@ -143,7 +143,7 @@ pub fn find_class(env &Env, name string) JavaClass {
 	$if debug {
 		mut cls := C.jclass{}
 		$if android {
-			cls = C.jniFindClass(n.str)
+			cls = C.gFindClass(n.str)
 		} $else {
 			cls = C.FindClass(env, n.str)
 		}
@@ -159,7 +159,7 @@ pub fn find_class(env &Env, name string) JavaClass {
 		return cls
 	}
 	$if android {
-		return C.jniFindClass(n.str)
+		return C.gFindClass(n.str)
 	}
 	return C.FindClass(env, n.str)
 }

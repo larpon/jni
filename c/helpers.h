@@ -64,17 +64,17 @@ void __v_jni_log_d(const char *fmt, ...) {
 	#endif
 }
 
-void jniSetJavaVM(JavaVM* vm) {
-	__v_jni_log_d("jniSetJavaVM %p", vm);
+void gSetJavaVM(JavaVM* vm) {
+	__v_jni_log_d("gSetJavaVM %p", vm);
 	gJavaVM = vm;
 }
 
-JavaVM* jniGetJavaVM() {
+JavaVM* gGetJavaVM() {
 	return gJavaVM;
 }
 
 // Utility function to get JNIEnv
-JNIEnv* jniGetEnv() {
+JNIEnv* gGetEnv() {
 	JNIEnv *env;
 	if (gJavaVM == 0) {
 		__v_jni_log_e("Invalid global Java VM");
@@ -98,11 +98,11 @@ JNIEnv* jniGetEnv() {
 	return env;
 }
 
-void jniSetupAndroid(const char *fqActivityName) {
+void gSetupAndroid(const char *fqActivityName) {
 	#ifdef __ANDROID__
 	__v_jni_log_d("jniSetupAndroid()");
 	__v_jni_log_d(fqActivityName);
-	JNIEnv *env = jniGetEnv();
+	JNIEnv *env = gGetEnv();
 	//replace with one of your classes in the line below
 	__v_jni_log_d("jniSetupAndroid() finding activity class...");
 	jclass randomClass = (*env)->FindClass(env, fqActivityName);
@@ -130,10 +130,10 @@ void jniSetupAndroid(const char *fqActivityName) {
 // Called to save JavaVM if library is loaded from Java:
 int JNI_OnLoad(JavaVM* vm, void* reserved) {
 	__v_jni_log_i("JNI_OnLoad: saving gJavaVM %p",vm);
-	jniSetJavaVM(vm);
+	gSetJavaVM(vm);
 
 	#ifdef __ANDROID__
-	JNIEnv *env = jniGetEnv();
+	JNIEnv *env = gGetEnv();
 	//replace with one of your classes in the line below
 	jclass randomClass = (*env)->FindClass(env, "io/v/android/VActivity");
 	__v_jni_log_i("FindClass %p", randomClass);
@@ -158,8 +158,8 @@ int JNI_OnLoad(JavaVM* vm, void* reserved) {
 	return JNI_VERSION_1_6;
 }*/
 
-jclass jniFindClass(const char *name) {
-	JNIEnv *env = jniGetEnv();
+jclass gFindClass(const char *name) {
+	JNIEnv *env = gGetEnv();
 	return (*env)->CallObjectMethod(env, gClassLoader, gFindClassMethod, (*env)->NewStringUTF(env, name));
 }
 

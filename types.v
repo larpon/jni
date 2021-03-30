@@ -107,14 +107,14 @@ fn v2j_value(vt Type) JavaValue {
 			}
 		}
 		string {
-			// TODO this assumes default env AND allocates resources
-			jstr := jstring(C.jniGetEnv(), vt)
+			// TODO this assumes default env
+			jstr := jstring(default_env(), vt)
 			jobj := &JavaObject(voidptr(&jstr))
 			JavaValue{
 				l: jobj
 			}
 			//JavaValue{
-			//	l: C.StringToObject(jstring(C.jniGetEnv(), vt))
+			//	l: C.StringToObject(jstring(default_env(), vt))
 			//}
 		}
 		JavaObject {
