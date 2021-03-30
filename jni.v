@@ -12,7 +12,7 @@ pub const void_arg = []JavaValue{}
 struct CallResult {
 pub:
 	call        string
-	method_type MethodType
+//	method_type MethodType
 	result      Type // TODO = Void ??
 }
 
