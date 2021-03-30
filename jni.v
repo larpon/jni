@@ -7,7 +7,7 @@ import jni.c
 // TODO
 pub const used_import = c.used_import
 
-pub const no_value_arg = []JavaValue{}
+pub const void_arg = []JavaValue{}
 
 struct CallResult {
 pub:
@@ -92,6 +92,18 @@ pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 			CallResult{
 				call: signature
 				val: call_static_boolean_method_a(env, class, mid, jv_args.data)
+			}
+		}
+		'byte' {
+			CallResult{
+				call: signature
+				val: call_static_byte_method_a(env, class, mid, jv_args.data)
+			}
+		}
+		'rune' {
+			CallResult{
+				call: signature
+				val: call_static_char_method_a(env, class, mid, jv_args.data)
 			}
 		}
 		'i16' {
@@ -186,6 +198,18 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 				val: call_boolean_method_a(env, obj, mid, jv_args.data)
 			}
 		}
+		'byte' {
+			CallResult{
+				call: signature
+				val: call_byte_method_a(env, obj, mid, jv_args.data)
+			}
+		}
+		'rune' {
+			CallResult{
+				call: signature
+				val: call_char_method_a(env, obj, mid, jv_args.data)
+			}
+		}
 		'i16' {
 			CallResult{
 				call: signature
@@ -258,7 +282,7 @@ pub fn get_object_class_name(env &Env, obj JavaObject) string {
 
 	mid_get_name := get_method_id(env, classclass, 'getName', '()Ljava/lang/String;')
 
-	jstr_class_name := call_object_method_a(env, obj, mid_get_name, no_value_arg.data)
+	jstr_class_name := call_object_method_a(env, obj, mid_get_name, void_arg.data)
 	$if debug {
 		if exception_check(env) {
 			exception_describe(env)
@@ -268,7 +292,7 @@ pub fn get_object_class_name(env &Env, obj JavaObject) string {
 			panic("An exception occured. Couldn't call \"getName\" method on object \"$obj\" in jni.Env (${ptr_str(env)})")
 		}
 	}
-	// TODO NOTE
+	// TODO NOTE current way of casting
 	jstr := &JavaString(voidptr(&jstr_class_name))
 	return j2v_string(env, jstr)
 	//return j2v_string(env, C.ObjectToString(jstr_class_name))

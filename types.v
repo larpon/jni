@@ -1,7 +1,7 @@
 module jni
 
 type Void = bool
-type Type = JavaObject | Void | bool | f32 | f64| i16 | int | i64 | string //| rune |  byte
+type Type = JavaObject | Void | bool | f32 | f64| i16 | int | i64 | string | rune |  byte
 
 // pub type Any = string | int | i64 | f32 | f64 | bool | []Any | map[voidptr]Any
 enum MethodType {
@@ -30,7 +30,7 @@ F                         | float                 | f32
 ---------------------------------------------------------------------------
 D                         | double                | f64
 ---------------------------------------------------------------------------
-L fully-qualified-class ; | fully-qualified-class | N/A
+L fully-qualified-class ; | fully-qualified-class |
 ---------------------------------------------------------------------------
 [ type                    | type[]                |
 ---------------------------------------------------------------------------
@@ -49,11 +49,13 @@ pub fn v2j_fn_name(v_func_name string) string {
 fn v2j_signature_type(vt Type) string {
 	return match vt {
 		bool { 'Z' }
-		f32 { 'F' }
-		f64 { 'D' }
+		byte { 'B' }
+		rune { 'C' }
 		i16 { 'S' }
 		int { 'I' }
 		i64 { 'J' }
+		f32 { 'F' }
+		f64 { 'D' }
 		string { 'Ljava/lang/String;' }
 		JavaObject { 'Ljava/lang/Object;' }
 		else { 'V' } // void
@@ -63,6 +65,8 @@ fn v2j_signature_type(vt Type) string {
 fn v2j_string_signature_type(vt string) string {
 	return match vt {
 		'bool' { 'Z' }
+		'byte' { 'B' }
+		'rune' { 'C' }
 		'i16' { 'S' }
 		'int' { 'I' }
 		'i64' { 'J' }
@@ -79,6 +83,16 @@ fn v2j_value(vt Type) JavaValue {
 		bool {
 			JavaValue{
 				z: jboolean(vt)
+			}
+		}
+		byte {
+			JavaValue{
+				b: jbyte(vt)
+			}
+		}
+		rune {
+			JavaValue{
+				c: jchar(vt)
 			}
 		}
 		f32 {
