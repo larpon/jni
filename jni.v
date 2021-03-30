@@ -88,7 +88,7 @@ pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 	$if debug {
 		println(@MOD + '.' + @FN + ' Java call style definition: "$fqn -> $jdef"')
 	}
-	class, mid := get_class_static_method_id(env, jdef) or { panic(err) }
+	class, mid := get_class_static_method_id(env, jdef)
 
 	mut call_result := CallResult{}
 	//
@@ -203,7 +203,7 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 	$if debug {
 		println(@MOD + '.' + @FN + ' Java call style definition: "$fqn -> $jdef"')
 	}
-	_, mid := get_object_class_and_method_id(env, obj, jdef) or { panic(err) }
+	_, mid := get_object_class_and_method_id(env, obj, jdef)
 
 	mut call_result := CallResult{}
 	//
@@ -292,7 +292,7 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 	$if debug {
 		if exception_check(env) {
 			exception_describe(env)
-			excp := 'An exception occured while executing "$signature" in JNIEnv (${ptr_str(env)})'
+			excp := @MOD + '.' + @FN + ' an exception occured while executing "$signature" in JNIEnv (${ptr_str(env)})'
 			// throw_exception(env, excp)
 			panic(excp)
 		}
@@ -312,7 +312,7 @@ pub fn get_object_class_name(env &Env, obj JavaObject) string {
 			if !isnil(jstr_class_name) {
 				delete_local_ref(env, jstr_class_name)
 			}
-			panic("An exception occured. Couldn't call \"getName\" method on object \"$obj\" in jni.Env (${ptr_str(env)})")
+			panic(@MOD + '.' + @FN + " an exception occured. Couldn't call \"getName\" method on object \"$obj\" in jni.Env (${ptr_str(env)})")
 		}
 	}
 	// TODO NOTE current way of casting
@@ -326,7 +326,7 @@ pub fn get_class_name(env &Env, jclazz JavaClass) string {
 	return get_object_class_name(env, o)
 }
 
-pub fn get_class_static_method_id(env &Env, fqn_sig string) ?(JavaClass, JavaMethodID) {
+pub fn get_class_static_method_id(env &Env, fqn_sig string) (JavaClass, JavaMethodID) {
 	clazz, fn_name, fn_sig := v2j_signature(fqn_sig)
 	mut jclazz := JavaClass{}
 	// Find the Java class
@@ -339,7 +339,7 @@ pub fn get_class_static_method_id(env &Env, fqn_sig string) ?(JavaClass, JavaMet
 	return jclazz, mid
 }
 
-pub fn get_object_class_and_method_id(env &Env, obj JavaObject, fqn_sig string) ?(JavaClass, JavaMethodID) {
+pub fn get_object_class_and_method_id(env &Env, obj JavaObject, fqn_sig string) (JavaClass, JavaMethodID) {
 	_, f_name, f_sig := v2j_signature(fqn_sig)
 	// Find the class of the object
 	jclazz := get_object_class(env, obj)
