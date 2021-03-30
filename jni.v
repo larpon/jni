@@ -81,8 +81,8 @@ pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 	mut jargs := ''
 
 	for vt in args {
-		jargs += v2j_signature_type(vt)
-		jv_args << v2j_value(vt)
+		jargs += v2j_signature_type(env, vt)
+		jv_args << v2j_value(env, vt)
 	}
 	jdef := fqn + '(' + jargs + ')' + v2j_string_signature_type(return_type)
 	$if debug {
@@ -196,8 +196,8 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 	mut jargs := ''
 
 	for vt in args {
-		jargs += v2j_signature_type(vt)
-		jv_args << v2j_value(vt)
+		jargs += v2j_signature_type(env, vt)
+		jv_args << v2j_value(env, vt)
 	}
 	jdef := fqn + '(' + jargs + ')' + v2j_string_signature_type(return_type)
 	$if debug {

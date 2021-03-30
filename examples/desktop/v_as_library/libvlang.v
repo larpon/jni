@@ -54,11 +54,8 @@ fn call_object_methods(env &jni.Env, thiz jni.JavaObject) {
 	clsn := java_object.class_name(env)
 	println('V: Class name: "$clsn"')
 	println('V: Passing io.vlang.V object type from V to Java...')
-	// Wrap the JavaObject as a JavaTypeObject to give it a
-	// specific type - in this case the type of the object is "io.vlang.V"
-	v_typed_object := jni.type_object(env, java_object) // TODO
-	// call "public void passInstance(V v)" on "io.vlang.V"
-	jni.call_object_method(env, thiz, 'passInstance(io.vlang.V)',v_typed_object)
+	// call "public void passInstance(V v)" on "io.vlang.V" instance
+	jni.call_object_method(env, thiz, 'passInstance(io.vlang.V)',java_object)
 }
 
 [export: 'JNICALL Java_io_vlang_V_vGetString']
