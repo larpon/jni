@@ -143,7 +143,6 @@ fn v2j_value(env &Env, vt Type) JavaValue {
 			}
 		}
 		string {
-			// TODO this assumes default env
 			jstr := jstring(env, vt)
 			jobj := &JavaObject(voidptr(&jstr))
 			JavaValue{
