@@ -60,14 +60,14 @@ pub fn sig(pkg string, f_name string, rt Type, args ...Type) string {
 fn parse_signature(fqn_sig string) (string, string) {
 	sig := fqn_sig.trim_space()
 	fqn := sig.all_before('(')
-	// args := '('+sig.all_after('(').all_before_last(')')+')'
 	mut return_type := sig.all_after_last(')').trim_space()
 	if return_type == '' {
 		return_type = 'void'
 	}
-	// fargs := sig.all_after('(').all_before(')')
 	$if debug {
-		println(@MOD + '.' + @FN + ' ' + '"$sig" -> fqn: "$fqn", return: "$return_type"')
+		args_str := sig.all_after('(').all_before(')')
+		args := '('+args_str+')'
+		println(@MOD + '.' + @FN + ' ' + '"$sig" -> "$fqn$args $return_type"')
 	}
 
 	return fqn, return_type
@@ -85,81 +85,93 @@ pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 		jv_args << v2j_value(vt)
 	}
 	jdef := fqn + '(' + jargs + ')' + v2j_string_signature_type(return_type)
-
+	$if debug {
+		println(@MOD + '.' + @FN + ' Java call style definition: "$fqn -> $jdef"')
+	}
 	class, mid := get_class_static_method_id(env, jdef) or { panic(err) }
-	call_result := match return_type {
-		'bool' {
-			CallResult{
-				call: signature
-				val: call_static_boolean_method_a(env, class, mid, jv_args.data)
-			}
+
+	mut call_result := CallResult{}
+	//
+	if return_type.contains('/') || return_type.contains('.') {
+		call_result = CallResult{
+			call: signature
+			val: call_static_boolean_method_a(env, class, mid, jv_args.data)
 		}
-		'byte' {
-			CallResult{
-				call: signature
-				val: call_static_byte_method_a(env, class, mid, jv_args.data)
+	} else {
+		call_result = match return_type {
+			'bool' {
+				CallResult{
+					call: signature
+					val: call_static_boolean_method_a(env, class, mid, jv_args.data)
+				}
 			}
-		}
-		'rune' {
-			CallResult{
-				call: signature
-				val: call_static_char_method_a(env, class, mid, jv_args.data)
+			'byte' {
+				CallResult{
+					call: signature
+					val: call_static_byte_method_a(env, class, mid, jv_args.data)
+				}
 			}
-		}
-		'i16' {
-			CallResult{
-				call: signature
-				val: call_static_short_method_a(env, class, mid, jv_args.data)
+			'rune' {
+				CallResult{
+					call: signature
+					val: call_static_char_method_a(env, class, mid, jv_args.data)
+				}
 			}
-		}
-		'int' {
-			CallResult{
-				call: signature
-				val: call_static_int_method_a(env, class, mid, jv_args.data)
+			'i16' {
+				CallResult{
+					call: signature
+					val: call_static_short_method_a(env, class, mid, jv_args.data)
+				}
 			}
-		}
-		'i64' {
-			CallResult{
-				call: signature
-				val: call_static_long_method_a(env, class, mid, jv_args.data)
+			'int' {
+				CallResult{
+					call: signature
+					val: call_static_int_method_a(env, class, mid, jv_args.data)
+				}
 			}
-		}
-		'f32' {
-			CallResult{
-				call: signature
-				val: call_static_float_method_a(env, class, mid, jv_args.data)
+			'i64' {
+				CallResult{
+					call: signature
+					val: call_static_long_method_a(env, class, mid, jv_args.data)
+				}
 			}
-		}
-		'f64' {
-			CallResult{
-				call: signature
-				val: call_static_double_method_a(env, class, mid, jv_args.data)
+			'f32' {
+				CallResult{
+					call: signature
+					val: call_static_float_method_a(env, class, mid, jv_args.data)
+				}
 			}
-		}
-		'string' {
-			jobject := call_static_object_method_a(env, class, mid, jv_args.data)
-			jstr := &JavaString(voidptr(&jobject))
-			//jstr :=  C.ObjectToString(call_static_object_method_a(env, class, mid, jv_args.data))
-			CallResult{
-				call: signature
-				val: j2v_string(env, jstr)
+			'f64' {
+				CallResult{
+					call: signature
+					val: call_static_double_method_a(env, class, mid, jv_args.data)
+				}
 			}
-		}
-		'object' {
-			CallResult{
-				call: signature
-				val: call_static_object_method_a(env, class, mid, jv_args.data)
+			'string' {
+				jobject := call_static_object_method_a(env, class, mid, jv_args.data)
+				jstr := &JavaString(voidptr(&jobject))
+				//jstr :=  C.ObjectToString(call_static_object_method_a(env, class, mid, jv_args.data))
+				CallResult{
+					call: signature
+					val: j2v_string(env, jstr)
+				}
 			}
-		}
-		'void' {
-			call_static_void_method_a(env, class, mid, jv_args.data)
-			CallResult{
-				call: signature
-				//val: Void{}
+			'object' {
+				CallResult{
+					call: signature
+					val: call_static_object_method_a(env, class, mid, jv_args.data)
+				}
 			}
-		}
-		else {
-			CallResult{}
+			'void' {
+				call_static_void_method_a(env, class, mid, jv_args.data)
+				CallResult{
+					call: signature
+					//val: Void{}
+				}
+			}
+			else {
+				CallResult{}
+			}
 		}
 	}
 	// Check for any exceptions
@@ -178,7 +190,6 @@ pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 }
 
 pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Type) CallResult {
-	// println(@FN+': $signature')
 	fqn, return_type := parse_signature(signature)
 
 	mut jv_args := []JavaValue{}
@@ -189,80 +200,92 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 		jv_args << v2j_value(vt)
 	}
 	jdef := fqn + '(' + jargs + ')' + v2j_string_signature_type(return_type)
+	$if debug {
+		println(@MOD + '.' + @FN + ' Java call style definition: "$fqn -> $jdef"')
+	}
 	_, mid := get_object_class_and_method_id(env, obj, jdef) or { panic(err) }
 
-	call_result := match return_type {
-		'bool' {
-			CallResult{
-				call: signature
-				val: call_boolean_method_a(env, obj, mid, jv_args.data)
-			}
+	mut call_result := CallResult{}
+	//
+	if return_type.contains('/') || return_type.contains('.') {
+		call_result = CallResult{
+			call: signature
+			val: call_object_method_a(env, obj, mid, jv_args.data)
 		}
-		'byte' {
-			CallResult{
-				call: signature
-				val: call_byte_method_a(env, obj, mid, jv_args.data)
+	} else {
+		call_result = match return_type {
+			'bool' {
+				CallResult{
+					call: signature
+					val: call_boolean_method_a(env, obj, mid, jv_args.data)
+				}
 			}
-		}
-		'rune' {
-			CallResult{
-				call: signature
-				val: call_char_method_a(env, obj, mid, jv_args.data)
+			'byte' {
+				CallResult{
+					call: signature
+					val: call_byte_method_a(env, obj, mid, jv_args.data)
+				}
 			}
-		}
-		'i16' {
-			CallResult{
-				call: signature
-				val: call_short_method_a(env, obj, mid, jv_args.data)
+			'rune' {
+				CallResult{
+					call: signature
+					val: call_char_method_a(env, obj, mid, jv_args.data)
+				}
 			}
-		}
-		'int' {
-			CallResult{
-				call: signature
-				val: call_int_method_a(env, obj, mid, jv_args.data)
+			'i16' {
+				CallResult{
+					call: signature
+					val: call_short_method_a(env, obj, mid, jv_args.data)
+				}
 			}
-		}
-		'i64' {
-			CallResult{
-				call: signature
-				val: call_long_method_a(env, obj, mid, jv_args.data)
+			'int' {
+				CallResult{
+					call: signature
+					val: call_int_method_a(env, obj, mid, jv_args.data)
+				}
 			}
-		}
-		'f32' {
-			CallResult{
-				call: signature
-				val: call_float_method_a(env, obj, mid, jv_args.data)
+			'i64' {
+				CallResult{
+					call: signature
+					val: call_long_method_a(env, obj, mid, jv_args.data)
+				}
 			}
-		}
-		'f64' {
-			CallResult{
-				call: signature
-				val: call_double_method_a(env, obj, mid, jv_args.data)
+			'f32' {
+				CallResult{
+					call: signature
+					val: call_float_method_a(env, obj, mid, jv_args.data)
+				}
 			}
-		}
-		'string' {
-			jobject := call_object_method_a(env, obj, mid, jv_args.data)
-			jstr := &JavaString(voidptr(&jobject))
-			//jstr := C.ObjectToString(call_object_method_a(env, obj, mid, jv_args.data))
-			CallResult{
-				call: signature
-				val: j2v_string(env, jstr)
+			'f64' {
+				CallResult{
+					call: signature
+					val: call_double_method_a(env, obj, mid, jv_args.data)
+				}
 			}
-		}
-		'object' {
-			CallResult{
-				call: signature
-				val: call_object_method_a(env, obj, mid, jv_args.data)
+			'string' {
+				jobject := call_object_method_a(env, obj, mid, jv_args.data)
+				jstr := &JavaString(voidptr(&jobject))
+				//jstr := C.ObjectToString(call_object_method_a(env, obj, mid, jv_args.data))
+				CallResult{
+					call: signature
+					val: j2v_string(env, jstr)
+				}
 			}
-		}
-		'void' {
-			call_void_method_a(env, obj, mid, jv_args.data)
-			CallResult{
-				call: signature
+			'object' {
+				CallResult{
+					call: signature
+					val: call_object_method_a(env, obj, mid, jv_args.data)
+				}
 			}
-		}
-		else {
-			CallResult{}
+			'void' {
+				call_void_method_a(env, obj, mid, jv_args.data)
+				CallResult{
+					call: signature
+				}
+			}
+			else {
+				CallResult{}
+			}
 		}
 	}
 	// Check for any exceptions

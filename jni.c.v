@@ -25,7 +25,6 @@ type JavaFloatArray = C.jfloatArray
 type JavaDoubleArray = C.jdoubleArray
 type JavaObjectArray = C.jobjectArray
 
-
 pub type JavaValue = C.jvalue
 
 // jni.h
