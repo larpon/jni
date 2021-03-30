@@ -65,7 +65,7 @@ void __v_jni_log_d(const char *fmt, ...) {
 }
 
 void gSetJavaVM(JavaVM* vm) {
-	__v_jni_log_d("gSetJavaVM %p", vm);
+	__v_jni_log_d("jni.c.gSetJavaVM %p\n", vm);
 	gJavaVM = vm;
 }
 
@@ -77,7 +77,7 @@ JavaVM* gGetJavaVM() {
 JNIEnv* gGetEnv() {
 	JNIEnv *env;
 	if (gJavaVM == 0) {
-		__v_jni_log_e("Invalid global Java VM");
+		__v_jni_log_e("jni.c: Invalid global Java VM");
 		return 0;
 	}
 
@@ -85,14 +85,14 @@ JNIEnv* gGetEnv() {
 	status = (*gJavaVM)->GetEnv(gJavaVM,(void **) &env, JNI_VERSION_1_6);
 
 	if (status < 0) {
-		__v_jni_log_i("Attaching thread to get JNI environment from Java VM %p", gJavaVM);
+		__v_jni_log_i("jni.c: Attaching thread to get JNI environment from Java VM %p", gJavaVM);
 		// Try to attach native thread to JVM:
 		status = (*gJavaVM)->AttachCurrentThread(gJavaVM, &env, 0);
 		if (status < 0) {
-			__v_jni_log_e("Failed to attach current thread to Java VM %p", gJavaVM);
+			__v_jni_log_e("jni.c: Failed to attach current thread to Java VM %p", gJavaVM);
 			return 0;
 		}
-		__v_jni_log_i("Attached to thread successfully");
+		__v_jni_log_i("jni.c: Attached to thread successfully");
 	}
 
 	return env;
@@ -100,28 +100,28 @@ JNIEnv* gGetEnv() {
 
 void gSetupAndroid(const char *fqActivityName) {
 	#ifdef __ANDROID__
-	__v_jni_log_d("jniSetupAndroid()");
+	__v_jni_log_d("jni.c.gSetupAndroid()");
 	__v_jni_log_d(fqActivityName);
 	JNIEnv *env = gGetEnv();
 	//replace with one of your classes in the line below
-	__v_jni_log_d("jniSetupAndroid() finding activity class...");
+	__v_jni_log_d("jni.c.gSetupAndroid() finding activity class...");
 	jclass randomClass = (*env)->FindClass(env, fqActivityName);
-	__v_jni_log_d("FindClass %p", randomClass);
+	__v_jni_log_d("jni.c.gSetupAndroid() FindClass %p", randomClass);
 	if (ExceptionCheck(env) == JNI_TRUE) { ExceptionDescribe(env); }
 	jclass classClass = (*env)->GetObjectClass(env, randomClass);
-	__v_jni_log_d("GetObjectClass %p", classClass);
+	__v_jni_log_d("jni.c.gSetupAndroid() GetObjectClass %p", classClass);
 	if (ExceptionCheck(env) == JNI_TRUE) { ExceptionDescribe(env); }
 	jclass classLoaderClass = (*env)->FindClass(env, "java/lang/ClassLoader");
-	__v_jni_log_d("FindClass %p", classLoaderClass);
+	__v_jni_log_d("jni.c.gSetupAndroid() FindClass %p", classLoaderClass);
 	if (ExceptionCheck(env) == JNI_TRUE) { ExceptionDescribe(env); }
 	jmethodID getClassLoaderMethod = (*env)->GetMethodID(env, classClass, "getClassLoader", "()Ljava/lang/ClassLoader;");
-	__v_jni_log_d("GetMethodID %d", getClassLoaderMethod);
+	__v_jni_log_d("jni.c.gSetupAndroid() GetMethodID %d", getClassLoaderMethod);
 	if (ExceptionCheck(env) == JNI_TRUE) { ExceptionDescribe(env); }
 	gClassLoader = (*env)->NewGlobalRef(env, (*env)->CallObjectMethod(env, randomClass, getClassLoaderMethod));
-	__v_jni_log_d("gClassLoader %p", gClassLoader);
+	__v_jni_log_d("jni.c.gSetupAndroid() gClassLoader %p", gClassLoader);
 	if (ExceptionCheck(env) == JNI_TRUE) { ExceptionDescribe(env); }
 	gFindClassMethod = (*env)->GetMethodID(env, classLoaderClass, "findClass", "(Ljava/lang/String;)Ljava/lang/Class;");
-	__v_jni_log_d("GetMethodID %d", gFindClassMethod);
+	__v_jni_log_d("jni.c.gSetupAndroid() GetMethodID %d", gFindClassMethod);
 	if (ExceptionCheck(env) == JNI_TRUE) { ExceptionDescribe(env); }
 	#endif
 }

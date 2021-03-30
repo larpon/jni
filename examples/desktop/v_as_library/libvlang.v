@@ -19,7 +19,7 @@ fn call_static_methods(env &jni.Env, thiz jni.JavaObject) {
 	// Object call style
 	jo := jni.object(env, thiz, pkg)
 	jor := jo.call(.@static, 'getInt() int').val as int
-	println('V jni.CallResult.int: $jor')
+	println('V: jni.CallResult.int: $jor')
 
 	// flat call style
 	r := jni.call_static_method(env, 'io.vlang.V.getInt() int')
@@ -29,7 +29,7 @@ fn call_static_methods(env &jni.Env, thiz jni.JavaObject) {
 	r3 := jni.call_static_method(env, 'io.vlang.V.mixedArguments(bool, int) int', true, 2)
 	println('V: $r3.val')
 
-	vprintln('vprintln')
+	jprintln('Hello from V - this shows up in Java')
 
 	jffr := java_float_func('Hello',22)
 	println('V: java_float_func(\'Hello\',22) -> $jffr')
@@ -43,9 +43,20 @@ fn call_object_methods(env &jni.Env, thiz jni.JavaObject) {
 	// Call method on the object passed in "thiz" (io.vlang.V.setInt(int))
 	jo := jni.object(env, thiz, pkg)
 	jor := jo.call(.instance, 'setInt(int)', 53)
-	println('V jni.Object: $jor')
+	println('V: jni.Object: $jor')
 	//
 	jni.call_object_method(env, thiz, 'setInt(int)', 42)
+
+	println('V: Passing io.vlang.V object type from Java to V...')
+	// call "public V getInstance()" on "io.vlang.V"
+	v_java_object_instance := jni.call_object_method(env, thiz, 'getInstance() io.vlang.V').val as jni.JavaObject
+
+	println('V: Passing io.vlang.V object type from V to Java...')
+	// Wrap the JavaObject as a JavaTypeObject to give it a
+	// specific type - in this case the type of the object is "io.vlang.V"
+	v_typed_object := jni.type_object(v_java_object_instance,'io.vlang.V')
+	// call "public void passInstance(V v)" on "io.vlang.V"
+	jni.call_object_method(env, thiz, 'passInstance(io.vlang.V)',v_typed_object)
 }
 
 [export: 'JNICALL Java_io_vlang_V_vGetString']
@@ -78,7 +89,7 @@ fn add_v_int(env &jni.Env, thiz jni.JavaObject, a int, b int) int {
  * 3. Use default/main thread JNIEnv to call the Java method.
  * 4. Effectively call: io.vlang.V.vprintln(text) in the JavaVM.
 */
-fn vprintln(text string) {
+fn jprintln(text string) {
 	meth := pkg+'.'+jni.v2j_fn_name(@FN) /*1*/ +'('+typeof(text).name+')' /*2*/
 	auto.call_static_method/*3*/(meth,text)/*4*/
 }
