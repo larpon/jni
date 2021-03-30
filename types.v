@@ -11,7 +11,7 @@ pub struct JavaTypeObject {
 // pub type Any = string | int | i64 | f32 | f64 | bool | []Any | map[voidptr]Any
 enum MethodType {
 	@static
-	instance
+	object
 }
 
 /*
@@ -35,7 +35,7 @@ F                         | float                 | f32
 ---------------------------------------------------------------------------
 D                         | double                | f64
 ---------------------------------------------------------------------------
-L fully-qualified-class ; | fully-qualified-class |
+L fully-qualified-class ; | fully-qualified-class | 'some.org.id.ClassName'
 ---------------------------------------------------------------------------
 [ type                    | type[]                |
 ---------------------------------------------------------------------------
@@ -43,10 +43,11 @@ L fully-qualified-class ; | fully-qualified-class |
 ---------------------------------------------------------------------------
 */
 
-pub fn type_object(obj JavaObject, typ string) JavaTypeObject {
+[inline]
+pub fn type_object(env &Env, obj JavaObject) JavaTypeObject {
 	return JavaTypeObject{
 		object: obj
-		@type: typ
+		@type: obj.class_name(env)
 	}
 }
 

@@ -290,7 +290,7 @@ pub fn get_object_class(env &Env, obj JavaObject) JavaClass {
 			if !isnil(obj) {
 				delete_local_ref(env, obj)
 			}
-			panic(@MOD + '.' + @FN + ': an exception occured in the Java VM while trying to find class of object "$obj" in jni.Env (${ptr_str(env)})')
+			panic(@MOD + '.' + @FN + ': an exception occured in the Java VM while trying to find class of object "${ptr_str(obj)}" in jni.Env (${ptr_str(env)})')
 		}
 		return clazz
 	}
@@ -312,7 +312,7 @@ pub fn get_method_id(env &Env, clazz JavaClass, name string, sig string) JavaMet
 				o := &JavaObject(voidptr(&mid)) //o := C.MethodIDToObject(mid)
 				delete_local_ref(env, o)
 			}
-			panic(@MOD + '.' + @FN + ': an exception occured in the JavaVM while trying to find method "$name'+'($sig)" on class "$clazz" in jni.Env (${ptr_str(env)})')
+			panic(@MOD + '.' + @FN + ': an exception occured in the JavaVM while trying to find method "$name'+'$sig" on class "${ptr_str(clazz)}" in jni.Env (${ptr_str(env)})')
 		}
 		return mid
 	}

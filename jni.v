@@ -26,7 +26,7 @@ pub fn throw_exception(env &Env, msg string) {
 pub fn panic_on_exception(env &Env) {
 	if exception_check(env) {
 		exception_describe(env)
-		panic('An exception occured in jni.Env (${ptr_str(env)})')
+		panic(@MOD + '.' + @FN + ' an exception occured in jni.Env (${ptr_str(env)})')
 	}
 }
 
@@ -300,33 +300,7 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 	return call_result
 }
 
-pub fn get_object_class_name(env &Env, obj JavaObject) string {
-	classclass := get_object_class(env, obj)
-
-	mid_get_name := get_method_id(env, classclass, 'getName', '()Ljava/lang/String;')
-
-	jstr_class_name := call_object_method_a(env, obj, mid_get_name, void_arg.data)
-	$if debug {
-		if exception_check(env) {
-			exception_describe(env)
-			if !isnil(jstr_class_name) {
-				delete_local_ref(env, jstr_class_name)
-			}
-			panic(@MOD + '.' + @FN + " an exception occured. Couldn't call \"getName\" method on object \"$obj\" in jni.Env (${ptr_str(env)})")
-		}
-	}
-	// TODO NOTE current way of casting
-	jstr := &JavaString(voidptr(&jstr_class_name))
-	return j2v_string(env, jstr)
-	//return j2v_string(env, C.ObjectToString(jstr_class_name))
-}
-
-pub fn get_class_name(env &Env, jclazz JavaClass) string {
-	o := &JavaObject(voidptr(&jclazz)) //o := C.ClassToObject(jclazz)
-	return get_object_class_name(env, o)
-}
-
-pub fn get_class_static_method_id(env &Env, fqn_sig string) (JavaClass, JavaMethodID) {
+fn get_class_static_method_id(env &Env, fqn_sig string) (JavaClass, JavaMethodID) {
 	clazz, fn_name, fn_sig := v2j_signature(fqn_sig)
 	mut jclazz := JavaClass{}
 	// Find the Java class
@@ -339,11 +313,72 @@ pub fn get_class_static_method_id(env &Env, fqn_sig string) (JavaClass, JavaMeth
 	return jclazz, mid
 }
 
-pub fn get_object_class_and_method_id(env &Env, obj JavaObject, fqn_sig string) (JavaClass, JavaMethodID) {
+fn get_object_class_and_method_id(env &Env, obj JavaObject, fqn_sig string) (JavaClass, JavaMethodID) {
 	_, f_name, f_sig := v2j_signature(fqn_sig)
 	// Find the class of the object
 	jclazz := get_object_class(env, obj)
 	// Find the method on the class
 	mid := get_method_id(env, jclazz, f_name, f_sig)
 	return jclazz, mid
+}
+
+
+// pub fn get_object_class_name(env &Env, obj JavaObject) string {
+// 	classclass := get_object_class(env, obj)
+//
+// 	mid_get_name := get_method_id(env, classclass, 'getName', '()Ljava/lang/String;')
+//
+// 	jstr_class_name := call_object_method_a(env, obj, mid_get_name, void_arg.data)
+// 	$if debug {
+// 		if exception_check(env) {
+// 			exception_describe(env)
+// 			if !isnil(jstr_class_name) {
+// 				delete_local_ref(env, jstr_class_name)
+// 			}
+// 			panic(@MOD + '.' + @FN + " an exception occured. Couldn't call \"getName\" method on object \"$obj\" in jni.Env (${ptr_str(env)})")
+// 		}
+// 	}
+// 	// TODO NOTE current way of casting
+// 	jstr := &JavaString(voidptr(&jstr_class_name))
+// 	return j2v_string(env, jstr)
+// 	//return j2v_string(env, C.ObjectToString(jstr_class_name))
+// }
+
+
+// pub fn get_class_name(env &Env, jclazz JavaClass) string {
+// 	o := &JavaObject(voidptr(&jclazz)) //o := C.ClassToObject(jclazz)
+// 	return get_object_class_name(env, o)
+// }
+
+[inline]
+pub fn (jo JavaObject) class_name(env &Env) string {
+	obj := jo
+	mut cls := get_object_class(env, obj)
+	// First get the class object
+	mut mid := get_method_id(env, cls, "getClass", "()Ljava/lang/Class;")
+	cls_obj := call_object_method_a(env, obj, mid, void_arg.data)
+	// Get the class object's class descriptor
+	cls = get_object_class(env, cls_obj)
+	// Find the getName() method on the class object
+	mid = get_method_id(env, cls, "getName", "()Ljava/lang/String;")
+	// Call the getName() to get a jstring object back
+	str_obj := call_object_method_a(env, cls_obj, mid, void_arg.data)
+	// TODO NOTE current way of casting
+	jstr := &JavaString(voidptr(&str_obj))
+	return j2v_string(env, jstr)
+}
+
+[inline]
+pub fn (jo JavaObject) call(env &Env, typ MethodType, signature string, args ...Type) CallResult {
+	pkg := jo.class_name(env)
+	return match typ {
+		.@static { call_static_method(env, pkg + '.' + signature, ...args) }
+		.object { call_object_method(env, jo, pkg + '.' + signature, ...args) }
+	}
+}
+
+[inline]
+pub fn (jc JavaClass) get_name(env &Env) string {
+	o := &JavaObject(voidptr(&jc))
+	return o.class_name(env)
 }

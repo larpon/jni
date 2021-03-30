@@ -17,7 +17,7 @@ fn jni_on_load(vm &jni.JavaVM, reserved voidptr) int {
 [export: 'JNICALL Java_io_vlang_V_callStaticMethods']
 fn call_static_methods(env &jni.Env, thiz jni.JavaObject) {
 	// Object call style
-	jo := jni.object(env, thiz, pkg)
+	jo := jni.object(env, thiz)
 	jor := jo.call(.@static, 'getInt() int').val as int
 	println('V: jni.CallResult.int: $jor')
 
@@ -41,20 +41,22 @@ fn call_static_methods(env &jni.Env, thiz jni.JavaObject) {
 [export: 'JNICALL Java_io_vlang_V_callObjectMethods']
 fn call_object_methods(env &jni.Env, thiz jni.JavaObject) {
 	// Call method on the object passed in "thiz" (io.vlang.V.setInt(int))
-	jo := jni.object(env, thiz, pkg)
-	jor := jo.call(.instance, 'setInt(int)', 53)
+	jo := jni.object(env, thiz)
+	jor := jo.call(.object, 'setInt(int)', 53)
 	println('V: jni.Object: $jor')
 	//
 	jni.call_object_method(env, thiz, 'setInt(int)', 42)
 
 	println('V: Passing io.vlang.V object type from Java to V...')
 	// call "public V getInstance()" on "io.vlang.V"
-	v_java_object_instance := jni.call_object_method(env, thiz, 'getInstance() io.vlang.V').val as jni.JavaObject
+	java_object := jni.call_object_method(env, thiz, 'getInstance() io.vlang.V').val as jni.JavaObject
 
+	clsn := java_object.class_name(env)
+	println('V: Class name: "$clsn"')
 	println('V: Passing io.vlang.V object type from V to Java...')
 	// Wrap the JavaObject as a JavaTypeObject to give it a
 	// specific type - in this case the type of the object is "io.vlang.V"
-	v_typed_object := jni.type_object(v_java_object_instance,'io.vlang.V')
+	v_typed_object := jni.type_object(env, java_object) // TODO
 	// call "public void passInstance(V v)" on "io.vlang.V"
 	jni.call_object_method(env, thiz, 'passInstance(io.vlang.V)',v_typed_object)
 }
@@ -72,6 +74,7 @@ fn get_v_string(env &jni.Env, thiz jni.JavaObject) jni.JavaString {
 
 [export: 'JNICALL Java_io_vlang_V_vGetInt']
 fn get_v_int(env &jni.Env, thiz jni.JavaObject) int {
+	thiz.call(env, .@static, 'jprintln(string)','called get_v_int()')
 	i := 42
 	return i
 }
