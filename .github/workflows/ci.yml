@@ -40,10 +40,12 @@ jobs:
         cd ..
         export VEXE="$(pwd)/v"
         export JAVA_HOME=$JAVA_HOME_11_X64
+        # Test basic shell operation
         cd $HOME/.vmodules/jni/examples/desktop/v_as_library
         export LD_LIBRARY_PATH=$(pwd):.
         $VEXE -cc gcc -cg  -shared libvlang.v
         javac io/vlang/V.java
         java io.vlang.V
+        # Test build_and_run.vsh
         cd $HOME/.vmodules/jni/examples/desktop/simple
-        $VEXE run ./build.vsh
+        $VEXE run ./build_and_run.vsh

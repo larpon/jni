@@ -30,9 +30,18 @@ os.setenv('JAVA_HOME', javahome, false)
 os.setenv('LD_LIBRARY_PATH', os.getenv('LD_LIBRARY_PATH') + os.path_delimiter + os.getwd(),
 	true)
 
-eprintln('Compiling shared libvlang.o')
-os.system('v -cg -prod -shared libvlang.v')
+lib_name := 'libv.so'
+if os.is_file('$lib_name') {
+	eprintln('Removing previous $lib_name')
+	os.rm('$lib_name') or {}
+}
+eprintln('Compiling shared $lib_name')
+os.system('v -cg -prod -shared libv.v')
 eprintln('Compiling Java sources')
-os.system(javac + ' io/vlang/V.java')
+os.system(javac + ' io/v/V.java')
+if !os.is_file('$lib_name') {
+	eprintln('No shared library $lib_name')
+	exit(1)
+}
 eprintln('Running Java application')
-os.system(java + ' io.vlang.V')
+os.system(java + ' io.v.V')
