@@ -463,6 +463,8 @@ pub fn call_void_method_a(env &Env, obj JavaObject, method_id JavaMethodID, args
 	C.CallVoidMethodA(env, obj, method_id, args)
 }
 
+//
+
 // fn C.CallNonvirtualObjectMethod(env &C.JNIEnv, obj C.jobject, clazz C.jclass, methodID C.jmethodID, ...) C.jobject
 // pub fn call_nonvirtual_object_method(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, ...) JavaObject {
 //	return C.CallNonvirtualObjectMethod(env, obj, clazz, method_id, ...)
@@ -474,6 +476,11 @@ pub fn call_void_method_a(env &Env, obj JavaObject, method_id JavaMethodID, args
 fn C.CallNonvirtualObjectMethodA(env &C.JNIEnv, obj C.jobject, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jobject
 pub fn call_nonvirtual_object_method_a(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args &JavaValue) JavaObject {
 	return C.CallNonvirtualObjectMethodA(env, obj, clazz, method_id, args)
+}
+pub fn call_nonvirtual_string_method_a(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args &JavaValue) string {
+	jobject := call_nonvirtual_object_method_a(env, obj, clazz, method_id, args)
+	jstr := &JavaString(voidptr(&jobject))
+	return j2v_string(env, jstr)
 }
 
 // fn C.CallNonvirtualBooleanMethod(env &C.JNIEnv, obj C.jobject, clazz C.jclass, methodID C.jmethodID, ...) C.jboolean
@@ -604,6 +611,11 @@ fn C.GetObjectField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID) C.jobject
 pub fn get_object_field(env &Env, obj JavaObject, field_id JavaFieldID) JavaObject {
 	return C.GetObjectField(env, obj, field_id)
 }
+pub fn get_string_field(env &Env, obj JavaObject, field_id JavaFieldID) string {
+	jobject := get_object_field(env, obj, field_id)
+	jstr := &JavaString(voidptr(&jobject))
+	return j2v_string(env, jstr)
+}
 fn C.GetBooleanField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID) C.jboolean
 pub fn get_boolean_field(env &Env, obj JavaObject, field_id JavaFieldID) bool {
 	return j2v_boolean(C.GetBooleanField(env, obj, field_id))
@@ -641,6 +653,11 @@ pub fn get_double_field(env &Env, obj JavaObject, field_id JavaFieldID) f64 {
 fn C.SetObjectField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID, val C.jobject)
 pub fn set_object_field(env &Env, obj JavaObject, field_id JavaFieldID, val JavaObject) {
 	C.SetObjectField(env, obj, field_id, val)
+}
+pub fn set_string_field(env &Env, obj JavaObject, field_id JavaFieldID, val string) {
+	jstr := jstring(env, val)
+	jobj := &JavaObject(voidptr(&jstr))
+	set_object_field(env, obj, field_id, jobj)
 }
 fn C.SetBooleanField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID, val C.jboolean)
 pub fn set_boolean_field(env &Env, obj JavaObject, field_id JavaFieldID, val bool) {
