@@ -3,7 +3,7 @@
 //
 // export JAVA_HOME="/path/to/jdk/root"
 // export LD_LIBRARY_PATH="$(pwd)":$LD_LIBRARY_PATH
-// v -prod -shared libvlang.v && javac io/vlang/V.java && java io.vlang.V
+// v -prod -shared libv.v && javac io/v/V.java && java io.v.V
 //
 import os
 

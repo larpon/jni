@@ -148,12 +148,9 @@ pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 				}
 			}
 			'string' {
-				jobject := call_static_object_method_a(env, class, mid, jv_args.data)
-				jstr := &JavaString(voidptr(&jobject))
-				//jstr :=  C.ObjectToString(call_static_object_method_a(env, class, mid, jv_args.data))
 				CallResult{
 					call: signature
-					result: j2v_string(env, jstr)
+					result: call_static_string_method_a(env, class, mid, jv_args.data)
 				}
 			}
 			'object' {
@@ -263,12 +260,9 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 				}
 			}
 			'string' {
-				jobject := call_object_method_a(env, obj, mid, jv_args.data)
-				jstr := &JavaString(voidptr(&jobject))
-				//jstr := C.ObjectToString(call_object_method_a(env, obj, mid, jv_args.data))
 				CallResult{
 					call: signature
-					result: j2v_string(env, jstr)
+					result: call_string_method_a(env, obj, mid, jv_args.data)
 				}
 			}
 			'object' {

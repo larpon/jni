@@ -339,6 +339,12 @@ fn C.CallObjectMethodA(env &C.JNIEnv, obj C.jobject, methodID C.jmethodID, args 
 pub fn call_object_method_a(env &Env, obj JavaObject, method_id JavaMethodID, args &JavaValue) JavaObject {
 	return C.CallObjectMethodA(env, obj, method_id, args)
 }
+pub fn call_string_method_a(env &Env, obj JavaObject, method_id JavaMethodID, args &JavaValue) string {
+	jobject := call_object_method_a(env, obj, method_id, args)
+	jstr := &JavaString(voidptr(&jobject))
+	//jstr := C.ObjectToString(call_object_method_a(env, obj, mid, jv_args.data))
+	return j2v_string(env, jstr)
+}
 
 // fn C.CallBooleanMethod(env &C.JNIEnv, obj C.jobject, methodID C.jmethodID, ...) C.jboolean
 // pub fn call_boolean_method(env &Env, obj JavaObject, method_id JavaMethodID, ...) bool {
@@ -700,6 +706,12 @@ pub fn get_static_method_id(env &Env, clazz JavaClass, name string, sig string) 
 fn C.CallStaticObjectMethodA(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jobject
 pub fn call_static_object_method_a(env &Env, clazz JavaClass, method_id JavaMethodID, args &JavaValue) JavaObject {
 	return C.CallStaticObjectMethodA(env, clazz, method_id, args)
+}
+pub fn call_static_string_method_a(env &Env, clazz JavaClass, method_id JavaMethodID, args &JavaValue) string {
+	jobject := call_static_object_method_a(env, clazz, method_id, args)
+	jstr := &JavaString(voidptr(&jobject))
+	//jstr :=  C.ObjectToString(call_static_object_method_a(env, class, mid, jv_args.data))
+	return j2v_string(env, jstr)
 }
 
 // fn C.CallStaticBooleanMethod(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, ...) C.jboolean
