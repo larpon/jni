@@ -327,11 +327,8 @@ pub fn (jo JavaObject) class_name(env &Env) string {
 	cls = get_object_class(env, cls_obj)
 	// Find the getName() method on the class object
 	mid = get_method_id(env, cls, "getName", "()Ljava/lang/String;")
-	// Call the getName() to get a jstring object back
-	str_obj := call_object_method_a(env, cls_obj, mid, void_arg.data)
-	// TODO NOTE current way of casting
-	jstr := &JavaString(voidptr(&str_obj))
-	return j2v_string(env, jstr)
+	// Call the getName() to get a string struct back
+	return call_string_method_a(env, cls_obj, mid, void_arg.data)
 }
 
 [inline]
