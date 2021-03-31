@@ -7,6 +7,18 @@
 //
 import os
 
+pub fn vexe() string {
+	mut exe := os.getenv('VEXE')
+	if os.is_executable(exe) {
+		return os.real_path(exe)
+	}
+	possible_symlink := os.find_abs_path_of_executable('v') or { '' }
+	if os.is_executable(possible_symlink) {
+		exe = os.real_path(possible_symlink)
+	}
+	return exe
+}
+
 fn java_home() string {
 	mut java_home := os.getenv('JAVA_HOME')
 	if java_home != '' {
@@ -36,7 +48,7 @@ if os.is_file('$lib_name') {
 	os.rm('$lib_name') or {}
 }
 eprintln('Compiling shared $lib_name')
-os.system('v -cg -prod -shared libvlang.v')
+os.system(vexe()+' -cg -prod -shared libvlang.v')
 eprintln('Compiling Java sources')
 os.system(javac + ' io/vlang/V.java')
 if !os.is_file('$lib_name') {
