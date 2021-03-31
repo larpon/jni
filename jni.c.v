@@ -52,6 +52,16 @@ struct C.jfieldID {}
 [typedef]
 struct C.jthrowable {}
 
+[typedef]
+struct C.jweak {}
+//
+[typedef]
+struct C.JNINativeMethod {
+	name charptr
+	signature charptr
+	fn_ptr voidptr
+}
+
 // Arrays
 [typedef]
 struct C.jarray {}
@@ -96,7 +106,6 @@ union C.jvalue {
 // C.jsize int
 
 // helpers.h
-// fn C.vc_cast(from voidptr, to voidptr) voidptr
 
 // TODO this currently work: &JavaObject(voidptr(&jstr))
 //fn C.StringToObject(str C.jstring) C.jobject
@@ -130,7 +139,6 @@ pub fn get_version(env &Env) int {
 }
 
 fn C.DefineClass(env &C.JNIEnv, name charptr, loader C.jobject, buf &C.jbyte, bufLen C.jsize) C.jclass
-
 // NOTE: unsure about `buf` (C.jbyte -> signed char) and `len` (C.jsize -> C.jint) types.
 pub fn define_class(env &Env, name string, loader JavaObject, buf byteptr, len int) JavaClass {
 	return C.DefineClass(env, name.str, loader, buf, jsize(len))
@@ -1010,14 +1018,33 @@ fn C.SetLongArrayRegion(env &C.JNIEnv, array C.jlongArray, start C.jsize, len C.
 fn C.SetFloatArrayRegion(env &C.JNIEnv, array C.jfloatArray, start C.jsize, len C.jsize, buf &C.jfloat)
 fn C.SetDoubleArrayRegion(env &C.JNIEnv, array C.jdoubleArray, start C.jsize, len C.jsize, buf &C.jdouble)
 
+//
 fn C.RegisterNatives(env &C.JNIEnv, clazz C.jclass, methods &C.JNINativeMethod, nMethods C.jint) C.jint
+pub fn register_natives(env &Env, clazz JavaClass, methods &C.JNINativeMethod, n_methods int) int {
+	return j2v_int(C.RegisterNatives(env, clazz, methods, jint(n_methods)))
+}
 fn C.UnregisterNatives(env &C.JNIEnv, clazz C.jclass) C.jint
+pub fn unregister_natives(env &Env, clazz JavaClass) int {
+	return j2v_int(C.UnregisterNatives(env, clazz))
+}
 
+//
 fn C.MonitorEnter(env &C.JNIEnv, obj C.jobject) C.jint
+pub fn monitor_enter(env &Env, obj JavaObject) int {
+	return j2v_int(C.MonitorEnter(env, obj))
+}
 fn C.MonitorExit(env &C.JNIEnv, obj C.jobject) C.jint
+pub fn monitor_exit(env &Env, obj JavaObject) int {
+	return j2v_int(C.MonitorExit(env, obj))
+}
 
+//
 fn C.GetJavaVM(env &C.JNIEnv, vm voidptr) C.jint
+pub fn get_java_vm(env &Env, vm voidptr) int {
+	return j2v_int(C.GetJavaVM(env, vm))
+}
 
+//
 fn C.GetStringRegion(env &C.JNIEnv, str C.jstring, start C.jsize, len C.jsize, buf &C.jchar)
 fn C.GetStringUTFRegion(env &C.JNIEnv, str C.jstring, start C.jsize, len C.jsize, buf charptr)
 
