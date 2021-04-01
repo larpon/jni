@@ -176,9 +176,9 @@ pub fn v2j_signature(fqn_signature string) (string, string, string) {
 pub fn j2v_string(env &Env, jstr JavaString) string {
 	mut cn := ''
 	unsafe {
-		native_string := C.GetStringUTFChars(env, jstr, C.jboolean(C.JNI_FALSE))
-		cn = '' + native_string.vstring()
-		C.ReleaseStringUTFChars(env, jstr, native_string)
+		char_ptr, _ := get_string_utf_chars(env, jstr)
+		cn = '' + char_ptr.vstring()
+		release_string_utf_chars(env, jstr, char_ptr)
 	}
 	return cn
 }

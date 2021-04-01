@@ -961,7 +961,6 @@ pub fn get_string_utf_length(env &Env, str JavaString) int {
 }
 fn C.GetStringUTFChars(env &C.JNIEnv, str C.jstring, isCopy &C.jboolean) charptr
 pub fn get_string_utf_chars(env &Env, str JavaString) (charptr, bool) {
-	// TODO
 	is_cp := false
 	is_copy := jboolean(is_cp)
 	return C.GetStringUTFChars(env, str, &is_copy), j2v_boolean(is_copy)
