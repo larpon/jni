@@ -280,5 +280,5 @@ pub fn jchar(val rune) C.jchar {
 
 [inline]
 pub fn jstring(env &Env, val string) C.jstring {
-	return C.NewStringUTF(env, val.str)
+	return new_string_utf(env, val)
 }

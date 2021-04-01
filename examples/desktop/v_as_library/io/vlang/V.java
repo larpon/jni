@@ -119,6 +119,6 @@ public class V
 
 	public static String getString() {
 		System.out.println(LOGTAG+".getString"+"()");
-		return "Hello from Java";
+		return "Hello from Java UTF-8: ϐ λ Ǯ ϑ";
 	}
 }
