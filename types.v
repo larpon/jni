@@ -4,7 +4,7 @@ type Void = bool
 type Type = JavaObject | Void | bool | f32 | f64| i16 | int | i64 | string | rune |  byte
 
 // pub type Any = string | int | i64 | f32 | f64 | bool | []Any | map[voidptr]Any
-enum MethodType {
+pub enum MethodType {
 	@static
 	object
 }
