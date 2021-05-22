@@ -86,16 +86,21 @@ fn init(mut app App) {
 	// 3d pipeline
 	mut pipdesc := C.sg_pipeline_desc{}
 	unsafe { C.memset(&pipdesc, 0, sizeof(pipdesc)) }
-	pipdesc.blend.enabled = true
-	pipdesc.blend.src_factor_rgb = gfx.BlendFactor(C.SG_BLENDFACTOR_SRC_ALPHA)
-	pipdesc.blend.dst_factor_rgb = gfx.BlendFactor(C.SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA)
-	pipdesc.depth_stencil = C.sg_depth_stencil_state{
-		depth_write_enabled: true
-		depth_compare_func: gfx.CompareFunc(C.SG_COMPAREFUNC_LESS_EQUAL)
+
+	color_state := C.sg_color_state{
+		blend: C.sg_blend_state{
+			enabled: true
+			src_factor_rgb: gfx.BlendFactor(C.SG_BLENDFACTOR_SRC_ALPHA)
+			dst_factor_rgb: gfx.BlendFactor(C.SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA)
+		}
 	}
-	pipdesc.rasterizer = C.sg_rasterizer_state{
-		cull_mode: .back
+	pipdesc.colors[0] = color_state
+
+	pipdesc.depth = C.sg_depth_state{
+		write_enabled: true
+		compare: gfx.CompareFunc(C.SG_COMPAREFUNC_LESS_EQUAL)
 	}
+	pipdesc.cull_mode = .back
 	app.pip_3d = sgl.make_pipeline(&pipdesc)
 }
 

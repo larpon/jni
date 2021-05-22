@@ -292,7 +292,8 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 
 fn get_class_static_method_id(env &Env, fqn_sig string) (JavaClass, JavaMethodID) {
 	clazz, fn_name, fn_sig := v2j_signature(fqn_sig)
-	mut jclazz := JavaClass{}
+	//mut jclazz := JavaClass{}
+	mut jclazz := C.jclass(0)
 	// Find the Java class
 	$if android {
 		jclazz = find_class(default_env(), clazz)
@@ -338,6 +339,8 @@ pub fn (jo JavaObject) call(env &Env, typ MethodType, signature string, args ...
 
 [inline]
 pub fn (jc JavaClass) get_name(env &Env) string {
-	o := &JavaObject(voidptr(&jc))
-	return o.class_name(env)
+	unsafe {
+		o := &JavaObject(voidptr(&jc))
+		return o.class_name(env)
+	}
 }

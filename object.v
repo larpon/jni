@@ -14,10 +14,12 @@ pub fn (o Object) call_static(signature string, args ...Type) CallResult {
 */
 pub fn object(env &Env, obj JavaObject) Object {
 	p := obj.class_name(env)
-	return Object{
-		env: env
-		obj: obj
-		pkg: p
+	unsafe {
+		return Object{
+			env: env
+			obj: obj
+			pkg: p
+		}
 	}
 }
 

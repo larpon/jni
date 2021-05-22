@@ -526,7 +526,7 @@ jint MonitorExit(JNIEnv *env, jobject obj) {
     return (*env)->MonitorExit(env, obj);
 }
 
-//jint GetJavaVM(JNIEnv *env, JavaVM **vm);
+jint GetJavaVM(JNIEnv *env, JavaVM **vm);
 
 void GetStringRegion(JNIEnv *env, jstring str, jsize start, jsize len, jchar *buf) {
     return (*env)->GetStringRegion(env,str,start,len,buf);

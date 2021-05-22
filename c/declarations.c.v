@@ -7,11 +7,15 @@ pub const (
 )
 
 ///usr/lib/jvm/java-11-openjdk-amd64/include/
-#flag linux -I $env('JAVA_HOME')/include
-#flag linux -I $env('JAVA_HOME')/include/linux
+$if linux {
+	#flag -I $env('JAVA_HOME')/include
+	#flag -I $env('JAVA_HOME')/include/linux
+}
 
-#flag darwin -I $env('JAVA_HOME')/include
-#flag darwin -I $env('JAVA_HOME')/include/darwin
+$if darwin {
+	#flag -I $env('JAVA_HOME')/include
+	#flag -I $env('JAVA_HOME')/include/darwin
+}
 
 #flag -I @VROOT/c
 

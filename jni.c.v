@@ -148,7 +148,7 @@ fn C.FindClass(env &C.JNIEnv, name charptr) C.jclass
 pub fn find_class(env &Env, name string) JavaClass {
 	n := name.replace('.', '/')
 	$if debug {
-		mut cls := C.jclass{}
+		mut cls := C.jclass(0)//{}
 		$if android {
 			cls = C.gFindClass(n.str)
 		} $else {
