@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #ifdef __ANDROID__
+#include <android/log.h>
 #define V_JNI_ANDROID_LOG_TAG "V_ANDROID"
 #define V_JNI_ANDROID_LOG_I(...) __android_log_print(ANDROID_LOG_INFO, V_JNI_ANDROID_LOG_TAG, __VA_ARGS__)
 #define V_JNI_ANDROID_LOG_W(...) __android_log_print(ANDROID_LOG_WARN, V_JNI_ANDROID_LOG_TAG, __VA_ARGS__)
