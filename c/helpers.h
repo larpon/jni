@@ -66,7 +66,7 @@ void __v_jni_log_d(const char *fmt, ...) {
 }
 
 void gSetJavaVM(JavaVM* vm) {
-	__v_jni_log_d("jni.c.gSetJavaVM %p\n", vm);
+	__v_jni_log_d("jni.c.gSetJavaVM %p", vm);
 	gJavaVM = vm;
 }
 

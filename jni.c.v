@@ -146,6 +146,9 @@ pub fn define_class(env &Env, name string, loader JavaObject, buf byteptr, len i
 
 fn C.FindClass(env &C.JNIEnv, name charptr) C.jclass
 pub fn find_class(env &Env, name string) JavaClass {
+	if isnil(env) {
+		panic(@MOD + '.' + @FN + ': JNI environment pointer jni.Env(${ptr_str(env)})" is invalid')
+	}
 	n := name.replace('.', '/')
 	$if debug {
 		mut cls := C.jclass(0)//{}
