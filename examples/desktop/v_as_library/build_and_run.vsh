@@ -54,11 +54,11 @@ $if debug {
 } $else {
 	os.system(vexe()+' -prod -shared $lib_name'+'.v')
 }
-eprintln('Compiling Java sources')
+eprintln('Compiling Java sources with javac from "$javac"')
 os.system(javac + ' '+java_class.replace('.','/')+'.java')
 if !os.is_file('$lib_name'+'.so') {
 	eprintln('No shared library $lib_name'+'.so')
 	exit(1)
 }
-eprintln('Running Java application')
+eprintln('Running Java application with java from "$java"')
 os.system(java + ' $java_class')

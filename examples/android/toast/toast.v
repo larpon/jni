@@ -25,7 +25,7 @@ fn jni_on_load(vm &jni.JavaVM, reserved voidptr) int {
 		// with V's init code is loaded and called.
 		jni.setup_android('io.v.android.ex.VToastActivity')
 	}
-	return C.JNI_VERSION_1_6
+	return int(jni.Version.v1_6)
 }
 
 struct App {

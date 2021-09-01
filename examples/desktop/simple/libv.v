@@ -9,7 +9,7 @@ import jni
 fn jni_on_load(vm &jni.JavaVM, reserved voidptr) int {
 	println(@FN+' called')
 	jni.set_java_vm(vm)
-	return C.JNI_VERSION_1_6
+	return int(jni.Version.v1_6)
 }
 
 // get_string_from_v returns a string obtained from Java via a static method call

@@ -2,6 +2,16 @@
 // Use of this source code is governed by an MIT license file distributed with this software package
 module jni
 
+pub enum Version {
+	v1_1 = 0x00010001 // C.JNI_VERSION_1_1
+	v1_2 = 0x00010002 // C.JNI_VERSION_1_2
+	v1_4 = 0x00010004 // C.JNI_VERSION_1_4
+	v1_6 = 0x00010006 // C.JNI_VERSION_1_6
+	v1_8 = 0x00010008 // C.JNI_VERSION_1_8
+	v9   = 0x00090000 // C.JNI_VERSION_9
+	v10  = 0x000a0000 // C.JNI_VERSION_10
+}
+
 type JavaVM = C.JavaVM
 type Env = C.JNIEnv
 

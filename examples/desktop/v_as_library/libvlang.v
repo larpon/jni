@@ -11,7 +11,7 @@ const pkg = 'io.vlang.V'
 fn jni_on_load(vm &jni.JavaVM, reserved voidptr) int {
 	println(@FN+' called')
 	jni.set_java_vm(vm)
-	return C.JNI_VERSION_1_6
+	return int(jni.Version.v1_6)
 }
 
 [export: 'JNICALL Java_io_vlang_V_callStaticMethods']
