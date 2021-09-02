@@ -7,7 +7,7 @@ import sokol.gfx
 import sokol.sgl
 import jni
 import jni.auto
-// import jni.android.keyboard
+import jni.android.keyboard
 
 const (
 	pkg      = 'io.v.android.ex.VKeyboardActivity'
@@ -95,11 +95,20 @@ fn (mut a App) show_keyboard() {
 	$if android {
 		auto.call_static_method(pkg + '.showSoftKeyboard()')
 		auto.call_static_method(pkg + '.setSoftKeyboardBuffer(string)', '')
-		a.keyboard_visible = true
+		a.keyboard_visible = keyboard.is_visible()
 		/*
 		if keyboard.visibility(.visible) {
 			a.keyboard_visible = true
-		}*/
+		}
+		*/
+	}
+}
+
+fn (a App) show_toast(text string) {
+	println(@FN + ': "$text"')
+	$if android {
+		jor := auto.call_static_method(jni.sig(pkg, @FN, 'void', text), text)
+		println('V jni.CallResult: $jor showing toast')
 	}
 }
 
@@ -107,11 +116,12 @@ fn (mut a App) hide_keyboard() {
 	println(@FN)
 	$if android {
 		auto.call_static_method(pkg + '.hideSoftKeyboard()')
-		a.keyboard_visible = false
+		a.keyboard_visible = keyboard.is_visible()
 		/*
 		if keyboard.visibility(.hidden) {
 			a.keyboard_visible = false
-		}*/
+		}
+		*/
 	}
 }
 

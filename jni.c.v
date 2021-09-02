@@ -134,6 +134,9 @@ union C.jvalue {
 
 fn C.gGetEnv() &C.JNIEnv
 
+fn C.gEnvNeedDetach(env &&C.JNIEnv) bool
+fn C.gDetachThread()
+
 fn C.gGetJavaVM() &C.JavaVM
 fn C.gSetJavaVM(vm &JavaVM)
 
