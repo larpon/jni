@@ -11,9 +11,9 @@ pub const void_arg = []JavaValue{}
 
 struct CallResult {
 pub:
-	call        string
-//	method_type MethodType
-	result      Type // TODO = Void ??
+	call string
+	//	method_type MethodType
+	result Type // TODO = Void ??
 }
 
 //
@@ -29,7 +29,6 @@ pub fn panic_on_exception(env &Env) {
 		panic(@MOD + '.' + @FN + ' an exception occured in jni.Env (${ptr_str(env)})')
 	}
 }
-
 
 // sig builds a V `jni` style signature from the supplied arguments.
 pub fn sig(pkg string, f_name string, rt Type, args ...Type) string {
@@ -66,7 +65,7 @@ fn parse_signature(fqn_sig string) (string, string) {
 	}
 	$if debug_signatures ? {
 		args_str := sig.all_after('(').all_before(')')
-		args := '('+args_str+')'
+		args := '(' + args_str + ')'
 		println(@MOD + '.' + @FN + ' ' + '"$sig" -> "$fqn$args $return_type"')
 	}
 
@@ -163,7 +162,7 @@ pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 				call_static_void_method_a(env, class, mid, jv_args.data)
 				CallResult{
 					call: signature
-					//result: Void{}
+					// result: Void{}
 				}
 			}
 			else {
@@ -282,7 +281,8 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 	$if debug {
 		if exception_check(env) {
 			exception_describe(env)
-			excp := @MOD + '.' + @FN + ' an exception occured while executing "$signature" in JNIEnv (${ptr_str(env)})'
+			excp := @MOD + '.' + @FN +
+				' an exception occured while executing "$signature" in JNIEnv (${ptr_str(env)})'
 			// throw_exception(env, excp)
 			panic(excp)
 		}
@@ -292,7 +292,7 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 
 fn get_class_static_method_id(env &Env, fqn_sig string) (JavaClass, JavaMethodID) {
 	clazz, fn_name, fn_sig := v2j_signature(fqn_sig)
-	//mut jclazz := JavaClass{}
+	// mut jclazz := JavaClass{}
 	mut jclazz := C.jclass(0)
 	// Find the Java class
 	$if android {
@@ -318,14 +318,14 @@ pub fn (jo JavaObject) class_name(env &Env) string {
 	obj := jo
 	mut cls := get_object_class(env, obj)
 	// First get the class object
-	mut mid := get_method_id(env, cls, "getClass", "()Ljava/lang/Class;")
-	cls_obj := call_object_method_a(env, obj, mid, void_arg.data)
+	mut mid := get_method_id(env, cls, 'getClass', '()Ljava/lang/Class;')
+	cls_obj := call_object_method_a(env, obj, mid, void_arg.data) // TODO vfmt will cause a compile error here
 	// Get the class object's class descriptor
 	cls = get_object_class(env, cls_obj)
 	// Find the getName() method on the class object
-	mid = get_method_id(env, cls, "getName", "()Ljava/lang/String;")
+	mid = get_method_id(env, cls, 'getName', '()Ljava/lang/String;')
 	// Call the getName() to get a string struct back
-	return call_string_method_a(env, cls_obj, mid, void_arg.data)
+	return call_string_method_a(env, cls_obj, mid, void_arg.data) // TODO vfmt will cause a compile error here
 }
 
 [inline]

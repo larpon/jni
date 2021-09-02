@@ -78,7 +78,7 @@ JavaVM* gGetJavaVM() {
 JNIEnv* gGetEnv() {
 	JNIEnv *env;
 	if (gJavaVM == 0) {
-		__v_jni_log_e("jni.c: Invalid global Java VM");
+		__v_jni_log_e("jni.c: (gGetEnv) Invalid global Java VM");
 		return 0;
 	}
 
@@ -97,6 +97,59 @@ JNIEnv* gGetEnv() {
 	}
 
 	return env;
+}
+
+/*
+gGetEnvNeedDetach allows you to see if the VM needs detach when you're done
+using the JNIEnv. In the real world this isn't very nice to work with since
+all calls retrieving a JNIEnv pointer need to check the need_detach and detach
+the current thread accordingly...
+
+Example usage of gGetEnvNeedDetach:
+
+jclass gFindClass(const char *name) {
+	JNIEnv *env;
+	bool need_detach = gGetEnvNeedDetach(&env);
+
+	jclass clz = (*env)->CallObjectMethod(env, gClassLoader, gFindClassMethod, (*env)->NewStringUTF(env, name));
+
+	if (need_detach) {
+		JavaVM *vm = gGetJavaVM();
+        (*vm)->DetachCurrentThread(vm);
+    }
+
+	return clz;
+}
+*/
+bool gGetEnvNeedDetach(JNIEnv **env) {
+	if (gJavaVM == 0) {
+		__v_jni_log_e("jni.c: (gGetEnvShouldDetach) Invalid global Java VM");
+		return 0;
+	}
+	// Get current thread JNI environment
+	JavaVM *vm = gGetJavaVM();
+	*env = NULL;
+
+	if ((*vm)->GetEnv(vm, (void**)env, JNI_VERSION_1_6) == JNI_OK) {
+		return false;
+	}
+
+	JavaVMAttachArgs args = {
+		.version  = JNI_VERSION_1_6,
+		.name = "NativeThread",
+		.group = NULL
+	};
+
+	if ((*vm)->AttachCurrentThread(vm, env, &args) != JNI_OK) {
+		return false;
+	}
+
+	return true;
+}
+
+jclass gFindClass(const char *name) {
+	JNIEnv *env = gGetEnv();
+	return (*env)->CallObjectMethod(env, gClassLoader, gFindClassMethod, (*env)->NewStringUTF(env, name));
 }
 
 void gSetupAndroid(const char *fqActivityName) {
@@ -126,68 +179,3 @@ void gSetupAndroid(const char *fqActivityName) {
 	if (ExceptionCheck(env) == JNI_TRUE) { ExceptionDescribe(env); }
 	#endif
 }
-
-/*
-// Called to save JavaVM if library is loaded from Java:
-int JNI_OnLoad(JavaVM* vm, void* reserved) {
-	__v_jni_log_i("JNI_OnLoad: saving gJavaVM %p",vm);
-	gSetJavaVM(vm);
-
-	#ifdef __ANDROID__
-	JNIEnv *env = gGetEnv();
-	//replace with one of your classes in the line below
-	jclass randomClass = (*env)->FindClass(env, "io/v/android/VActivity");
-	__v_jni_log_i("FindClass %p", randomClass);
-	if (ExceptionCheck(env) == JNI_TRUE) { ExceptionDescribe(env); }
-	jclass classClass = (*env)->GetObjectClass(env, randomClass);
-	__v_jni_log_i("GetObjectClass %p", classClass);
-	if (ExceptionCheck(env) == JNI_TRUE) { ExceptionDescribe(env); }
-	jclass classLoaderClass = (*env)->FindClass(env, "java/lang/ClassLoader");
-	__v_jni_log_i("FindClass %p", classLoaderClass);
-	if (ExceptionCheck(env) == JNI_TRUE) { ExceptionDescribe(env); }
-	jmethodID getClassLoaderMethod = (*env)->GetMethodID(env, classClass, "getClassLoader", "()Ljava/lang/ClassLoader;");
-	__v_jni_log_i("GetMethodID %d", getClassLoaderMethod);
-	if (ExceptionCheck(env) == JNI_TRUE) { ExceptionDescribe(env); }
-	gClassLoader = (*env)->NewGlobalRef(env, (*env)->CallObjectMethod(env, randomClass, getClassLoaderMethod));
-	__v_jni_log_i("gClassLoader %p", gClassLoader);
-	if (ExceptionCheck(env) == JNI_TRUE) { ExceptionDescribe(env); }
-	gFindClassMethod = (*env)->GetMethodID(env, classLoaderClass, "findClass", "(Ljava/lang/String;)Ljava/lang/Class;");
-	__v_jni_log_i("GetMethodID %d", gFindClassMethod);
-	if (ExceptionCheck(env) == JNI_TRUE) { ExceptionDescribe(env); }
-	#endif
-
-	return JNI_VERSION_1_6;
-}*/
-
-jclass gFindClass(const char *name) {
-	JNIEnv *env = gGetEnv();
-	return (*env)->CallObjectMethod(env, gClassLoader, gFindClassMethod, (*env)->NewStringUTF(env, name));
-}
-
-//long VoidToLong(void* vp) {
-//    return (long)vp;
-//}
-
-//void* LongToVoid(long l) {
-//    return (void*)l;
-//}
-
-//jobject StringToObject(jstring str) {
-//    return (jobject)str;
-//}
-
-//jstring ObjectToString(jobject obj) {
-//    return (jstring)obj;
-//}
-
-//jclass ObjectToClass(jobject obj) {
-//    return (jclass)obj;
-//}
-
-//jobject ClassToObject(jclass cls) {
-//    return (jobject)cls;
-//}
-
-//jobject MethodIDToObject(jmethodID meth) {
-//	return (jobject)meth;
-//}

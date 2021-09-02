@@ -7,7 +7,7 @@ import sokol.gfx
 import sokol.sgl
 import jni
 import jni.auto
-//import jni.android.keyboard
+// import jni.android.keyboard
 
 const (
 	pkg      = 'io.v.android.ex.VKeyboardActivity'
@@ -32,7 +32,9 @@ fn jni_on_load(vm &jni.JavaVM, reserved voidptr) int {
 // within `jstr`, the `count` characters beginning at `start` have just replaced old text that had `length` before.
 [export: 'JNICALL Java_io_v_android_ex_VKeyboardActivity_onSoftKeyboardInput']
 fn on_soft_keyboard_input(env &jni.Env, thiz jni.JavaObject, app_ptr i64, jstr jni.JavaString, start int, before int, count int) {
-	if app_ptr == 0 { return }
+	if app_ptr == 0 {
+		return
+	}
 
 	mut app := &App(app_ptr)
 
@@ -48,7 +50,6 @@ fn on_soft_keyboard_input(env &jni.Env, thiz jni.JavaObject, app_ptr i64, jstr j
 	} else if pos > buffer.len {
 		// Backspace
 		println(@MOD + '.' + @FN + ': $start > $buffer.len')
-
 	} else {
 		char_code = byte(buffer[pos])
 		char_literal = char_code.ascii_str()
@@ -85,18 +86,18 @@ mut:
 
 	keyboard_visible bool
 
-	buffer string
+	buffer      string
 	parsed_char string
-
 }
 
 fn (mut a App) show_keyboard() {
 	println(@FN)
 	$if android {
-		auto.call_static_method(pkg+'.showSoftKeyboard()')
-		auto.call_static_method(pkg+'.setSoftKeyboardBuffer(string)','')
+		auto.call_static_method(pkg + '.showSoftKeyboard()')
+		auto.call_static_method(pkg + '.setSoftKeyboardBuffer(string)', '')
 		a.keyboard_visible = true
-		/*if keyboard.visibility(.visible) {
+		/*
+		if keyboard.visibility(.visible) {
 			a.keyboard_visible = true
 		}*/
 	}
@@ -105,9 +106,10 @@ fn (mut a App) show_keyboard() {
 fn (mut a App) hide_keyboard() {
 	println(@FN)
 	$if android {
-		auto.call_static_method(pkg+'.hideSoftKeyboard()')
+		auto.call_static_method(pkg + '.hideSoftKeyboard()')
 		a.keyboard_visible = false
-		/*if keyboard.visibility(.hidden) {
+		/*
+		if keyboard.visibility(.hidden) {
 			a.keyboard_visible = false
 		}*/
 	}
@@ -121,8 +123,8 @@ fn frame(mut app App) {
 
 	app.gg.begin()
 
-	app.gg.draw_text_def(int(f32(ws.width)*0.1),int(f32(ws.height)*0.2), 'Java buffer: "$app.buffer"')
-	app.gg.draw_text_def(int(f32(ws.width)*0.1),int(f32(ws.height)*0.25), 'Last char parsed in V: "$app.parsed_char"')
+	app.gg.draw_text_def(int(f32(ws.width) * 0.1), int(f32(ws.height) * 0.2), 'Java buffer: "$app.buffer"')
+	app.gg.draw_text_def(int(f32(ws.width) * 0.1), int(f32(ws.height) * 0.25), 'Last char parsed in V: "$app.parsed_char"')
 
 	sgl.viewport(int((f32(rws.width) * 0.5) - (min * 0.5)), int((f32(rws.height) * 0.5) - (min * 0.5)),
 		int(min), int(min), true)
@@ -144,7 +146,7 @@ fn init(mut app App) {
 	// Pass app reference off to Java so we
 	// can get it back in the V callback (on_soft_keyboard_input)
 	app_ref := i64(voidptr(app))
-	auto.call_static_method(pkg+'.setVAppPointer(long) void',app_ref)
+	auto.call_static_method(pkg + '.setVAppPointer(long) void', app_ref)
 }
 
 fn cleanup(mut app App) {
@@ -157,7 +159,7 @@ fn event(ev &gg.Event, mut app App) {
 		app.mouse_y = int(ev.mouse_y)
 	}
 	$if debug ? {
-		if ev.typ == .char ||ev.typ == .key_down || ev.typ == .key_up {
+		if ev.typ == .char || ev.typ == .key_down || ev.typ == .key_up {
 			println('$ev.typ : $ev.char_code, $ev.key_code')
 		}
 	}
@@ -181,7 +183,6 @@ fn event(ev &gg.Event, mut app App) {
 }
 
 fn main() {
-
 	mut app := &App{
 		gg: 0
 	}

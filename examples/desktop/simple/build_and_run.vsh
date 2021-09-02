@@ -44,20 +44,20 @@ os.setenv('LD_LIBRARY_PATH', os.getenv('LD_LIBRARY_PATH') + os.path_delimiter + 
 
 lib_name := 'libv'
 java_class := 'io.v.V'
-if os.is_file('$lib_name'+'.so') {
-	eprintln('Removing previous $lib_name'+'.so')
-	os.rm('$lib_name'+'.so') or {}
+if os.is_file('$lib_name' + '.so') {
+	eprintln('Removing previous $lib_name' + '.so')
+	os.rm('$lib_name' + '.so') or {}
 }
-eprintln('Compiling shared $lib_name'+'.so')
+eprintln('Compiling shared $lib_name' + '.so')
 $if debug {
-	os.system(vexe()+' -d debug_signatures -cg -prod -shared $lib_name'+'.v')
+	os.system(vexe() + ' -d debug_signatures -cg -prod -shared $lib_name' + '.v')
 } $else {
-	os.system(vexe()+' -prod -shared $lib_name'+'.v')
+	os.system(vexe() + ' -prod -shared $lib_name' + '.v')
 }
 eprintln('Compiling Java sources')
-os.system(javac + ' '+java_class.replace('.','/')+'.java')
-if !os.is_file('$lib_name'+'.so') {
-	eprintln('No shared library $lib_name'+'.so')
+os.system(javac + ' ' + java_class.replace('.', '/') + '.java')
+if !os.is_file('$lib_name' + '.so') {
+	eprintln('No shared library $lib_name' + '.so')
 	exit(1)
 }
 eprintln('Running Java application')

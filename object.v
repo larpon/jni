@@ -26,7 +26,8 @@ pub fn object(env &Env, obj JavaObject) Object {
 [inline]
 pub fn (o Object) call(typ MethodType, signature string, args ...Type) CallResult {
 	return o.obj.call(o.env, typ, signature, ...args)
-	/*return match typ {
+	/*
+	return match typ {
 		.@static { call_static_method(o.env, o.pkg + '.' + signature, ...args) }
 		.object { call_object_method(o.env, o.obj, o.pkg + '.' + signature, ...args) }
 	}*/

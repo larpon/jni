@@ -1,7 +1,7 @@
 module jni
 
 type Void = bool
-type Type = JavaObject | Void | bool | f32 | f64| i16 | int | i64 | string | rune |  byte
+type Type = JavaObject | Void | bool | byte | f32 | f64 | i16 | i64 | int | rune | string
 
 // pub type Any = string | int | i64 | f32 | f64 | bool | []Any | map[voidptr]Any
 pub enum MethodType {
@@ -58,42 +58,78 @@ pub fn v2j_fn_name(v_func_name string) string {
 
 fn v2j_signature_type(env &Env, vt Type) string {
 	return match vt {
-		bool { 'Z' }
-		byte { 'B' }
-		rune { 'C' }
-		i16 { 'S' }
-		int { 'I' }
-		i64 { 'J' }
-		f32 { 'F' }
-		f64 { 'D' }
+		bool {
+			'Z'
+		}
+		byte {
+			'B'
+		}
+		rune {
+			'C'
+		}
+		i16 {
+			'S'
+		}
+		int {
+			'I'
+		}
+		i64 {
+			'J'
+		}
+		f32 {
+			'F'
+		}
+		f64 {
+			'D'
+		}
 		string {
 			'Ljava/lang/String;'
 		}
 		JavaObject {
 			//'Ljava/lang/Object;'
-			'L'+vt.class_name(env).replace('.', '/')+';'
+			'L' + vt.class_name(env).replace('.', '/') + ';'
 		}
-		else { 'V' } // void
+		else {
+			'V'
+		} // void
 	}
 }
 
 fn v2j_string_signature_type(vt string) string {
-	type_or_void := fn(s string) string {
+	type_or_void := fn (s string) string {
 		if s.contains('.') || s.contains('/') {
-			return 'L'+s.replace('.', '/')+';'
+			return 'L' + s.replace('.', '/') + ';'
 		}
 		return 'V' // void
 	}
 	return match vt {
-		'bool' { 'Z' }
-		'byte' { 'B' }
-		'rune' { 'C' }
-		'i16' { 'S' }
-		'int' { 'I' }
-		'i64' { 'J' }
-		'f32' { 'F' }
-		'f64' { 'D' }
-		'string' { 'Ljava/lang/String;' }
+		'bool' {
+			'Z'
+		}
+		'byte' {
+			'B'
+		}
+		'rune' {
+			'C'
+		}
+		'i16' {
+			'S'
+		}
+		'int' {
+			'I'
+		}
+		'i64' {
+			'J'
+		}
+		'f32' {
+			'F'
+		}
+		'f64' {
+			'D'
+		}
+		'string' {
+			'Ljava/lang/String;'
+		}
 		else {
 			type_or_void(vt)
 		}
@@ -148,13 +184,13 @@ fn v2j_value(env &Env, vt Type) JavaValue {
 			JavaValue{
 				l: jobj
 			}
-			//JavaValue{
+			// JavaValue{
 			//	l: C.StringToObject(jstring(default_env(), vt))
 			//}
 		}
 		JavaObject {
 			JavaValue{
-				l: vt //JavaObject(vt)
+				l: vt // JavaObject(vt)
 			}
 		}
 		else {
@@ -202,7 +238,6 @@ pub fn j2v_boolean(jbool C.jboolean) bool {
 pub fn j2v_int(jint C.jint) int {
 	return int(jint)
 }
-
 
 [inline]
 pub fn j2v_size(jsize C.jsize) int {
@@ -266,7 +301,6 @@ pub fn jsize(val int) C.jsize {
 pub fn jshort(val i16) C.jshort {
 	return C.jshort(val)
 }
-
 
 [inline]
 pub fn jlong(val i64) C.jlong {

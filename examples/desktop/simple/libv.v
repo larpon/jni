@@ -7,7 +7,7 @@ import jni
 // jni_on_load is called by the JavaVM upon setup
 [export: 'JNI_OnLoad']
 fn jni_on_load(vm &jni.JavaVM, reserved voidptr) int {
-	println(@FN+' called')
+	println(@FN + ' called')
 	jni.set_java_vm(vm)
 	return int(jni.Version.v1_6)
 }
@@ -21,5 +21,5 @@ fn get_string_from_v(env &jni.Env, thiz jni.JavaObject) jni.JavaString {
 	string_from_java := call_result.result as string
 	println(@MOD + '.' + @FN + ' string from Java "$string_from_java"')
 	// Return a Java 'String' to the caller - replacing 'Java' with 'V'...
-	return jni.jstring(env, string_from_java.replace('Java','V'))
+	return jni.jstring(env, string_from_java.replace('Java', 'V'))
 }
