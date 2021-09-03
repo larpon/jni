@@ -72,7 +72,6 @@ pub fn visibility(soft_visibility SoftKeyboardVisibility) bool {
 			// Runs lInputMethodManager.showSoftInput(...)
 			method_show_soft_input := jni.get_method_id(env, input_method_manager_class,
 				'showSoftInput', '(Landroid/view/View;I)Z')
-			// method_show_soft_input := C.GetMethodID(env, input_method_manager_class, c'showSoftInput',	c'(Landroid/view/View;I)Z')
 
 			jv_args << jni.JavaValue{
 				l: decor_view
