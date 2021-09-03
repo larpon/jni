@@ -9,7 +9,7 @@ const pkg = 'io.vlang.V'
 
 [export: 'JNI_OnLoad']
 fn jni_on_load(vm &jni.JavaVM, reserved voidptr) int {
-	println(@FN+' called')
+	println(@FN + ' called')
 	jni.set_java_vm(vm)
 	return int(jni.Version.v1_6)
 }
@@ -26,16 +26,17 @@ fn call_static_methods(env &jni.Env, thiz jni.JavaObject) {
 	println('V: $r.result')
 	r2 := jni.call_static_method(env, 'io.vlang.V.getBool() bool')
 	println('V: $r2.result')
-	r3 := jni.call_static_method(env, 'io.vlang.V.mixedArguments(bool, int) int', true, 2)
+	r3 := jni.call_static_method(env, 'io.vlang.V.mixedArguments(bool, int) int', true,
+		2)
 	println('V: $r3.result')
 
 	jprintln('Hello from V - this shows up in Java')
 
-	jffr := java_float_func('Hello',22)
+	jffr := java_float_func('Hello', 22)
 	println('V: java_float_func(\'Hello\',22) -> $jffr')
 
-	println('V: java_void_func(\'Void\',0)')
-	java_void_func('Void',0)
+	println("V: java_void_func('Void',0)")
+	java_void_func('Void', 0)
 }
 
 [export: 'JNICALL Java_io_vlang_V_callObjectMethods']
@@ -57,7 +58,7 @@ fn call_object_methods(env &jni.Env, thiz jni.JavaObject) {
 
 	println('V: Passing io.vlang.V object type from V to Java...')
 	// call "public void passInstance(V v)" on "io.vlang.V" instance
-	jni.call_object_method(env, thiz, 'passInstance(io.vlang.V)',java_object)
+	jni.call_object_method(env, thiz, 'passInstance(io.vlang.V)', java_object)
 }
 
 [export: 'JNICALL Java_io_vlang_V_vGetString']
@@ -67,13 +68,13 @@ fn get_v_string(env &jni.Env, thiz jni.JavaObject) jni.JavaString {
 
 	r3 := jni.call_static_method(env, 'io.vlang.V.getString() string')
 
-	s := 'V: values obtained from Java: ${r.result}, ${r2.result}, ${r3.result}'
+	s := 'V: values obtained from Java: $r.result, $r2.result, $r3.result'
 	return jni.jstring(env, s)
 }
 
 [export: 'JNICALL Java_io_vlang_V_vGetInt']
 fn get_v_int(env &jni.Env, thiz jni.JavaObject) int {
-	thiz.call(env, .@static, 'jprintln(string)','called get_v_int()')
+	thiz.call(env, .@static, 'jprintln(string)', 'called get_v_int()')
 	i := 42
 	return i
 }
@@ -85,26 +86,31 @@ fn add_v_int(env &jni.Env, thiz jni.JavaObject, a int, b int) int {
 }
 
 /*
- * Danger zone: Comfort > obscurity here :|
+* Danger zone: Comfort > obscurity and speed here :|
  * 1. Assemble the FQN automatically: 'io.vlang.V' + '.' + 'vprintln'
  * 2. Get type of the `text` argument: 'string'
  * 3. Use default/main thread JNIEnv to call the Java method.
  * 4. Effectively call: io.vlang.V.vprintln(text) in the JavaVM.
 */
 fn jprintln(text string) {
-	meth := pkg+'.'+jni.v2j_fn_name(@FN) /*1*/ +'('+typeof(text).name+')' /*2*/
-	auto.call_static_method/*3*/(meth,text)/*4*/
+	// 1. jni.v2j_fn_name(@FN)
+	// 2. typeof(text).name
+	// 3. auto...
+	// 4. .call_static_method(meth,text)
+	meth := libvlang.pkg + '.' + jni.v2j_fn_name(@FN) + '(' + typeof(text).name + ')'
+	auto.call_static_method(meth, text)
 }
 
 /*
- * Danger zone
+* Danger zone
  * automatic "reflection" setup of V function calls in Java
 */
 // java_float_func is "reflected" from "public static float javaFloatFunc(String s, int i)" in "io.vlang.V"
 fn java_float_func(text string, i int) f32 {
-	return auto.call_static_method(jni.sig(pkg,@FN,f32(0),text,i),text,i).result as f32
+	return auto.call_static_method(jni.sig(libvlang.pkg, @FN, f32(0), text, i), text,
+		i).result as f32
 }
 
 fn java_void_func(text string, i int) {
-	auto.call_static_method(jni.sig(pkg,@FN,'void',text,i),text,i)
+	auto.call_static_method(jni.sig(libvlang.pkg, @FN, 'void', text, i), text, i)
 }

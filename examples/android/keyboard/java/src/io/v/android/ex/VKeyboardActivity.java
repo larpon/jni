@@ -157,5 +157,4 @@ public class VKeyboardActivity extends io.v.android.VActivity {
 			}
 		});
 	}
-
 }

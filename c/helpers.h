@@ -100,16 +100,16 @@ JNIEnv* gGetEnv() {
 }
 
 /*
-gGetEnvNeedDetach allows you to see if the VM needs detach when you're done
+gEnvNeedDetach allows you to see if the VM needs detach when you're done
 using the JNIEnv. In the real world this isn't very nice to work with since
 all calls retrieving a JNIEnv pointer need to check the need_detach and detach
 the current thread accordingly...
 
-Example usage of gGetEnvNeedDetach:
+Example usage of gEnvNeedDetach:
 
 jclass gFindClass(const char *name) {
 	JNIEnv *env;
-	bool need_detach = gGetEnvNeedDetach(&env);
+	bool need_detach = gEnvNeedDetach(&env);
 
 	jclass clz = (*env)->CallObjectMethod(env, gClassLoader, gFindClassMethod, (*env)->NewStringUTF(env, name));
 
@@ -121,7 +121,7 @@ jclass gFindClass(const char *name) {
 	return clz;
 }
 */
-bool gGetEnvNeedDetach(JNIEnv **env) {
+bool gEnvNeedDetach(JNIEnv **env) {
 	if (gJavaVM == 0) {
 		__v_jni_log_e("jni.c: (gGetEnvShouldDetach) Invalid global Java VM");
 		return 0;
@@ -145,6 +145,11 @@ bool gGetEnvNeedDetach(JNIEnv **env) {
 	}
 
 	return true;
+}
+
+void gDetachThread() {
+	JavaVM *vm = gGetJavaVM();
+	(*vm)->DetachCurrentThread(vm);
 }
 
 jclass gFindClass(const char *name) {

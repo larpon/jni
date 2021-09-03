@@ -7,7 +7,7 @@ import sokol.gfx
 import sokol.sgl
 import jni
 import jni.auto
-// import jni.android.keyboard
+import jni.android.keyboard
 
 const (
 	pkg      = 'io.v.android.ex.VKeyboardActivity'
@@ -84,8 +84,6 @@ mut:
 
 	ticks i64
 
-	keyboard_visible bool
-
 	buffer      string
 	parsed_char string
 }
@@ -94,12 +92,7 @@ fn (mut a App) show_keyboard() {
 	println(@FN)
 	$if android {
 		auto.call_static_method(pkg + '.showSoftKeyboard()')
-		auto.call_static_method(pkg + '.setSoftKeyboardBuffer(string)', '')
-		a.keyboard_visible = true
-		/*
-		if keyboard.visibility(.visible) {
-			a.keyboard_visible = true
-		}*/
+		auto.call_static_method(pkg + '.setSoftKeyboardBuffer(string)', a.buffer)
 	}
 }
 
@@ -107,11 +100,6 @@ fn (mut a App) hide_keyboard() {
 	println(@FN)
 	$if android {
 		auto.call_static_method(pkg + '.hideSoftKeyboard()')
-		a.keyboard_visible = false
-		/*
-		if keyboard.visibility(.hidden) {
-			a.keyboard_visible = false
-		}*/
 	}
 }
 
@@ -125,6 +113,8 @@ fn frame(mut app App) {
 
 	app.gg.draw_text_def(int(f32(ws.width) * 0.1), int(f32(ws.height) * 0.2), 'Java buffer: "$app.buffer"')
 	app.gg.draw_text_def(int(f32(ws.width) * 0.1), int(f32(ws.height) * 0.25), 'Last char parsed in V: "$app.parsed_char"')
+	// NOTE Don't call out to slow Java code (keyboard.is_visible()) like this every frame
+	// app.gg.draw_text_def(int(f32(ws.width) * 0.1), int(f32(ws.height) * 0.45), 'Keyboard visible: ${keyboard.is_visible()}')
 
 	sgl.viewport(int((f32(rws.width) * 0.5) - (min * 0.5)), int((f32(rws.height) * 0.5) - (min * 0.5)),
 		int(min), int(min), true)
@@ -150,6 +140,7 @@ fn init(mut app App) {
 }
 
 fn cleanup(mut app App) {
+	keyboard.visibility(.hidden)
 	gfx.shutdown()
 }
 
@@ -173,7 +164,7 @@ fn event(ev &gg.Event, mut app App) {
 	}
 	if ev.typ == .touches_ended || ev.typ == .mouse_up {
 		if ev.num_touches > 0 {
-			if app.keyboard_visible {
+			if keyboard.is_visible() {
 				app.hide_keyboard()
 			} else {
 				app.show_keyboard()

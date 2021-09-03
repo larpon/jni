@@ -319,13 +319,13 @@ pub fn (jo JavaObject) class_name(env &Env) string {
 	mut cls := get_object_class(env, obj)
 	// First get the class object
 	mut mid := get_method_id(env, cls, 'getClass', '()Ljava/lang/Class;')
-	cls_obj := call_object_method_a(env, obj, mid, void_arg.data) // TODO vfmt will cause a compile error here
+	cls_obj := call_object_method_a(env, obj, mid, jni.void_arg.data) // NOTE vfmt will cause a compile error here if you only use 'void_arg.data'
 	// Get the class object's class descriptor
 	cls = get_object_class(env, cls_obj)
 	// Find the getName() method on the class object
 	mid = get_method_id(env, cls, 'getName', '()Ljava/lang/String;')
 	// Call the getName() to get a string struct back
-	return call_string_method_a(env, cls_obj, mid, void_arg.data) // TODO vfmt will cause a compile error here
+	return call_string_method_a(env, cls_obj, mid, jni.void_arg.data) // NOTE vfmt will cause a compile error here if you only use 'void_arg.data'
 }
 
 [inline]
