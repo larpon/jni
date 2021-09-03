@@ -8,8 +8,8 @@ pub enum Version {
 	v1_4 = 0x00010004 // C.JNI_VERSION_1_4
 	v1_6 = 0x00010006 // C.JNI_VERSION_1_6
 	v1_8 = 0x00010008 // C.JNI_VERSION_1_8
-	v9   = 0x00090000 // C.JNI_VERSION_9
-	v10  = 0x000a0000 // C.JNI_VERSION_10
+	v9 = 0x00090000 // C.JNI_VERSION_9
+	v10 = 0x000a0000 // C.JNI_VERSION_10
 }
 
 type JavaVM = C.JavaVM
@@ -19,7 +19,8 @@ type Env = C.JNIEnv
 type JavaObject = C.jobject
 type JavaString = C.jstring
 type JavaClass = C.jclass
-//type JavaSize = C.jsize
+
+// type JavaSize = C.jsize
 type JavaMethodID = C.jmethodID
 type JavaFieldID = C.jfieldID
 type JavaThrowable = C.jthrowable
@@ -64,12 +65,13 @@ struct C.jthrowable {}
 
 [typedef]
 struct C.jweak {}
+
 //
 [typedef]
 struct C.JNINativeMethod {
-	name charptr
-	signature charptr
-	fn_ptr voidptr
+	name      &char
+	signature &char
+	fn_ptr    voidptr
 }
 
 // Arrays
@@ -118,19 +120,19 @@ union C.jvalue {
 // helpers.h
 
 // TODO this currently work: &JavaObject(voidptr(&jstr))
-//fn C.StringToObject(str C.jstring) C.jobject
+// fn C.StringToObject(str C.jstring) C.jobject
 
 // TODO this currently work: &JavaString(voidptr(&jobj))
-//fn C.ObjectToString(obj C.jobject) C.jstring
+// fn C.ObjectToString(obj C.jobject) C.jstring
 
 // TODO this currently work: &JavaClass(voidptr(&jobj))
-//fn C.ObjectToClass(obj C.jobject) C.jclass
+// fn C.ObjectToClass(obj C.jobject) C.jclass
 
 // TODO this currently work: &JavaObject(voidptr(&jcls))
-//fn C.ClassToObject(cls C.jclass) C.jobject
+// fn C.ClassToObject(cls C.jclass) C.jobject
 
 // TODO this currently work: o := &JavaObject(voidptr(&mid)) //o := C.MethodIDToObject(mid)
-//fn C.MethodIDToObject(cls C.jmethodID) C.jobject
+// fn C.MethodIDToObject(cls C.jmethodID) C.jobject
 
 fn C.gGetEnv() &C.JNIEnv
 
@@ -140,9 +142,9 @@ fn C.gDetachThread()
 fn C.gGetJavaVM() &C.JavaVM
 fn C.gSetJavaVM(vm &JavaVM)
 
-fn C.gFindClass(name charptr) C.jclass
+fn C.gFindClass(name &char) C.jclass
 
-fn C.gSetupAndroid(name charptr)
+fn C.gSetupAndroid(name &char)
 
 // jni.h / jni_wrapper.h
 
@@ -151,20 +153,21 @@ pub fn get_version(env &Env) int {
 	return int(C.GetVersion(env))
 }
 
-fn C.DefineClass(env &C.JNIEnv, name charptr, loader C.jobject, buf &C.jbyte, bufLen C.jsize) C.jclass
+fn C.DefineClass(env &C.JNIEnv, name &char, loader C.jobject, buf &C.jbyte, bufLen C.jsize) C.jclass
+
 // NOTE: unsure about `buf` (C.jbyte -> signed char) and `len` (C.jsize -> C.jint) types.
-pub fn define_class(env &Env, name string, loader JavaObject, buf byteptr, len int) JavaClass {
+pub fn define_class(env &Env, name string, loader JavaObject, buf &byte, len int) JavaClass {
 	return C.DefineClass(env, name.str, loader, buf, jsize(len))
 }
 
-fn C.FindClass(env &C.JNIEnv, name charptr) C.jclass
+fn C.FindClass(env &C.JNIEnv, name &char) C.jclass
 pub fn find_class(env &Env, name string) JavaClass {
 	if isnil(env) {
 		panic(@MOD + '.' + @FN + ': JNI environment pointer jni.Env(${ptr_str(env)})" is invalid')
 	}
 	n := name.replace('.', '/')
 	$if debug {
-		mut cls := C.jclass(0)//{}
+		mut cls := C.jclass(0) //{}
 		$if android {
 			cls = C.gFindClass(n.str)
 		} $else {
@@ -173,11 +176,12 @@ pub fn find_class(env &Env, name string) JavaClass {
 		if exception_check(env) {
 			exception_describe(env)
 			if !isnil(cls) {
-				o := &JavaObject(voidptr(&cls)) //o := C.ClassToObject(cls)
-				//o := C.ClassToObject(cls)
+				o := &JavaObject(voidptr(&cls)) // o := C.ClassToObject(cls)
+				// o := C.ClassToObject(cls)
 				delete_local_ref(env, o)
 			}
-			panic(@MOD + '.' + @FN + ': an exception occured in the Java VM while trying to find class "$n" in jni.Env(${ptr_str(env)})')
+			panic(@MOD + '.' + @FN +
+				': an exception occured in the Java VM while trying to find class "$n" in jni.Env(${ptr_str(env)})')
 		}
 		return cls
 	}
@@ -222,7 +226,7 @@ pub fn throw(env &Env, obj JavaThrowable) int {
 	return j2v_int(C.Throw(env, obj))
 }
 
-fn C.ThrowNew(env &C.JNIEnv, clazz C.jclass, msg charptr) C.jint
+fn C.ThrowNew(env &C.JNIEnv, clazz C.jclass, msg &char) C.jint
 pub fn throw_new(env &Env, clazz JavaClass, msg string) int {
 	return j2v_int(C.ThrowNew(env, clazz, msg.str))
 }
@@ -242,7 +246,7 @@ pub fn exception_clear(env &Env) {
 	C.ExceptionClear(env)
 }
 
-fn C.FatalError(env &C.JNIEnv, msg charptr)
+fn C.FatalError(env &C.JNIEnv, msg &char)
 pub fn fatal_error(env &Env, msg string) {
 	C.FatalError(env, msg.str)
 }
@@ -314,7 +318,8 @@ pub fn get_object_class(env &Env, obj JavaObject) JavaClass {
 			if !isnil(obj) {
 				delete_local_ref(env, obj)
 			}
-			panic(@MOD + '.' + @FN + ': an exception occured in the Java VM while trying to find class of object "${ptr_str(obj)}" in jni.Env (${ptr_str(env)})')
+			panic(@MOD + '.' + @FN +
+				': an exception occured in the Java VM while trying to find class of object "${ptr_str(obj)}" in jni.Env (${ptr_str(env)})')
 		}
 		return clazz
 	}
@@ -326,17 +331,19 @@ pub fn is_instance_of(env &Env, obj JavaObject, clazz JavaClass) bool {
 	return j2v_boolean(C.IsInstanceOf(env, obj, clazz))
 }
 
-fn C.GetMethodID(env &C.JNIEnv, clazz C.jclass, name charptr, sig charptr) C.jmethodID
+fn C.GetMethodID(env &C.JNIEnv, clazz C.jclass, name &char, sig &char) C.jmethodID
 pub fn get_method_id(env &Env, clazz JavaClass, name string, sig string) JavaMethodID {
 	$if debug {
 		mid := C.GetMethodID(env, clazz, name.str, sig.str)
 		if exception_check(env) {
 			exception_describe(env)
 			if !isnil(mid) {
-				o := &JavaObject(voidptr(&mid)) //o := C.MethodIDToObject(mid)
+				o := &JavaObject(voidptr(&mid)) // o := C.MethodIDToObject(mid)
 				delete_local_ref(env, o)
 			}
-			panic(@MOD + '.' + @FN + ': an exception occured in the JavaVM while trying to find method "$name'+'$sig" on class "${ptr_str(clazz)}" in jni.Env (${ptr_str(env)})')
+			panic(@MOD + '.' + @FN +
+				': an exception occured in the JavaVM while trying to find method "$name' +
+				'$sig" on class "${ptr_str(clazz)}" in jni.Env (${ptr_str(env)})')
 		}
 		return mid
 	}
@@ -355,10 +362,11 @@ fn C.CallObjectMethodA(env &C.JNIEnv, obj C.jobject, methodID C.jmethodID, args 
 pub fn call_object_method_a(env &Env, obj JavaObject, method_id JavaMethodID, args &JavaValue) JavaObject {
 	return C.CallObjectMethodA(env, obj, method_id, args)
 }
+
 pub fn call_string_method_a(env &Env, obj JavaObject, method_id JavaMethodID, args &JavaValue) string {
 	jobject := call_object_method_a(env, obj, method_id, args)
 	jstr := &JavaString(voidptr(&jobject))
-	//jstr := C.ObjectToString(call_object_method_a(env, obj, mid, jv_args.data))
+	// jstr := C.ObjectToString(call_object_method_a(env, obj, mid, jv_args.data))
 	return j2v_string(env, jstr)
 }
 
@@ -493,6 +501,7 @@ fn C.CallNonvirtualObjectMethodA(env &C.JNIEnv, obj C.jobject, clazz C.jclass, m
 pub fn call_nonvirtual_object_method_a(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args &JavaValue) JavaObject {
 	return C.CallNonvirtualObjectMethodA(env, obj, clazz, method_id, args)
 }
+
 pub fn call_nonvirtual_string_method_a(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args &JavaValue) string {
 	jobject := call_nonvirtual_object_method_a(env, obj, clazz, method_id, args)
 	jstr := &JavaString(voidptr(&jobject))
@@ -617,7 +626,7 @@ pub fn call_nonvirtual_void_method_a(env &Env, obj JavaObject, clazz JavaClass, 
 }
 
 //
-fn C.GetFieldID(env &C.JNIEnv, clazz C.jclass, name charptr, sig charptr) C.jfieldID
+fn C.GetFieldID(env &C.JNIEnv, clazz C.jclass, name &char, sig &char) C.jfieldID
 pub fn get_field_id(env &Env, clazz JavaClass, name string, sig string) JavaFieldID {
 	return C.GetFieldID(env, clazz, name.str, sig.str)
 }
@@ -627,39 +636,48 @@ fn C.GetObjectField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID) C.jobject
 pub fn get_object_field(env &Env, obj JavaObject, field_id JavaFieldID) JavaObject {
 	return C.GetObjectField(env, obj, field_id)
 }
+
 pub fn get_string_field(env &Env, obj JavaObject, field_id JavaFieldID) string {
 	jobject := get_object_field(env, obj, field_id)
 	jstr := &JavaString(voidptr(&jobject))
 	return j2v_string(env, jstr)
 }
+
 fn C.GetBooleanField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID) C.jboolean
 pub fn get_boolean_field(env &Env, obj JavaObject, field_id JavaFieldID) bool {
 	return j2v_boolean(C.GetBooleanField(env, obj, field_id))
 }
+
 fn C.GetByteField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID) C.jbyte
 pub fn get_byte_field(env &Env, obj JavaObject, field_id JavaFieldID) byte {
 	return j2v_byte(C.GetByteField(env, obj, field_id))
 }
+
 fn C.GetCharField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID) C.jchar
 pub fn get_char_field(env &Env, obj JavaObject, field_id JavaFieldID) rune {
 	return j2v_char(C.GetCharField(env, obj, field_id))
 }
+
 fn C.GetShortField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID) C.jshort
 pub fn get_short_field(env &Env, obj JavaObject, field_id JavaFieldID) i16 {
 	return j2v_short(C.GetShortField(env, obj, field_id))
 }
+
 fn C.GetIntField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID) C.jint
 pub fn get_int_field(env &Env, obj JavaObject, field_id JavaFieldID) int {
 	return j2v_int(C.GetIntField(env, obj, field_id))
 }
+
 fn C.GetLongField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID) C.jlong
 pub fn get_long_field(env &Env, obj JavaObject, field_id JavaFieldID) i64 {
 	return j2v_long(C.GetLongField(env, obj, field_id))
 }
+
 fn C.GetFloatField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID) C.jfloat
 pub fn get_float_field(env &Env, obj JavaObject, field_id JavaFieldID) f32 {
 	return j2v_float(C.GetFloatField(env, obj, field_id))
 }
+
 fn C.GetDoubleField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID) C.jdouble
 pub fn get_double_field(env &Env, obj JavaObject, field_id JavaFieldID) f64 {
 	return j2v_double(C.GetDoubleField(env, obj, field_id))
@@ -670,57 +688,67 @@ fn C.SetObjectField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID, val C.jobj
 pub fn set_object_field(env &Env, obj JavaObject, field_id JavaFieldID, val JavaObject) {
 	C.SetObjectField(env, obj, field_id, val)
 }
+
 pub fn set_string_field(env &Env, obj JavaObject, field_id JavaFieldID, val string) {
 	jstr := jstring(env, val)
 	jobj := &JavaObject(voidptr(&jstr))
 	set_object_field(env, obj, field_id, jobj)
 }
+
 fn C.SetBooleanField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID, val C.jboolean)
 pub fn set_boolean_field(env &Env, obj JavaObject, field_id JavaFieldID, val bool) {
 	C.SetBooleanField(env, obj, field_id, jboolean(val))
 }
+
 fn C.SetByteField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID, val C.jbyte)
 pub fn set_byte_field(env &Env, obj JavaObject, field_id JavaFieldID, val byte) {
 	C.SetByteField(env, obj, field_id, jbyte(val))
 }
+
 fn C.SetCharField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID, val C.jchar)
 pub fn set_char_field(env &Env, obj JavaObject, field_id JavaFieldID, val rune) {
 	C.SetCharField(env, obj, field_id, jchar(val))
 }
+
 fn C.SetShortField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID, val C.jshort)
 pub fn set_short_field(env &Env, obj JavaObject, field_id JavaFieldID, val i16) {
 	C.SetShortField(env, obj, field_id, jshort(val))
 }
+
 fn C.SetIntField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID, val C.jint)
 pub fn set_int_field(env &Env, obj JavaObject, field_id JavaFieldID, val int) {
 	C.SetIntField(env, obj, field_id, jint(val))
 }
+
 fn C.SetLongField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID, val C.jlong)
 pub fn set_long_field(env &Env, obj JavaObject, field_id JavaFieldID, val i64) {
 	C.SetLongField(env, obj, field_id, jlong(val))
 }
+
 fn C.SetFloatField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID, val C.jfloat)
 pub fn set_float_field(env &Env, obj JavaObject, field_id JavaFieldID, val f32) {
 	C.SetFloatField(env, obj, field_id, jfloat(val))
 }
+
 fn C.SetDoubleField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID, val C.jdouble)
 pub fn set_double_field(env &Env, obj JavaObject, field_id JavaFieldID, val f64) {
 	C.SetDoubleField(env, obj, field_id, jdouble(val))
 }
 
 //
-fn C.GetStaticMethodID(env &C.JNIEnv, clazz C.jclass, name charptr, sig charptr) C.jmethodID
+fn C.GetStaticMethodID(env &C.JNIEnv, clazz C.jclass, name &char, sig &char) C.jmethodID
 pub fn get_static_method_id(env &Env, clazz JavaClass, name string, sig string) JavaMethodID {
 	$if debug {
 		mid := C.GetStaticMethodID(env, clazz, name.str, sig.str)
 		if exception_check(env) {
 			exception_describe(env)
 			if !isnil(mid) {
-				o := &JavaObject(voidptr(&mid)) //o := C.MethodIDToObject(mid)
+				o := &JavaObject(voidptr(&mid)) // o := C.MethodIDToObject(mid)
 				delete_local_ref(env, o)
 			}
-			//clsn := get_class_name(env, clazz)
-			panic(@MOD + '.' + @FN + ': an exception occured in jni.Env (${ptr_str(env)} couldn\'t find method "$name" with signature "$sig" on class "$clazz")')
+			// clsn := get_class_name(env, clazz)
+			panic(@MOD + '.' + @FN +
+				': an exception occured in jni.Env (${ptr_str(env)} couldn\'t find method "$name" with signature "$sig" on class "$clazz")')
 		}
 		return mid
 	}
@@ -729,30 +757,31 @@ pub fn get_static_method_id(env &Env, clazz JavaClass, name string, sig string) 
 
 //
 // fn C.CallStaticObjectMethod(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, ...) C.jobject
-//pub fn call_static_object_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) JavaObject {
+// pub fn call_static_object_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) JavaObject {
 //	return C.CallStaticObjectMethod(env, clazz, method_id, ...)
 //}
 // fn C.CallStaticObjectMethodV(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jobject
-//pub fn call_static_object_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) JavaObject {
+// pub fn call_static_object_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) JavaObject {
 //	return C.CallStaticObjectMethodV(env, clazz, method_id, args)
 //}
 fn C.CallStaticObjectMethodA(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jobject
 pub fn call_static_object_method_a(env &Env, clazz JavaClass, method_id JavaMethodID, args &JavaValue) JavaObject {
 	return C.CallStaticObjectMethodA(env, clazz, method_id, args)
 }
+
 pub fn call_static_string_method_a(env &Env, clazz JavaClass, method_id JavaMethodID, args &JavaValue) string {
 	jobject := call_static_object_method_a(env, clazz, method_id, args)
 	jstr := &JavaString(voidptr(&jobject))
-	//jstr :=  C.ObjectToString(call_static_object_method_a(env, class, mid, jv_args.data))
+	// jstr :=  C.ObjectToString(call_static_object_method_a(env, class, mid, jv_args.data))
 	return j2v_string(env, jstr)
 }
 
 // fn C.CallStaticBooleanMethod(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, ...) C.jboolean
-//pub fn call_static_boolean_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) bool {
+// pub fn call_static_boolean_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) bool {
 //	return C.CallStaticBooleanMethod(env, clazz, method_id, ...)
 //}
 // fn C.CallStaticBooleanMethodV(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jboolean
-//pub fn call_static_boolean_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) bool {
+// pub fn call_static_boolean_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) bool {
 //	return C.CallStaticBooleanMethodV(env, clazz, method_id, args)
 //}
 fn C.CallStaticBooleanMethodA(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jboolean
@@ -761,11 +790,11 @@ pub fn call_static_boolean_method_a(env &Env, clazz JavaClass, method_id JavaMet
 }
 
 // fn C.CallStaticByteMethod(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, ...) C.jbyte
-//pub fn call_static_byte_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) C.jbyte {
+// pub fn call_static_byte_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) C.jbyte {
 //	return C.CallStaticByteMethod(env, clazz, method_id, ...)
 //}
 // fn C.CallStaticByteMethodV(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jbyte
-//pub fn call_static_byte_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) C.jbyte {
+// pub fn call_static_byte_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) C.jbyte {
 //	return C.CallStaticByteMethodV(env, clazz, method_id, args)
 //}
 fn C.CallStaticByteMethodA(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jbyte
@@ -774,11 +803,11 @@ pub fn call_static_byte_method_a(env &Env, clazz JavaClass, method_id JavaMethod
 }
 
 // fn C.CallStaticCharMethod(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, ...) C.jchar
-//pub fn call_static_char_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) C.jchar {
+// pub fn call_static_char_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) C.jchar {
 //	return C.CallStaticCharMethod(env, clazz, method_id, ...)
 //}
 // fn C.CallStaticCharMethodV(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jchar
-//pub fn call_static_char_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) C.jchar {
+// pub fn call_static_char_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) C.jchar {
 //	return C.CallStaticCharMethodV(env, clazz, method_id, args)
 //}
 fn C.CallStaticCharMethodA(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jchar
@@ -787,11 +816,11 @@ pub fn call_static_char_method_a(env &Env, clazz JavaClass, method_id JavaMethod
 }
 
 // fn C.CallStaticShortMethod(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, ...) C.jshort
-//pub fn call_static_short_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) i16 {
+// pub fn call_static_short_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) i16 {
 //	return C.CallStaticShortMethod(env, clazz, method_id, ...)
 //}
 // fn C.CallStaticShortMethodV(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jshort
-//pub fn call_static_short_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) i16 {
+// pub fn call_static_short_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) i16 {
 //	return C.CallStaticShortMethodV(env, clazz, method_id, args)
 //}
 fn C.CallStaticShortMethodA(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jshort
@@ -800,11 +829,11 @@ pub fn call_static_short_method_a(env &Env, clazz JavaClass, method_id JavaMetho
 }
 
 // fn C.CallStaticIntMethod(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, ...) C.jint
-//pub fn call_static_int_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) int {
+// pub fn call_static_int_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) int {
 //	return C.CallStaticIntMethod(env, clazz, method_id, ...)
 //}
 // fn C.CallStaticIntMethodV(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jint
-//pub fn call_static_int_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) int {
+// pub fn call_static_int_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) int {
 //	return C.CallStaticIntMethodV(env, clazz, method_id, args)
 //}
 fn C.CallStaticIntMethodA(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jint
@@ -813,11 +842,11 @@ pub fn call_static_int_method_a(env &Env, clazz JavaClass, method_id JavaMethodI
 }
 
 // fn C.CallStaticLongMethod(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, ...) C.jlong
-//pub fn call_static_long_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) i64 {
+// pub fn call_static_long_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) i64 {
 //	return C.CallStaticLongMethod(env, clazz, method_id, ...)
 //}
 // fn C.CallStaticLongMethodV(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jlong
-//pub fn call_static_long_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) i64 {
+// pub fn call_static_long_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) i64 {
 //	return C.CallStaticLongMethodV(env, clazz, method_id, args)
 //}
 fn C.CallStaticLongMethodA(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jlong
@@ -826,11 +855,11 @@ pub fn call_static_long_method_a(env &Env, clazz JavaClass, method_id JavaMethod
 }
 
 // fn C.CallStaticFloatMethod(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, ...) C.jfloat
-//pub fn call_static_float_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) f32 {
+// pub fn call_static_float_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) f32 {
 //	return C.CallStaticFloatMethod(env, clazz, method_id, ...)
 //}
 // fn C.CallStaticFloatMethodV(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jfloat
-//pub fn call_static_float_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) f32 {
+// pub fn call_static_float_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) f32 {
 //	return C.CallStaticFloatMethodV(env, clazz, method_id, args)
 //}
 fn C.CallStaticFloatMethodA(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jfloat
@@ -839,11 +868,11 @@ pub fn call_static_float_method_a(env &Env, clazz JavaClass, method_id JavaMetho
 }
 
 // fn C.CallStaticDoubleMethod(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, ...) C.jdouble
-//pub fn call_static_double_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) f64 {
+// pub fn call_static_double_method(env &Env, clazz JavaClass, method_id JavaMethodID, ...) f64 {
 //	return C.CallStaticDoubleMethod(env, clazz, method_id, ...)
 //}
 // fn C.CallStaticDoubleMethodV(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args C.va_list) C.jdouble
-//pub fn call_static_double_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) f64 {
+// pub fn call_static_double_method_v(env &Env, clazz JavaClass, method_id JavaMethodID, args C.va_list) f64 {
 //	return C.CallStaticDoubleMethodV(env, clazz, method_id, args)
 //}
 fn C.CallStaticDoubleMethodA(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jdouble
@@ -852,11 +881,11 @@ pub fn call_static_double_method_a(env &Env, clazz JavaClass, method_id JavaMeth
 }
 
 // fn C.CallStaticVoidMethod(env &C.JNIEnv, cls C.jclass, methodID C.jmethodID, ...)
-//pub fn call_static_void_method(env &Env, cls JavaClass, method_id JavaMethodID, ...) {
+// pub fn call_static_void_method(env &Env, cls JavaClass, method_id JavaMethodID, ...) {
 //	return C.CallStaticVoidMethod(env, cls, method_id, ...)
 //}
 // fn C.CallStaticVoidMethodV(env &C.JNIEnv, cls C.jclass, methodID C.jmethodID, args C.va_list)
-//pub fn call_static_void_method_v(env &Env, cls JavaClass, method_id JavaMethodID, args C.va_list) {
+// pub fn call_static_void_method_v(env &Env, cls JavaClass, method_id JavaMethodID, args C.va_list) {
 //	return C.CallStaticVoidMethodV(env, cls, method_id, args)
 //}
 fn C.CallStaticVoidMethodA(env &C.JNIEnv, cls C.jclass, methodID C.jmethodID, args &C.jvalue)
@@ -865,42 +894,51 @@ pub fn call_static_void_method_a(env &Env, cls JavaClass, method_id JavaMethodID
 }
 
 //
-fn C.GetStaticFieldID(env &C.JNIEnv, clazz C.jclass, name charptr, sig charptr) C.jfieldID
+fn C.GetStaticFieldID(env &C.JNIEnv, clazz C.jclass, name &char, sig &char) C.jfieldID
 pub fn get_static_field_id(env &Env, clazz JavaClass, name string, sig string) JavaFieldID {
 	return C.GetStaticFieldID(env, clazz, name.str, sig.str)
 }
+
 fn C.GetStaticObjectField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID) C.jobject
 pub fn get_static_object_field(env &Env, clazz JavaClass, field_id JavaFieldID) JavaObject {
 	return C.GetStaticObjectField(env, clazz, field_id)
 }
+
 fn C.GetStaticBooleanField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID) C.jboolean
 pub fn get_static_boolean_field(env &Env, clazz JavaClass, field_id JavaFieldID) bool {
 	return j2v_boolean(C.GetStaticBooleanField(env, clazz, field_id))
 }
+
 fn C.GetStaticByteField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID) C.jbyte
 pub fn get_static_byte_field(env &Env, clazz JavaClass, field_id JavaFieldID) byte {
 	return j2v_byte(C.GetStaticByteField(env, clazz, field_id))
 }
+
 fn C.GetStaticCharField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID) C.jchar
 pub fn get_static_char_field(env &Env, clazz JavaClass, field_id JavaFieldID) rune {
 	return j2v_char(C.GetStaticCharField(env, clazz, field_id))
 }
+
 fn C.GetStaticShortField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID) C.jshort
 pub fn get_static_short_field(env &Env, clazz JavaClass, field_id JavaFieldID) i16 {
 	return j2v_short(C.GetStaticShortField(env, clazz, field_id))
 }
+
 fn C.GetStaticIntField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID) C.jint
 pub fn get_static_int_field(env &Env, clazz JavaClass, field_id JavaFieldID) int {
 	return j2v_int(C.GetStaticIntField(env, clazz, field_id))
 }
+
 fn C.GetStaticLongField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID) C.jlong
 pub fn get_static_long_field(env &Env, clazz JavaClass, field_id JavaFieldID) i64 {
 	return j2v_long(C.GetStaticLongField(env, clazz, field_id))
 }
+
 fn C.GetStaticFloatField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID) C.jfloat
 pub fn get_static_float_field(env &Env, clazz JavaClass, field_id JavaFieldID) f32 {
 	return j2v_float(C.GetStaticFloatField(env, clazz, field_id))
 }
+
 fn C.GetStaticDoubleField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID) C.jdouble
 pub fn get_static_double_field(env &Env, clazz JavaClass, field_id JavaFieldID) f64 {
 	return j2v_double(C.GetStaticDoubleField(env, clazz, field_id))
@@ -911,34 +949,42 @@ fn C.SetStaticObjectField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID, val
 pub fn set_static_object_field(env &Env, clazz JavaClass, field_id JavaFieldID, value JavaObject) {
 	C.SetStaticObjectField(env, clazz, field_id, value)
 }
+
 fn C.SetStaticBooleanField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID, value C.jboolean)
 pub fn set_static_boolean_field(env &Env, clazz JavaClass, field_id JavaFieldID, value bool) {
 	C.SetStaticBooleanField(env, clazz, field_id, jboolean(value))
 }
+
 fn C.SetStaticByteField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID, value C.jbyte)
 pub fn set_static_byte_field(env &Env, clazz JavaClass, field_id JavaFieldID, value byte) {
 	C.SetStaticByteField(env, clazz, field_id, jbyte(value))
 }
+
 fn C.SetStaticCharField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID, value C.jchar)
 pub fn set_static_char_field(env &Env, clazz JavaClass, field_id JavaFieldID, value rune) {
 	C.SetStaticCharField(env, clazz, field_id, jchar(value))
 }
+
 fn C.SetStaticShortField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID, value C.jshort)
 pub fn set_static_short_field(env &Env, clazz JavaClass, field_id JavaFieldID, value i16) {
 	C.SetStaticShortField(env, clazz, field_id, jshort(value))
 }
+
 fn C.SetStaticIntField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID, value C.jint)
 pub fn set_static_int_field(env &Env, clazz JavaClass, field_id JavaFieldID, value int) {
 	C.SetStaticIntField(env, clazz, field_id, jint(value))
 }
+
 fn C.SetStaticLongField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID, value C.jlong)
 pub fn set_static_long_field(env &Env, clazz JavaClass, field_id JavaFieldID, value i64) {
 	C.SetStaticLongField(env, clazz, field_id, jlong(value))
 }
+
 fn C.SetStaticFloatField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID, value C.jfloat)
 pub fn set_static_float_field(env &Env, clazz JavaClass, field_id JavaFieldID, value f32) {
 	C.SetStaticFloatField(env, clazz, field_id, jfloat(value))
 }
+
 fn C.SetStaticDoubleField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID, value C.jdouble)
 pub fn set_static_double_field(env &Env, clazz JavaClass, field_id JavaFieldID, value f64) {
 	C.SetStaticDoubleField(env, clazz, field_id, jdouble(value))
@@ -946,43 +992,49 @@ pub fn set_static_double_field(env &Env, clazz JavaClass, field_id JavaFieldID, 
 
 //
 fn C.NewString(env &C.JNIEnv, unicode &C.jchar, len C.jsize) C.jstring
-pub fn new_string(env &Env, unicode string /*, len int*/) JavaString {
+pub fn new_string(env &Env, unicode string) JavaString { //, len int
 	// TODO
-	//mut uc := []rune{}
+	// mut uc := []rune{}
 	return C.NewString(env, unicode.str, jsize(unicode.len))
 }
+
 fn C.GetStringLength(env &C.JNIEnv, str C.jstring) C.jsize
 pub fn get_string_length(env &Env, str JavaString) int {
 	return j2v_size(C.GetStringLength(env, str))
 }
+
 fn C.GetStringChars(env &C.JNIEnv, str C.jstring, isCopy &C.jboolean) &C.jchar
 pub fn get_string_chars(env &Env, str JavaString) ([]rune, bool) {
 	// TODO
 	return []rune{}, false
-	//return C.GetStringChars(env, str, &is_copy)
+	// return C.GetStringChars(env, str, &is_copy)
 }
+
 fn C.ReleaseStringChars(env &C.JNIEnv, str C.jstring, chars &C.jchar)
 pub fn release_string_chars(env &Env, str JavaString, chars []rune) {
 	// TODO
 	C.ReleaseStringChars(env, str, chars.data)
 }
 
-fn C.NewStringUTF(env &C.JNIEnv, utf charptr) C.jstring
+fn C.NewStringUTF(env &C.JNIEnv, utf &char) C.jstring
 pub fn new_string_utf(env &Env, utf string) JavaString {
 	return C.NewStringUTF(env, utf.str)
 }
+
 fn C.GetStringUTFLength(env &C.JNIEnv, str C.jstring) C.jsize
 pub fn get_string_utf_length(env &Env, str JavaString) int {
 	return j2v_size(C.GetStringUTFLength(env, str))
 }
-fn C.GetStringUTFChars(env &C.JNIEnv, str C.jstring, isCopy &C.jboolean) charptr
-pub fn get_string_utf_chars(env &Env, str JavaString) (charptr, bool) {
+
+fn C.GetStringUTFChars(env &C.JNIEnv, str C.jstring, isCopy &C.jboolean) &char
+pub fn get_string_utf_chars(env &Env, str JavaString) (&char, bool) {
 	is_cp := false
 	is_copy := jboolean(is_cp)
 	return C.GetStringUTFChars(env, str, &is_copy), j2v_boolean(is_copy)
 }
-fn C.ReleaseStringUTFChars(env &C.JNIEnv, str C.jstring, chars charptr)
-pub fn release_string_utf_chars(env &Env, str JavaString, chars charptr) {
+
+fn C.ReleaseStringUTFChars(env &C.JNIEnv, str C.jstring, chars &char)
+pub fn release_string_utf_chars(env &Env, str JavaString, chars &char) {
 	C.ReleaseStringUTFChars(env, str, chars)
 }
 
@@ -1003,6 +1055,7 @@ fn C.GetObjectArrayElement(env &C.JNIEnv, array C.jobjectArray, index C.jsize) C
 pub fn get_object_array_element(env &Env, array JavaObjectArray, index int) JavaObject {
 	return C.GetObjectArrayElement(env, array, jsize(index))
 }
+
 pub fn (a JavaObjectArray) at(env &Env, index int) JavaObject {
 	return get_object_array_element(env, a, index)
 }
@@ -1012,8 +1065,9 @@ fn C.SetObjectArrayElement(env &C.JNIEnv, array C.jobjectArray, index C.jsize, v
 pub fn set_object_array_element(env &Env, array JavaObjectArray, index int, val JavaObject) {
 	C.SetObjectArrayElement(env, array, jsize(index), val)
 }
+
 pub fn (a JavaObjectArray) insert(env &Env, index int, val JavaObject) {
-	set_object_array_element(env, a, index , val)
+	set_object_array_element(env, a, index, val)
 }
 
 //
@@ -1067,6 +1121,7 @@ fn C.RegisterNatives(env &C.JNIEnv, clazz C.jclass, methods &C.JNINativeMethod, 
 pub fn register_natives(env &Env, clazz JavaClass, methods &C.JNINativeMethod, n_methods int) int {
 	return j2v_int(C.RegisterNatives(env, clazz, methods, jint(n_methods)))
 }
+
 fn C.UnregisterNatives(env &C.JNIEnv, clazz C.jclass) C.jint
 pub fn unregister_natives(env &Env, clazz JavaClass) int {
 	return j2v_int(C.UnregisterNatives(env, clazz))
@@ -1077,6 +1132,7 @@ fn C.MonitorEnter(env &C.JNIEnv, obj C.jobject) C.jint
 pub fn monitor_enter(env &Env, obj JavaObject) int {
 	return j2v_int(C.MonitorEnter(env, obj))
 }
+
 fn C.MonitorExit(env &C.JNIEnv, obj C.jobject) C.jint
 pub fn monitor_exit(env &Env, obj JavaObject) int {
 	return j2v_int(C.MonitorExit(env, obj))
@@ -1090,7 +1146,7 @@ pub fn get_java_vm(env &Env, vm voidptr) int {
 
 //
 fn C.GetStringRegion(env &C.JNIEnv, str C.jstring, start C.jsize, len C.jsize, buf &C.jchar)
-fn C.GetStringUTFRegion(env &C.JNIEnv, str C.jstring, start C.jsize, len C.jsize, buf charptr)
+fn C.GetStringUTFRegion(env &C.JNIEnv, str C.jstring, start C.jsize, len C.jsize, buf &char)
 
 fn C.GetPrimitiveArrayCritical(env &C.JNIEnv, array C.jarray, isCopy &C.jboolean) voidptr
 fn C.ReleasePrimitiveArrayCritical(env &C.JNIEnv, array C.jarray, carray voidptr, mode C.jint)

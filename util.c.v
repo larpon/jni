@@ -28,7 +28,7 @@ pub fn env_detach() (&Env, bool) {
 pub fn detach_thread(need_detach bool) {
 	if need_detach {
 		C.gDetachThread()
-    }
+	}
 }
 
 pub fn setup_android(fq_activity_name string) {
