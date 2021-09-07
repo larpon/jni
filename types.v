@@ -136,7 +136,7 @@ fn v2j_string_signature_type(vt string) string {
 	}
 }
 
-fn v2j_value(env &Env, vt Type) JavaValue {
+pub fn v2j_value(env &Env, vt Type) JavaValue {
 	return match vt {
 		bool {
 			JavaValue{
