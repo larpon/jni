@@ -114,7 +114,7 @@ fn frame(mut app App) {
 	app.gg.draw_text_def(int(f32(ws.width) * 0.1), int(f32(ws.height) * 0.2), 'Java buffer: "$app.buffer"')
 	app.gg.draw_text_def(int(f32(ws.width) * 0.1), int(f32(ws.height) * 0.25), 'Last char parsed in V: "$app.parsed_char"')
 	// NOTE Don't call out to slow Java code (keyboard.is_visible()) like this every frame
-	// app.gg.draw_text_def(int(f32(ws.width) * 0.1), int(f32(ws.height) * 0.45), 'Keyboard visible: ${keyboard.is_visible()}')
+	// app.gg.draw_text_def(int(f32(ws.width) * 0.1), int(f32(ws.height) * 0.27), 'Keyboard visible: ${keyboard.is_visible()}')
 
 	sgl.viewport(int((f32(rws.width) * 0.5) - (min * 0.5)), int((f32(rws.height) * 0.5) - (min * 0.5)),
 		int(min), int(min), true)

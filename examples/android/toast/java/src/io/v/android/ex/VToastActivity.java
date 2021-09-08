@@ -11,7 +11,7 @@ public class VToastActivity extends io.v.android.VActivity {
 		final String s = text;
 		thiz.runOnUiThread(new Runnable() {
 			public void run() {
-				Toast.makeText(thiz.getApplicationContext(),s,Toast.LENGTH_SHORT).show();
+				Toast.makeText(thiz, s, Toast.LENGTH_SHORT).show();
 			}
 		});
 	}
