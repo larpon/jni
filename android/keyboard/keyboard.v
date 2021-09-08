@@ -190,7 +190,7 @@ pub fn is_visible() bool {
 		view_visible_height := jni.call_int_method_a(env, view_visible_rect, rect_height,
 			jni.void_arg.data)
 
-		// Release new'd objects
+		// Release references to objects
 		jni.delete_local_ref(env, view_visible_rect)
 		jni.delete_local_ref(env, &jni.JavaObject(voidptr(&rect_class)))
 		jni.delete_local_ref(env, display_dimension)
