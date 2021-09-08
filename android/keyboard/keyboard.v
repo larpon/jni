@@ -106,11 +106,6 @@ pub fn visibility(soft_visibility SoftKeyboardVisibility) bool {
 	return false
 }
 
-fn toast_dbg(text string) {
-	auto.call_static_method(jni.sig('io.v.android.VActivity', 'showToast', 'void', text),
-		text)
-}
-
 // is_visible returns `true` if it's like that the soft input is covering some of the screen.
 // It is not recommended to run this in hot code paths like a game loop since
 // it takes round trips through the JNI and allocates/deallocates memory via the JVM.
@@ -197,9 +192,9 @@ pub fn is_visible() bool {
 
 		// Release new'd objects
 		jni.delete_local_ref(env, view_visible_rect)
-		// jni.delete_local_ref(env, &jni.JavaObject(voidptr(rect_class))) // ??? Original code has this - but it crashes
+		jni.delete_local_ref(env, &jni.JavaObject(voidptr(&rect_class)))
 		jni.delete_local_ref(env, display_dimension)
-		// jni.delete_local_ref(env, &jni.JavaObject(voidptr(view_class))) // ??? Original code has this - but it crashes
+		jni.delete_local_ref(env, &jni.JavaObject(voidptr(&view_class)))
 
 		// hack := display_height - status_bar_height != view_visible_height // ??? Original code had this
 		// but it doesn't work on devices with where the primary keys are software keys places in a bar in the bottom.
