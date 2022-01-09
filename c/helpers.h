@@ -3,13 +3,15 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-#ifdef __ANDROID__
-#include <android/log.h>
-#define V_JNI_ANDROID_LOG_TAG "V_ANDROID"
-#define V_JNI_ANDROID_LOG_I(...) __android_log_print(ANDROID_LOG_INFO, V_JNI_ANDROID_LOG_TAG, __VA_ARGS__)
-#define V_JNI_ANDROID_LOG_W(...) __android_log_print(ANDROID_LOG_WARN, V_JNI_ANDROID_LOG_TAG, __VA_ARGS__)
-#define V_JNI_ANDROID_LOG_E(...) __android_log_print(ANDROID_LOG_ERROR, V_JNI_ANDROID_LOG_TAG, __VA_ARGS__)
-#define V_JNI_ANDROID_LOG_D(...) __android_log_print(ANDROID_LOG_DEBUG, V_JNI_ANDROID_LOG_TAG, __VA_ARGS__)
+#ifdef V_ANDROID_LOG_PRINT
+	#ifdef __ANDROID__
+	#include <android/log.h>
+	#define V_JNI_ANDROID_LOG_TAG "V_ANDROID"
+	#define V_JNI_ANDROID_LOG_I(...) __android_log_print(ANDROID_LOG_INFO, V_JNI_ANDROID_LOG_TAG, __VA_ARGS__)
+	#define V_JNI_ANDROID_LOG_W(...) __android_log_print(ANDROID_LOG_WARN, V_JNI_ANDROID_LOG_TAG, __VA_ARGS__)
+	#define V_JNI_ANDROID_LOG_E(...) __android_log_print(ANDROID_LOG_ERROR, V_JNI_ANDROID_LOG_TAG, __VA_ARGS__)
+	#define V_JNI_ANDROID_LOG_D(...) __android_log_print(ANDROID_LOG_DEBUG, V_JNI_ANDROID_LOG_TAG, __VA_ARGS__)
+	#endif
 #endif
 
 static JavaVM* gJavaVM;
@@ -20,7 +22,7 @@ static jmethodID gFindClassMethod;
 void __v_jni_log_i(const char *fmt, ...) {
 	va_list args;
     va_start(args, fmt);
-	#ifdef __ANDROID__
+	#ifdef V_ANDROID_LOG_PRINT
 		V_JNI_ANDROID_LOG_I(fmt, args);
 	#else
 		vprintf(fmt, args);
@@ -31,7 +33,7 @@ void __v_jni_log_i(const char *fmt, ...) {
 void __v_jni_log_w(const char *fmt, ...) {
 	va_list args;
     va_start(args, fmt);
-	#ifdef __ANDROID__
+	#ifdef V_ANDROID_LOG_PRINT
 		V_JNI_ANDROID_LOG_W(fmt, args);
 	#else
 		vprintf(fmt, args);
@@ -42,7 +44,7 @@ void __v_jni_log_w(const char *fmt, ...) {
 void __v_jni_log_e(const char *fmt, ...) {
 	va_list args;
     va_start(args, fmt);
-	#ifdef __ANDROID__
+	#ifdef V_ANDROID_LOG_PRINT
 		V_JNI_ANDROID_LOG_E(fmt, args);
 	#else
 		vprintf(fmt, args);
@@ -55,7 +57,7 @@ void __v_jni_log_d(const char *fmt, ...) {
 	{
 		va_list args;
 		va_start(args, fmt);
-		#ifdef __ANDROID__
+		#ifdef V_ANDROID_LOG_PRINT
 			V_JNI_ANDROID_LOG_D(fmt, args);
 		#else
 			vprintf(fmt, args);
