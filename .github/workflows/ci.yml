@@ -18,34 +18,40 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: vlang/v
-
     - name: Build local v
-      run: make -j4
+      run: make && sudo ./v symlink
 
-    - name: Checkout V jni
+    - name: Checkout jni
       uses: actions/checkout@v2
       with:
-        repository: Larpon/jni
-        path: $HOME/.vmodules/jni
+        path: jni
 
-#    - name: Run tests
-#      run: ./v test $HOME/.vmodules/jni
+    - name: Link local jni folder in ~/.vmodules/jni
+      run: |
+        cd jni
+        mkdir -p ~/.vmodules
+        ln -s $(pwd) ~/.vmodules/jni
+    - name: Test code formatting
+      run: |
+        cd jni
+        v test-fmt
+
+    - name: Run jni tests
+      run: |
+        cd jni
+        v test .
 
     - name: Install and run V jni examples
       run: |
-        git clone --depth 1 https://github.com/Larpon/jni
         cd jni
-        mkdir -p $HOME/.vmodules
-        ln -s $(pwd) $HOME/.vmodules/jni
-        cd ..
-        export VEXE="$(pwd)/v"
+        JNI_HOME=$(pwd)
         export JAVA_HOME=$JAVA_HOME_11_X64
         # Test basic shell operation
-        cd $HOME/.vmodules/jni/examples/desktop/v_as_library
+        cd $JNI_HOME/examples/desktop/v_as_library
         export LD_LIBRARY_PATH=$(pwd):.
-        $VEXE -cc gcc -cg  -shared libvlang.v
+        v -cc gcc -cg  -shared libvlang.v
         javac io/vlang/V.java
         java io.vlang.V
         # Test build_and_run.vsh
-        cd $HOME/.vmodules/jni/examples/desktop/simple
-        $VEXE run ./build_and_run.vsh
+        cd $JNI_HOME/examples/desktop/simple
+        v run ./build_and_run.vsh
