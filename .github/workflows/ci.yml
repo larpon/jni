@@ -70,6 +70,7 @@ jobs:
 
     - name: Build Android examples
       run: |
+        echo $(pwd)
         declare -a jni_android_examples=('keyboard' 'toast')
         mkdir apks
         for example in "${jni_android_examples[@]}"; do
