@@ -32,8 +32,8 @@ struct App {
 mut:
 	gg &gg.Context
 
-	pip_3d      C.sgl_pipeline
-	texture     C.sg_image
+	pip_3d      sgl.Pipeline
+	texture     gfx.Image
 	init_flag   bool
 	frame_count int
 
@@ -78,27 +78,27 @@ fn draw_triangle() {
 fn init(mut app App) {
 	desc := sapp.create_desc()
 	gfx.setup(&desc)
-	sgl_desc := C.sgl_desc_t{
+	sgl_desc := sgl.Desc{
 		max_vertices: 50 * 65536
 	}
 	sgl.setup(&sgl_desc)
 
 	// 3d pipeline
-	mut pipdesc := C.sg_pipeline_desc{}
-	unsafe { C.memset(&pipdesc, 0, sizeof(pipdesc)) }
+	mut pipdesc := gfx.PipelineDesc{}
+	unsafe { vmemset(&pipdesc, 0, int(sizeof(pipdesc))) }
 
-	color_state := C.sg_color_state{
-		blend: C.sg_blend_state{
+	color_state := gfx.ColorState{
+		blend: gfx.BlendState{
 			enabled: true
-			src_factor_rgb: gfx.BlendFactor(C.SG_BLENDFACTOR_SRC_ALPHA)
-			dst_factor_rgb: gfx.BlendFactor(C.SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA)
+			src_factor_rgb: .src_alpha
+			dst_factor_rgb: .one_minus_src_alpha
 		}
 	}
 	pipdesc.colors[0] = color_state
 
-	pipdesc.depth = C.sg_depth_state{
+	pipdesc.depth = gfx.DepthState{
 		write_enabled: true
-		compare: gfx.CompareFunc(C.SG_COMPAREFUNC_LESS_EQUAL)
+		compare: .less_equal
 	}
 	pipdesc.cull_mode = .back
 	app.pip_3d = sgl.make_pipeline(&pipdesc)
