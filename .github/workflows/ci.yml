@@ -9,8 +9,8 @@ on:
       - "**.md"
 
 jobs:
-  ubuntu-18_04:
-    runs-on: ubuntu-18.04
+  build-and-run-examples:
+    runs-on: ubuntu-20.04
     timeout-minutes: 30
     steps:
 
@@ -41,7 +41,7 @@ jobs:
         cd jni
         v test .
 
-    - name: Install and run V jni examples
+    - name: Install and run V jni Desktop examples
       run: |
         cd jni
         JNI_HOME=$(pwd)
@@ -55,3 +55,25 @@ jobs:
         # Test build_and_run.vsh
         cd $JNI_HOME/examples/desktop/simple
         v run ./build_and_run.vsh
+
+    - name: Checkout vab
+      uses: actions/checkout@v2
+      with:
+        repository: vlang/vab
+        path: vab
+
+    - name: Build vab
+      run: |
+        cd vab
+        v vab.v
+        sudo ln -s $(pwd)/vab /usr/local/bin/vab
+
+    - name: Build Android examples
+      run: |
+        cd vab
+        declare -a jni_android_examples=('keyboard' 'toast')
+        mkdir apks
+        for example in "${jni_android_examples[@]}"; do
+          safe_name=$(echo "$example" | sed 's%/%-%' | sed 's%\.%-%' )
+          vab --api 29 --build-tools '29.0.0' -v 3 examples/$example -o apks/$safe_name.apk
+        done
