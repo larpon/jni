@@ -191,7 +191,7 @@ fn main() {
 		init_fn: init
 		cleanup_fn: cleanup
 		event_fn: event
-		font_path: font.system_path()
+		font_path: font.default()
 	)
 
 	app.gg.run()
