@@ -2,6 +2,7 @@
 // Use of this source code is governed by an MIT license file distributed with this software package
 import gg
 import gx
+import os.font
 import sokol.sapp
 import sokol.gfx
 import sokol.sgl
@@ -190,7 +191,7 @@ fn main() {
 		init_fn: init
 		cleanup_fn: cleanup
 		event_fn: event
-		font_path: gg.system_font_path()
+		font_path: font.system_path()
 	)
 
 	app.gg.run()
