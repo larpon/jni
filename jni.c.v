@@ -156,7 +156,7 @@ pub fn get_version(env &Env) int {
 fn C.DefineClass(env &C.JNIEnv, name &char, loader C.jobject, buf &C.jbyte, bufLen C.jsize) C.jclass
 
 // NOTE: unsure about `buf` (C.jbyte -> signed char) and `len` (C.jsize -> C.jint) types.
-pub fn define_class(env &Env, name string, loader JavaObject, buf &byte, len int) JavaClass {
+pub fn define_class(env &Env, name string, loader JavaObject, buf &u8, len int) JavaClass {
 	return C.DefineClass(env, name.str, loader, buf, jsize(len))
 }
 
@@ -392,7 +392,7 @@ pub fn call_boolean_method_a(env &Env, obj JavaObject, method_id JavaMethodID, a
 //	return C.CallByteMethodV(env, obj, method_id, args)
 //}
 fn C.CallByteMethodA(env &C.JNIEnv, obj C.jobject, methodID C.jmethodID, args &C.jvalue) C.jbyte
-pub fn call_byte_method_a(env &Env, obj JavaObject, method_id JavaMethodID, args &JavaValue) byte {
+pub fn call_byte_method_a(env &Env, obj JavaObject, method_id JavaMethodID, args &JavaValue) u8 {
 	return j2v_byte(C.CallByteMethodA(env, obj, method_id, args))
 }
 
@@ -530,7 +530,7 @@ pub fn call_nonvirtual_boolean_method_a(env &Env, obj JavaObject, clazz JavaClas
 //	return C.CallNonvirtualByteMethodV(env, obj, clazz, method_id, args)
 //}
 fn C.CallNonvirtualByteMethodA(env &C.JNIEnv, obj C.jobject, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jbyte
-pub fn call_nonvirtual_byte_method_a(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args &JavaValue) byte {
+pub fn call_nonvirtual_byte_method_a(env &Env, obj JavaObject, clazz JavaClass, method_id JavaMethodID, args &JavaValue) u8 {
 	return j2v_byte(C.CallNonvirtualByteMethodA(env, obj, clazz, method_id, args))
 }
 
@@ -649,7 +649,7 @@ pub fn get_boolean_field(env &Env, obj JavaObject, field_id JavaFieldID) bool {
 }
 
 fn C.GetByteField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID) C.jbyte
-pub fn get_byte_field(env &Env, obj JavaObject, field_id JavaFieldID) byte {
+pub fn get_byte_field(env &Env, obj JavaObject, field_id JavaFieldID) u8 {
 	return j2v_byte(C.GetByteField(env, obj, field_id))
 }
 
@@ -701,7 +701,7 @@ pub fn set_boolean_field(env &Env, obj JavaObject, field_id JavaFieldID, val boo
 }
 
 fn C.SetByteField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID, val C.jbyte)
-pub fn set_byte_field(env &Env, obj JavaObject, field_id JavaFieldID, val byte) {
+pub fn set_byte_field(env &Env, obj JavaObject, field_id JavaFieldID, val u8) {
 	C.SetByteField(env, obj, field_id, jbyte(val))
 }
 
@@ -798,7 +798,7 @@ pub fn call_static_boolean_method_a(env &Env, clazz JavaClass, method_id JavaMet
 //	return C.CallStaticByteMethodV(env, clazz, method_id, args)
 //}
 fn C.CallStaticByteMethodA(env &C.JNIEnv, clazz C.jclass, methodID C.jmethodID, args &C.jvalue) C.jbyte
-pub fn call_static_byte_method_a(env &Env, clazz JavaClass, method_id JavaMethodID, args &JavaValue) byte {
+pub fn call_static_byte_method_a(env &Env, clazz JavaClass, method_id JavaMethodID, args &JavaValue) u8 {
 	return j2v_byte(C.CallStaticByteMethodA(env, clazz, method_id, args))
 }
 
@@ -910,7 +910,7 @@ pub fn get_static_boolean_field(env &Env, clazz JavaClass, field_id JavaFieldID)
 }
 
 fn C.GetStaticByteField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID) C.jbyte
-pub fn get_static_byte_field(env &Env, clazz JavaClass, field_id JavaFieldID) byte {
+pub fn get_static_byte_field(env &Env, clazz JavaClass, field_id JavaFieldID) u8 {
 	return j2v_byte(C.GetStaticByteField(env, clazz, field_id))
 }
 
@@ -956,7 +956,7 @@ pub fn set_static_boolean_field(env &Env, clazz JavaClass, field_id JavaFieldID,
 }
 
 fn C.SetStaticByteField(env &C.JNIEnv, clazz C.jclass, fieldID C.jfieldID, value C.jbyte)
-pub fn set_static_byte_field(env &Env, clazz JavaClass, field_id JavaFieldID, value byte) {
+pub fn set_static_byte_field(env &Env, clazz JavaClass, field_id JavaFieldID, value u8) {
 	C.SetStaticByteField(env, clazz, field_id, jbyte(value))
 }
 

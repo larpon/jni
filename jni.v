@@ -104,7 +104,7 @@ pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 					result: call_static_boolean_method_a(env, class, mid, jv_args.data)
 				}
 			}
-			'byte' {
+			'u8' {
 				CallResult{
 					call: signature
 					result: call_static_byte_method_a(env, class, mid, jv_args.data)
@@ -212,7 +212,7 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 					result: call_boolean_method_a(env, obj, mid, jv_args.data)
 				}
 			}
-			'byte' {
+			'u8' {
 				CallResult{
 					call: signature
 					result: call_byte_method_a(env, obj, mid, jv_args.data)

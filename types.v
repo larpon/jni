@@ -1,7 +1,7 @@
 module jni
 
 type Void = bool
-type Type = JavaObject | Void | bool | byte | f32 | f64 | i16 | i64 | int | rune | string
+type Type = JavaObject | Void | bool | f32 | f64 | i16 | i64 | int | rune | string | u8
 
 // pub type Any = string | int | i64 | f32 | f64 | bool | []Any | map[voidptr]Any
 pub enum MethodType {
@@ -16,7 +16,7 @@ Signature                 | Java Type             | V Type
 ---------------------------------------------------------------------------
 Z                         | boolean               | bool
 ---------------------------------------------------------------------------
-B                         | byte                  | byte
+B                         | byte                  | u8
 ---------------------------------------------------------------------------
 C                         | char                  | rune
 ---------------------------------------------------------------------------
@@ -61,7 +61,7 @@ fn v2j_signature_type(env &Env, vt Type) string {
 		bool {
 			'Z'
 		}
-		byte {
+		u8 {
 			'B'
 		}
 		rune {
@@ -106,7 +106,7 @@ fn v2j_string_signature_type(vt string) string {
 		'bool' {
 			'Z'
 		}
-		'byte' {
+		'u8' {
 			'B'
 		}
 		'rune' {
@@ -143,7 +143,7 @@ pub fn v2j_value(env &Env, vt Type) JavaValue {
 				z: jboolean(vt)
 			}
 		}
-		byte {
+		u8 {
 			JavaValue{
 				b: jbyte(vt)
 			}
@@ -225,8 +225,8 @@ pub fn j2v_char(jchar C.jchar) rune {
 }
 
 [inline]
-pub fn j2v_byte(jbyte C.jbyte) byte {
-	return byte(i8(jbyte))
+pub fn j2v_byte(jbyte C.jbyte) u8 {
+	return u8(i8(jbyte))
 }
 
 [inline]
@@ -273,7 +273,7 @@ pub fn jboolean(val bool) C.jboolean {
 }
 
 [inline]
-pub fn jbyte(val byte) C.jbyte {
+pub fn jbyte(val u8) C.jbyte {
 	return C.jbyte(val)
 }
 
