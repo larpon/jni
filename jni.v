@@ -9,7 +9,7 @@ pub const used_import = c.used_import
 
 pub const void_arg = []JavaValue{}
 
-struct CallResult {
+pub struct CallResult {
 pub:
 	call string
 	//	method_type MethodType
