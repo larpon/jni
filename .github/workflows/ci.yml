@@ -70,5 +70,5 @@ jobs:
         mkdir apks
         for example in "${jni_android_examples[@]}"; do
           safe_name=$(echo "$example" | sed 's%/%-%' | sed 's%\.%-%' )
-          vab --api 29 -v 3 jni/examples/android/$example -o apks/$safe_name.apk
+          vab --api 29 --build-tools '29.0.0' -v 3 jni/examples/android/$example -o apks/$safe_name.apk
         done
