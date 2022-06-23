@@ -3,7 +3,6 @@
 module keyboard
 
 import jni
-import jni.auto
 import jni.android
 
 pub enum SoftKeyboardVisibility {
