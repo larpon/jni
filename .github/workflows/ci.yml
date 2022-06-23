@@ -8,6 +8,10 @@ on:
     paths-ignore:
       - "**.md"
 
+concurrency:
+  group: general-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
 jobs:
   build-and-run-examples:
     runs-on: ubuntu-20.04
@@ -19,16 +23,22 @@ jobs:
       with:
         check-latest: true
 
+    - name: Install vab
+      run: |
+        v install vab
+        v ~/.vmodules/vab
+
+    - name: Symlink vab command
+      run: sudo ln -s ~/.vmodules/vab/vab /usr/local/bin/vab
+
     - name: Checkout jni
       uses: actions/checkout@v2
       with:
         path: jni
 
     - name: Link local jni folder in ~/.vmodules/jni
-      run: |
-        cd jni
-        mkdir -p ~/.vmodules
-        ln -s $(pwd) ~/.vmodules/jni
+      run: sudo ln -s $(pwd)/jni ~/.vmodules/jni
+
     - name: Test code formatting
       run: |
         cd jni
@@ -47,24 +57,12 @@ jobs:
         # Test basic shell operation
         cd $JNI_HOME/examples/desktop/v_as_library
         export LD_LIBRARY_PATH=$(pwd):.
-        v -cc gcc -cg  -shared libvlang.v
+        v -cc gcc -cg -shared libvlang.v
         javac io/vlang/V.java
         java io.vlang.V
         # Test build_and_run.vsh
         cd $JNI_HOME/examples/desktop/simple
         v run ./build_and_run.vsh
-
-    - name: Checkout vab
-      uses: actions/checkout@v2
-      with:
-        repository: vlang/vab
-        path: vab
-
-    - name: Build vab
-      run: |
-        cd vab
-        v vab.v
-        sudo ln -s $(pwd)/vab /usr/local/bin/vab
 
     - name: Build Android examples
       run: |

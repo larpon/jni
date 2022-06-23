@@ -3,7 +3,6 @@
 module keyboard
 
 import jni
-import jni.auto
 import jni.android
 
 pub enum SoftKeyboardVisibility {
@@ -30,7 +29,7 @@ pub fn visibility(soft_visibility SoftKeyboardVisibility) bool {
 		}
 
 		// Retrieve NativeActivity
-		activity := android.activity() or { panic(@MOD + '.' + @FN + ': ' + err.msg) }
+		activity := android.activity() or { panic(@MOD + '.' + @FN + ': ' + err.msg()) }
 		activity_class := jni.get_object_class(env, activity.clazz)
 
 		// Retrieve Context.INPUT_METHOD_SERVICE
@@ -123,7 +122,7 @@ pub fn is_visible() bool {
 		}
 
 		// Retrieve NativeActivity
-		activity := android.activity() or { panic(@MOD + '.' + @FN + ': ' + err.msg) }
+		activity := android.activity() or { panic(@MOD + '.' + @FN + ': ' + err.msg()) }
 		activity_class := jni.get_object_class(env, activity.clazz)
 
 		mut jv_args := []jni.JavaValue{}

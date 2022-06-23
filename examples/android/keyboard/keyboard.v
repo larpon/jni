@@ -3,7 +3,6 @@
 import gg
 import gx
 import os.font
-import sokol.sapp
 import sokol.gfx
 import sokol.sgl
 import jni
