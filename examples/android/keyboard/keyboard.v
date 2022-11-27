@@ -39,23 +39,23 @@ fn on_soft_keyboard_input(env &jni.Env, thiz jni.JavaObject, app_ptr i64, jstr j
 	mut app := &App(app_ptr)
 
 	buffer := jni.j2v_string(env, jstr)
-	println(@MOD + '.' + @FN + ': "$buffer" ($start,$before,$count)')
+	println(@MOD + '.' + @FN + ': "${buffer}" (${start},${before},${count})')
 
 	mut char_code := byte(0)
 	mut char_literal := ''
 
 	mut pos := start + before
 	if pos < 0 {
-		println(@MOD + '.' + @FN + ': $pos is negative')
+		println(@MOD + '.' + @FN + ': ${pos} is negative')
 	} else if pos > buffer.len {
 		// Backspace
-		println(@MOD + '.' + @FN + ': $start > $buffer.len')
+		println(@MOD + '.' + @FN + ': ${start} > ${buffer.len}')
 	} else {
 		char_code = byte(buffer[pos])
 		char_literal = char_code.ascii_str()
 	}
 
-	println(@MOD + '.' + @FN + ': input "$char_literal"')
+	println(@MOD + '.' + @FN + ': input "${char_literal}"')
 
 	app.buffer = buffer
 	app.parsed_char = char_literal
@@ -111,8 +111,8 @@ fn frame(mut app App) {
 
 	app.gg.begin()
 
-	app.gg.draw_text_def(int(f32(ws.width) * 0.1), int(f32(ws.height) * 0.2), 'Java buffer: "$app.buffer"')
-	app.gg.draw_text_def(int(f32(ws.width) * 0.1), int(f32(ws.height) * 0.25), 'Last char parsed in V: "$app.parsed_char"')
+	app.gg.draw_text_def(int(f32(ws.width) * 0.1), int(f32(ws.height) * 0.2), 'Java buffer: "${app.buffer}"')
+	app.gg.draw_text_def(int(f32(ws.width) * 0.1), int(f32(ws.height) * 0.25), 'Last char parsed in V: "${app.parsed_char}"')
 	// NOTE Don't call out to slow Java code (keyboard.is_visible()) like this every frame
 	// app.gg.draw_text_def(int(f32(ws.width) * 0.1), int(f32(ws.height) * 0.27), 'Keyboard visible: ${keyboard.is_visible()}')
 
@@ -151,7 +151,7 @@ fn event(ev &gg.Event, mut app App) {
 	}
 	$if debug ? {
 		if ev.typ == .char || ev.typ == .key_down || ev.typ == .key_up {
-			println('$ev.typ : $ev.char_code, $ev.key_code')
+			println('${ev.typ} : ${ev.char_code}, ${ev.key_code}')
 		}
 	}
 

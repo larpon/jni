@@ -20,7 +20,7 @@ pub fn visibility(soft_visibility SoftKeyboardVisibility) bool {
 	// https://groups.google.com/g/android-ndk/c/Tk3g00wLKhk/m/TJQucoaE_asJ
 	$if android {
 		$if debug ? {
-			eprintln(@MOD + '.' + @FN + ': $soft_visibility')
+			eprintln(@MOD + '.' + @FN + ': ${soft_visibility}')
 		}
 
 		env, need_detach := jni.env_detach()

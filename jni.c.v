@@ -181,7 +181,7 @@ pub fn find_class(env &Env, name string) JavaClass {
 				delete_local_ref(env, o)
 			}
 			panic(@MOD + '.' + @FN +
-				': an exception occured in the Java VM while trying to find class "$n" in jni.Env(${ptr_str(env)})')
+				': an exception occured in the Java VM while trying to find class "${n}" in jni.Env(${ptr_str(env)})')
 		}
 		return cls
 	}
@@ -342,8 +342,8 @@ pub fn get_method_id(env &Env, clazz JavaClass, name string, sig string) JavaMet
 				delete_local_ref(env, o)
 			}
 			panic(@MOD + '.' + @FN +
-				': an exception occured in the JavaVM while trying to find method "$name' +
-				'$sig" on class "${ptr_str(clazz)}" in jni.Env (${ptr_str(env)})')
+				': an exception occured in the JavaVM while trying to find method "${name}' +
+				'${sig}" on class "${ptr_str(clazz)}" in jni.Env (${ptr_str(env)})')
 		}
 		return mid
 	}
@@ -748,7 +748,7 @@ pub fn get_static_method_id(env &Env, clazz JavaClass, name string, sig string) 
 			}
 			// clsn := get_class_name(env, clazz)
 			panic(@MOD + '.' + @FN +
-				': an exception occured in jni.Env (${ptr_str(env)} couldn\'t find method "$name" with signature "$sig" on class "$clazz")')
+				': an exception occured in jni.Env (${ptr_str(env)} couldn\'t find method "${name}" with signature "${sig}" on class "${clazz}")')
 		}
 		return mid
 	}

@@ -19,7 +19,7 @@ fn get_string_from_v(env &jni.Env, thiz jni.JavaObject) jni.JavaString {
 	call_result := jni.call_static_method(env, 'io.v.V.getStringFromJava() string')
 	// Cast the value of the call result to a v 'string'...
 	string_from_java := call_result.result as string
-	println(@MOD + '.' + @FN + ' string from Java "$string_from_java"')
+	println(@MOD + '.' + @FN + ' string from Java "${string_from_java}"')
 	// Return a Java 'String' to the caller - replacing 'Java' with 'V'...
 	return jni.jstring(env, string_from_java.replace('Java', 'V'))
 }

@@ -44,10 +44,10 @@ mut:
 }
 
 fn (a App) show_toast(text string) {
-	println(@FN + ': "$text"')
+	println(@FN + ': "${text}"')
 	$if android {
 		jor := auto.call_static_method(jni.sig(pkg, @FN, 'void', text), text)
-		println('V jni.CallResult: $jor showing toast')
+		println('V jni.CallResult: ${jor} showing toast')
 	}
 }
 

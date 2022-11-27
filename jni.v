@@ -66,7 +66,7 @@ fn parse_signature(fqn_sig string) (string, string) {
 	$if debug_signatures ? {
 		args_str := sig.all_after('(').all_before(')')
 		args := '(' + args_str + ')'
-		println(@MOD + '.' + @FN + ' ' + '"$sig" -> "$fqn$args $return_type"')
+		println(@MOD + '.' + @FN + ' ' + '"${sig}" -> "${fqn}${args} ${return_type}"')
 	}
 
 	return fqn, return_type
@@ -85,7 +85,7 @@ pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 	}
 	jdef := fqn + '(' + jargs + ')' + v2j_string_signature_type(return_type)
 	$if debug_signatures ? {
-		println(@MOD + '.' + @FN + ' Java call style definition: "$fqn -> $jdef"')
+		println(@MOD + '.' + @FN + ' Java call style definition: "${fqn} -> ${jdef}"')
 	}
 	class, mid := get_class_static_method_id(env, jdef)
 
@@ -174,7 +174,7 @@ pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 	$if debug {
 		if exception_check(env) {
 			exception_describe(env)
-			excp := 'An exception occured while executing "$signature" in JNIEnv (${ptr_str(env)})'
+			excp := 'An exception occured while executing "${signature}" in JNIEnv (${ptr_str(env)})'
 			panic(excp)
 		}
 	}
@@ -193,7 +193,7 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 	}
 	jdef := fqn + '(' + jargs + ')' + v2j_string_signature_type(return_type)
 	$if debug_signatures ? {
-		println(@MOD + '.' + @FN + ' Java call style definition: "$fqn -> $jdef"')
+		println(@MOD + '.' + @FN + ' Java call style definition: "${fqn} -> ${jdef}"')
 	}
 	_, mid := get_object_class_and_method_id(env, obj, jdef)
 
@@ -282,7 +282,7 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 		if exception_check(env) {
 			exception_describe(env)
 			excp := @MOD + '.' + @FN +
-				' an exception occured while executing "$signature" in JNIEnv (${ptr_str(env)})'
+				' an exception occured while executing "${signature}" in JNIEnv (${ptr_str(env)})'
 			// throw_exception(env, excp)
 			panic(excp)
 		}

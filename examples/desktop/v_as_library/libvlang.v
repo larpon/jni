@@ -19,21 +19,21 @@ fn call_static_methods(env &jni.Env, thiz jni.JavaObject) {
 	// Object call style
 	jo := jni.object(env, thiz)
 	jor := jo.call(.@static, 'getInt() int').result as int
-	println('V: jni.CallResult.int: $jor')
+	println('V: jni.CallResult.int: ${jor}')
 
 	// flat call style
 	r := jni.call_static_method(env, 'io.vlang.V.getInt() int')
-	println('V: $r.result')
+	println('V: ${r.result}')
 	r2 := jni.call_static_method(env, 'io.vlang.V.getBool() bool')
-	println('V: $r2.result')
+	println('V: ${r2.result}')
 	r3 := jni.call_static_method(env, 'io.vlang.V.mixedArguments(bool, int) int', true,
 		2)
-	println('V: $r3.result')
+	println('V: ${r3.result}')
 
 	jprintln('Hello from V - this shows up in Java')
 
 	jffr := java_float_func('Hello', 22)
-	println('V: java_float_func(\'Hello\',22) -> $jffr')
+	println('V: java_float_func(\'Hello\',22) -> ${jffr}')
 
 	println("V: java_void_func('Void',0)")
 	java_void_func('Void', 0)
@@ -44,7 +44,7 @@ fn call_object_methods(env &jni.Env, thiz jni.JavaObject) {
 	// Call method on the object passed in "thiz" (io.vlang.V.setInt(int))
 	jo := jni.object(env, thiz)
 	jor := jo.call(.object, 'setInt(int)', 53)
-	println('V: jni.Object: $jor')
+	println('V: jni.Object: ${jor}')
 	//
 	jni.call_object_method(env, thiz, 'setInt(int)', 42)
 
@@ -54,7 +54,7 @@ fn call_object_methods(env &jni.Env, thiz jni.JavaObject) {
 
 	println('V: Getting class name...')
 	clsn := java_object.class_name(env)
-	println('V: Class name: "$clsn"')
+	println('V: Class name: "${clsn}"')
 
 	println('V: Passing io.vlang.V object type from V to Java...')
 	// call "public void passInstance(V v)" on "io.vlang.V" instance
@@ -68,7 +68,7 @@ fn get_v_string(env &jni.Env, thiz jni.JavaObject) jni.JavaString {
 
 	r3 := jni.call_static_method(env, 'io.vlang.V.getString() string')
 
-	s := 'V: values obtained from Java: $r.result, $r2.result, $r3.result'
+	s := 'V: values obtained from Java: ${r.result}, ${r2.result}, ${r3.result}'
 	return jni.jstring(env, s)
 }
 
