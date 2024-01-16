@@ -49,7 +49,11 @@ if os.is_file('${lib_name}' + '.so') {
 	os.rm('${lib_name}' + '.so') or {}
 }
 eprintln('Compiling shared ${lib_name}' + '.so')
-
+$if debug {
+  os.system(vexe() + ' -d debug_signatures -cg -prod -shared $lib_name' + '.v')
+} $else {
+  os.system(vexe() + ' -prod -shared $lib_name' + '.v')
+}
 eprintln('Compiling Java sources with javac from "${javac}"')
 os.system(javac + ' ' + java_class.replace('.', '/') + '.java')
 if !os.is_file('${lib_name}' + '.so') {
