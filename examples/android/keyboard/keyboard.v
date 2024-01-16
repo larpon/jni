@@ -9,12 +9,10 @@ import jni
 import jni.auto
 import jni.android.keyboard
 
-const (
-	pkg      = 'io.v.android.ex.VKeyboardActivity'
-	bg_color = gx.white
-)
+const pkg = 'io.v.android.ex.VKeyboardActivity'
+const bg_color = gx.white
 
-[export: 'JNI_OnLoad']
+@[export: 'JNI_OnLoad']
 fn jni_on_load(vm &jni.JavaVM, reserved voidptr) int {
 	println(@FN + ' called')
 	jni.set_java_vm(vm)
@@ -30,7 +28,7 @@ fn jni_on_load(vm &jni.JavaVM, reserved voidptr) int {
 // on_soft_keyboard_input is exported to the Java activity "VKeyboardActivity".
 // The method is called in Java to notify you that:
 // within `jstr`, the `count` characters beginning at `start` have just replaced old text that had `length` before.
-[export: 'JNICALL Java_io_v_android_ex_VKeyboardActivity_onSoftKeyboardInput']
+@[export: 'JNICALL Java_io_v_android_ex_VKeyboardActivity_onSoftKeyboardInput']
 fn on_soft_keyboard_input(env &jni.Env, thiz jni.JavaObject, app_ptr i64, jstr jni.JavaString, start int, before int, count int) {
 	if app_ptr == 0 {
 		return

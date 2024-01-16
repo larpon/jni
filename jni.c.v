@@ -8,8 +8,8 @@ pub enum Version {
 	v1_4 = 0x00010004 // C.JNI_VERSION_1_4
 	v1_6 = 0x00010006 // C.JNI_VERSION_1_6
 	v1_8 = 0x00010008 // C.JNI_VERSION_1_8
-	v9 = 0x00090000 // C.JNI_VERSION_9
-	v10 = 0x000a0000 // C.JNI_VERSION_10
+	v9   = 0x00090000 // C.JNI_VERSION_9
+	v10  = 0x000a0000 // C.JNI_VERSION_10
 }
 
 type JavaVM = C.JavaVM
@@ -39,35 +39,35 @@ type JavaObjectArray = C.jobjectArray
 pub type JavaValue = C.jvalue
 
 // jni.h
-[typedef]
+@[typedef]
 struct C.jstring {}
 
-[typedef]
+@[typedef]
 struct C.JNIEnv {}
 
-[typedef]
+@[typedef]
 struct C.JavaVM {}
 
-[typedef]
+@[typedef]
 struct C.jobject {}
 
-[typedef]
+@[typedef]
 struct C.jclass {}
 
-[typedef]
+@[typedef]
 struct C.jmethodID {}
 
-[typedef]
+@[typedef]
 struct C.jfieldID {}
 
-[typedef]
+@[typedef]
 struct C.jthrowable {}
 
-[typedef]
+@[typedef]
 struct C.jweak {}
 
 //
-[typedef]
+@[typedef]
 struct C.JNINativeMethod {
 	name      &char
 	signature &char
@@ -75,34 +75,34 @@ struct C.JNINativeMethod {
 }
 
 // Arrays
-[typedef]
+@[typedef]
 struct C.jarray {}
 
-[typedef]
+@[typedef]
 struct C.jbyteArray {}
 
-[typedef]
+@[typedef]
 struct C.jcharArray {}
 
-[typedef]
+@[typedef]
 struct C.jshortArray {}
 
-[typedef]
+@[typedef]
 struct C.jintArray {}
 
-[typedef]
+@[typedef]
 struct C.jlongArray {}
 
-[typedef]
+@[typedef]
 struct C.jfloatArray {}
 
-[typedef]
+@[typedef]
 struct C.jdoubleArray {}
 
-[typedef]
+@[typedef]
 struct C.jobjectArray {}
 
-[typedef]
+@[typedef]
 union C.jvalue {
 	z C.jboolean
 	b C.jbyte

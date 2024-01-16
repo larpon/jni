@@ -199,7 +199,7 @@ pub fn v2j_value(env &Env, vt Type) JavaValue {
 	}
 }
 
-[inline]
+@[inline]
 pub fn v2j_signature(fqn_signature string) (string, string, string) {
 	clazz := fqn_signature.all_before_last('.')
 	fn_sig := fqn_signature.all_after_last('.')
@@ -208,7 +208,7 @@ pub fn v2j_signature(fqn_signature string) (string, string, string) {
 	return clazz, f_name, f_sig
 }
 
-[inline]
+@[inline]
 pub fn j2v_string(env &Env, jstr JavaString) string {
 	mut cn := ''
 	unsafe {
@@ -219,52 +219,52 @@ pub fn j2v_string(env &Env, jstr JavaString) string {
 	return cn
 }
 
-[inline]
+@[inline]
 pub fn j2v_char(jchar C.jchar) rune {
 	return rune(u16(jchar))
 }
 
-[inline]
+@[inline]
 pub fn j2v_byte(jbyte C.jbyte) u8 {
 	return u8(i8(jbyte))
 }
 
-[inline]
+@[inline]
 pub fn j2v_boolean(jbool C.jboolean) bool {
 	return jbool == C.jboolean(C.JNI_TRUE)
 }
 
-[inline]
+@[inline]
 pub fn j2v_int(jint C.jint) int {
 	return int(jint)
 }
 
-[inline]
+@[inline]
 pub fn j2v_size(jsize C.jsize) int {
 	return int(jsize)
 }
 
-[inline]
+@[inline]
 pub fn j2v_short(jshort C.jshort) i16 {
 	return i16(jshort)
 }
 
-[inline]
+@[inline]
 pub fn j2v_long(jlong C.jlong) i64 {
 	return i64(jlong)
 }
 
-[inline]
+@[inline]
 pub fn j2v_float(jfloat C.jfloat) f32 {
 	return f32(jfloat)
 }
 
-[inline]
+@[inline]
 pub fn j2v_double(jdouble C.jdouble) f64 {
 	return f64(jdouble)
 }
 
-[inline]
+@[inline]
 pub fn jboolean(val bool) C.jboolean {
 	if val {
 		return C.jboolean(C.JNI_TRUE)
@@ -272,47 +272,47 @@ pub fn jboolean(val bool) C.jboolean {
 	return C.jboolean(C.JNI_FALSE)
 }
 
-[inline]
+@[inline]
 pub fn jbyte(val u8) C.jbyte {
 	return C.jbyte(val)
 }
 
-[inline]
+@[inline]
 pub fn jfloat(val f32) C.jfloat {
 	return C.jfloat(val)
 }
 
-[inline]
+@[inline]
 pub fn jdouble(val f64) C.jdouble {
 	return C.jdouble(val)
 }
 
-[inline]
+@[inline]
 pub fn jint(val int) C.jint {
 	return C.jint(val)
 }
 
-[inline]
+@[inline]
 pub fn jsize(val int) C.jsize {
 	return C.jsize(val)
 }
 
-[inline]
+@[inline]
 pub fn jshort(val i16) C.jshort {
 	return C.jshort(val)
 }
 
-[inline]
+@[inline]
 pub fn jlong(val i64) C.jlong {
 	return C.jlong(val)
 }
 
-[inline]
+@[inline]
 pub fn jchar(val rune) C.jchar {
 	return C.jchar(val)
 }
 
-[inline]
+@[inline]
 pub fn jstring(env &Env, val string) C.jstring {
 	return new_string_utf(env, val)
 }

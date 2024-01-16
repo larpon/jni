@@ -5,7 +5,7 @@ module libv
 import jni
 
 // jni_on_load is called by the JavaVM upon setup
-[export: 'JNI_OnLoad']
+@[export: 'JNI_OnLoad']
 fn jni_on_load(vm &jni.JavaVM, reserved voidptr) int {
 	println(@FN + ' called')
 	jni.set_java_vm(vm)
@@ -13,7 +13,7 @@ fn jni_on_load(vm &jni.JavaVM, reserved voidptr) int {
 }
 
 // get_string_from_v returns a string obtained from Java via a static method call
-[export: 'JNICALL Java_io_v_V_getStringFromV']
+@[export: 'JNICALL Java_io_v_V_getStringFromV']
 fn get_string_from_v(env &jni.Env, thiz jni.JavaObject) jni.JavaString {
 	// Obtain the string "Hello from Java!" from the Java class...
 	call_result := jni.call_static_method(env, 'io.v.V.getStringFromJava() string')

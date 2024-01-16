@@ -7,14 +7,14 @@ import jni.auto
 
 const pkg = 'io.vlang.V'
 
-[export: 'JNI_OnLoad']
+@[export: 'JNI_OnLoad']
 fn jni_on_load(vm &jni.JavaVM, reserved voidptr) int {
 	println(@FN + ' called')
 	jni.set_java_vm(vm)
 	return int(jni.Version.v1_6)
 }
 
-[export: 'JNICALL Java_io_vlang_V_callStaticMethods']
+@[export: 'JNICALL Java_io_vlang_V_callStaticMethods']
 fn call_static_methods(env &jni.Env, thiz jni.JavaObject) {
 	// Object call style
 	jo := jni.object(env, thiz)
@@ -39,7 +39,7 @@ fn call_static_methods(env &jni.Env, thiz jni.JavaObject) {
 	java_void_func('Void', 0)
 }
 
-[export: 'JNICALL Java_io_vlang_V_callObjectMethods']
+@[export: 'JNICALL Java_io_vlang_V_callObjectMethods']
 fn call_object_methods(env &jni.Env, thiz jni.JavaObject) {
 	// Call method on the object passed in "thiz" (io.vlang.V.setInt(int))
 	jo := jni.object(env, thiz)
@@ -61,7 +61,7 @@ fn call_object_methods(env &jni.Env, thiz jni.JavaObject) {
 	jni.call_object_method(env, thiz, 'passInstance(io.vlang.V)', java_object)
 }
 
-[export: 'JNICALL Java_io_vlang_V_vGetString']
+@[export: 'JNICALL Java_io_vlang_V_vGetString']
 fn get_v_string(env &jni.Env, thiz jni.JavaObject) jni.JavaString {
 	r := jni.call_static_method(env, 'io.vlang.V.getInt() int')
 	r2 := jni.call_static_method(env, 'io.vlang.V.getBool() bool')
@@ -72,14 +72,14 @@ fn get_v_string(env &jni.Env, thiz jni.JavaObject) jni.JavaString {
 	return jni.jstring(env, s)
 }
 
-[export: 'JNICALL Java_io_vlang_V_vGetInt']
+@[export: 'JNICALL Java_io_vlang_V_vGetInt']
 fn get_v_int(env &jni.Env, thiz jni.JavaObject) int {
 	thiz.call(env, .@static, 'jprintln(string)', 'called get_v_int()')
 	i := 42
 	return i
 }
 
-[export: 'JNICALL Java_io_vlang_V_vAddInt']
+@[export: 'JNICALL Java_io_vlang_V_vAddInt']
 fn add_v_int(env &jni.Env, thiz jni.JavaObject, a int, b int) int {
 	res := a + b
 	return res

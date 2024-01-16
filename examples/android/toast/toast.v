@@ -10,12 +10,10 @@ import time
 import jni
 import jni.auto
 
-const (
-	pkg      = 'io.v.android.ex.VToastActivity'
-	bg_color = gx.white
-)
+const pkg = 'io.v.android.ex.VToastActivity'
+const bg_color = gx.white
 
-[export: 'JNI_OnLoad']
+@[export: 'JNI_OnLoad']
 fn jni_on_load(vm &jni.JavaVM, reserved voidptr) int {
 	println(@FN + ' called')
 	jni.set_java_vm(vm)

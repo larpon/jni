@@ -23,7 +23,7 @@ pub fn object(env &Env, obj JavaObject) Object {
 	}
 }
 
-[inline]
+@[inline]
 pub fn (o Object) call(typ MethodType, signature string, args ...Type) CallResult {
 	return o.obj.call(o.env, typ, signature, ...args)
 	/*

@@ -50,9 +50,9 @@ if os.is_file('${lib_name}' + '.so') {
 }
 eprintln('Compiling shared ${lib_name}' + '.so')
 $if debug {
-  os.system(vexe() + ' -d debug_signatures -cg -prod -shared $lib_name' + '.v')
+	os.system(vexe() + ' -d debug_signatures -cg -prod -shared ${lib_name}' + '.v')
 } $else {
-  os.system(vexe() + ' -prod -shared $lib_name' + '.v')
+	os.system(vexe() + ' -prod -shared ${lib_name}' + '.v')
 }
 
 eprintln('Compiling Java sources')

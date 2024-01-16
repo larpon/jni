@@ -51,7 +51,7 @@ pub fn sig(pkg string, f_name string, rt Type, args ...Type) string {
 		return_type = ''
 	}
 	vtypargs = vtypargs.trim_right(', ')
-	jni_sig := pkg + '.' + jni.v2j_fn_name(f_name) + '(' + vtypargs + ')' + return_type
+	jni_sig := pkg + '.' + v2j_fn_name(f_name) + '(' + vtypargs + ')' + return_type
 	// println(jni_sig)
 	return jni_sig
 }
@@ -313,7 +313,7 @@ fn get_object_class_and_method_id(env &Env, obj JavaObject, fqn_sig string) (Jav
 	return jclazz, mid
 }
 
-[inline]
+@[inline]
 pub fn (jo JavaObject) class_name(env &Env) string {
 	obj := jo
 	mut cls := get_object_class(env, obj)
@@ -328,7 +328,7 @@ pub fn (jo JavaObject) class_name(env &Env) string {
 	return call_string_method_a(env, cls_obj, mid, jni.void_arg.data) // NOTE vfmt will cause a compile error here if you only use 'void_arg.data'
 }
 
-[inline]
+@[inline]
 pub fn (jo JavaObject) call(env &Env, typ MethodType, signature string, args ...Type) CallResult {
 	pkg := jo.class_name(env)
 	return match typ {
@@ -337,7 +337,7 @@ pub fn (jo JavaObject) call(env &Env, typ MethodType, signature string, args ...
 	}
 }
 
-[inline]
+@[inline]
 pub fn (jc JavaClass) get_name(env &Env) string {
 	unsafe {
 		o := &JavaObject(voidptr(&jc))
