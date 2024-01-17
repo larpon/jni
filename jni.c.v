@@ -12,98 +12,110 @@ pub enum Version {
 	v10  = 0x000a0000 // C.JNI_VERSION_10
 }
 
-type JavaVM = C.JavaVM
-type Env = C.JNIEnv
+pub type JavaVM = C.JavaVM
+pub type Env = C.JNIEnv
 
 // type JavaByte = C.jbyte
-type JavaObject = C.jobject
-type JavaString = C.jstring
-type JavaClass = C.jclass
+pub type JavaObject = voidptr // C.jobject
+pub type JavaString = voidptr // C.jstring
+pub type JavaClass = voidptr // C.jclass
 
 // type JavaSize = C.jsize
-type JavaMethodID = C.jmethodID
-type JavaFieldID = C.jfieldID
-type JavaThrowable = C.jthrowable
+pub type JavaMethodID = C.jmethodID
+pub type JavaFieldID = C.jfieldID
+pub type JavaThrowable = voidptr // C.jthrowable = C.jobject = void*
 
 //
-type JavaArray = C.jarray
-type JavaByteArray = C.jbyteArray
-type JavaCharArray = C.jcharArray
-type JavaShortArray = C.jshortArray
-type JavaIntArray = C.jintArray
-type JavaLongArray = C.jlongArray
-type JavaFloatArray = C.jfloatArray
-type JavaDoubleArray = C.jdoubleArray
-type JavaObjectArray = C.jobjectArray
+pub type JavaArray = voidptr // C.jarray
+pub type JavaByteArray = voidptr // C.jbyteArray
+pub type JavaCharArray = voidptr // C.jcharArray
+pub type JavaShortArray = voidptr // C.jshortArray
+pub type JavaIntArray = voidptr // C.jintArray
+pub type JavaLongArray = voidptr // C.jlongArray
+pub type JavaFloatArray = voidptr // C.jfloatArray
+pub type JavaDoubleArray = voidptr // C.jdoubleArray
+pub type JavaObjectArray = voidptr // C.jobjectArray
 
 pub type JavaValue = C.jvalue
 
+// For more info on the C types see https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/types.html
+
+pub type C.jboolean = u8
+
+pub type C.jbyte = i8
+
+pub type C.jchar = u16
+
+pub type C.jshort = i16
+
+pub type C.jint = i32
+
+pub type C.jlong = i64
+
+pub type C.jfloat = f32
+
+pub type C.jdouble = f64
+
+pub type C.jsize = i32 // C.jint
+
 // jni.h
-@[typedef]
-struct C.jstring {}
 
 @[typedef]
-struct C.JNIEnv {}
+pub struct C.JNIEnv {}
 
 @[typedef]
-struct C.JavaVM {}
+pub struct C.JavaVM {}
+
+pub type C.jobject = voidptr
+
+pub type C.jclass = voidptr // C.jobject = void*
+
+pub type C.jstring = voidptr
+
+// Arrays
+pub type C.jarray = voidptr
+
+pub type C.jobjectArray = voidptr // C.jarray = C.jobject = void*
+
+pub type C.jbooleanArray = voidptr // C.jarray = C.jobject = void*
+
+pub type C.jbyteArray = voidptr // C.jarray = C.jobject = void*
+
+pub type C.jcharArray = voidptr // C.jarray = C.jobject = void*
+
+pub type C.jshortArray = voidptr // C.jarray = C.jobject = void*
+
+pub type C.jintArray = voidptr // C.jarray = C.jobject = void*
+
+pub type C.jlongArray = voidptr // C.jarray = C.jobject = void*
+
+pub type C.jfloatArray = voidptr // C.jarray = C.jobject = void*
+
+pub type C.jdoubleArray = voidptr // C.jarray = C.jobject = void*
+
+// Misc
+pub type C.jthrowable = voidptr // C.jobject = void*
+pub type C.jweak = voidptr // C.jobject = void*
 
 @[typedef]
-struct C.jobject {}
+pub struct C.jmethodID {}
 
 @[typedef]
-struct C.jclass {}
+pub struct C.jfieldID {}
 
 @[typedef]
-struct C.jmethodID {}
-
-@[typedef]
-struct C.jfieldID {}
-
-@[typedef]
-struct C.jthrowable {}
-
-@[typedef]
-struct C.jweak {}
+pub struct C.jthrowable {}
 
 //
 @[typedef]
-struct C.JNINativeMethod {
+pub struct C.JNINativeMethod {
 	name      &char
 	signature &char
 	fn_ptr    voidptr
 }
 
-// Arrays
 @[typedef]
-struct C.jarray {}
-
-@[typedef]
-struct C.jbyteArray {}
-
-@[typedef]
-struct C.jcharArray {}
-
-@[typedef]
-struct C.jshortArray {}
-
-@[typedef]
-struct C.jintArray {}
-
-@[typedef]
-struct C.jlongArray {}
-
-@[typedef]
-struct C.jfloatArray {}
-
-@[typedef]
-struct C.jdoubleArray {}
-
-@[typedef]
-struct C.jobjectArray {}
-
-@[typedef]
-union C.jvalue {
+pub union C.jvalue {
 	z C.jboolean
 	b C.jbyte
 	c C.jchar
@@ -167,7 +179,7 @@ pub fn find_class(env &Env, name string) JavaClass {
 	}
 	n := name.replace('.', '/')
 	$if debug {
-		mut cls := C.jclass(0) //{}
+		mut cls := JavaClass(unsafe { nil }) // C.jclass(0)
 		$if android {
 			cls = C.gFindClass(n.str)
 		} $else {
@@ -176,7 +188,7 @@ pub fn find_class(env &Env, name string) JavaClass {
 		if exception_check(env) {
 			exception_describe(env)
 			if !isnil(cls) {
-				o := &JavaObject(voidptr(&cls)) // o := C.ClassToObject(cls)
+				o := JavaObject(cls) // o := C.ClassToObject(cls)
 				// o := C.ClassToObject(cls)
 				delete_local_ref(env, o)
 			}
@@ -338,7 +350,7 @@ pub fn get_method_id(env &Env, clazz JavaClass, name string, sig string) JavaMet
 		if exception_check(env) {
 			exception_describe(env)
 			if !isnil(mid) {
-				o := &JavaObject(voidptr(&mid)) // o := C.MethodIDToObject(mid)
+				o := JavaObject(mid) // o := C.MethodIDToObject(mid)
 				delete_local_ref(env, o)
 			}
 			panic(@MOD + '.' + @FN +
@@ -691,8 +703,8 @@ pub fn set_object_field(env &Env, obj JavaObject, field_id JavaFieldID, val Java
 
 pub fn set_string_field(env &Env, obj JavaObject, field_id JavaFieldID, val string) {
 	jstr := jstring(env, val)
-	jobj := &JavaObject(voidptr(&jstr))
-	set_object_field(env, obj, field_id, jobj)
+	// jobj := &JavaObject(voidptr(&jstr))
+	set_object_field(env, obj, field_id, jstr)
 }
 
 fn C.SetBooleanField(env &C.JNIEnv, obj C.jobject, fieldID C.jfieldID, val C.jboolean)
@@ -743,7 +755,7 @@ pub fn get_static_method_id(env &Env, clazz JavaClass, name string, sig string) 
 		if exception_check(env) {
 			exception_describe(env)
 			if !isnil(mid) {
-				o := &JavaObject(voidptr(&mid)) // o := C.MethodIDToObject(mid)
+				o := JavaObject(mid) // TODO? o := C.MethodIDToObject(mid)
 				delete_local_ref(env, o)
 			}
 			// clsn := get_class_name(env, clazz)
@@ -1168,4 +1180,12 @@ fn C.GetDirectBufferCapacity(env &C.JNIEnv, buf C.jobject) C.jlong
 
 // New JNI 1.6 Features
 
-fn C.GetObjectRefType(env &C.JNIEnv, obj C.jobject) C.jobjectRefType
+// JObjectRefType is C.jobjectRefType
+pub enum JObjectRefType {
+	invald      = C.JNIInvalidRefType // = 0,
+	local       = C.JNILocalRefType // = 1,
+	global      = C.JNIGlobalRefType // = 2,
+	weak_global = C.JNIWeakGlobalRefType // = 3
+}
+
+fn C.GetObjectRefType(env &C.JNIEnv, obj C.jobject) JObjectRefType

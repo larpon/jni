@@ -76,30 +76,8 @@ fn draw_triangle() {
 fn init(mut app App) {
 	desc := sapp.create_desc()
 	gfx.setup(&desc)
-	sgl_desc := sgl.Desc{
-		max_vertices: 50 * 65536
-	}
+	sgl_desc := sgl.Desc{}
 	sgl.setup(&sgl_desc)
-
-	// 3d pipeline
-	mut pipdesc := gfx.PipelineDesc{}
-	unsafe { vmemset(&pipdesc, 0, int(sizeof(pipdesc))) }
-
-	color_state := gfx.ColorState{
-		blend: gfx.BlendState{
-			enabled: true
-			src_factor_rgb: .src_alpha
-			dst_factor_rgb: .one_minus_src_alpha
-		}
-	}
-	pipdesc.colors[0] = color_state
-
-	pipdesc.depth = gfx.DepthState{
-		write_enabled: true
-		compare: .less_equal
-	}
-	pipdesc.cull_mode = .back
-	app.pip_3d = sgl.make_pipeline(&pipdesc)
 }
 
 fn cleanup(mut app App) {
@@ -130,7 +108,7 @@ fn event(ev &gg.Event, mut app App) {
 fn main() {
 	// App init
 	mut app := &App{
-		gg: 0
+		gg: unsafe { nil }
 	}
 
 	app.gg = gg.new_context(

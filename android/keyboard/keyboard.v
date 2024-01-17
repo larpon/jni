@@ -191,9 +191,9 @@ pub fn is_visible() bool {
 
 		// Release references to objects
 		jni.delete_local_ref(env, view_visible_rect)
-		jni.delete_local_ref(env, &jni.JavaObject(voidptr(&rect_class)))
+		jni.delete_local_ref(env, jni.JavaObject(rect_class))
 		jni.delete_local_ref(env, display_dimension)
-		jni.delete_local_ref(env, &jni.JavaObject(voidptr(&view_class)))
+		jni.delete_local_ref(env, jni.JavaObject(view_class))
 
 		// hack := display_height - status_bar_height != view_visible_height // ??? Original code had this
 		// but it doesn't work on devices with where the primary keys are software keys places in a bar in the bottom.

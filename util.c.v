@@ -15,7 +15,7 @@ pub fn set_java_vm(vm &JavaVM) {
 }
 
 pub fn env_detach() (&Env, bool) {
-	env := &C.JNIEnv(0)
+	env := &C.JNIEnv(unsafe { nil })
 	need_detach := C.gEnvNeedDetach(&env)
 
 	if isnil(env) {

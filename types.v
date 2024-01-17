@@ -180,7 +180,8 @@ pub fn v2j_value(env &Env, vt Type) JavaValue {
 		}
 		string {
 			jstr := jstring(env, vt)
-			jobj := &JavaObject(voidptr(&jstr))
+			// jobj := &JavaObject(voidptr(&jstr))
+			jobj := JavaObject(jstr)
 			JavaValue{
 				l: jobj
 			}
@@ -231,7 +232,7 @@ pub fn j2v_byte(jbyte C.jbyte) u8 {
 
 @[inline]
 pub fn j2v_boolean(jbool C.jboolean) bool {
-	return jbool == C.jboolean(C.JNI_TRUE)
+	return jbool == C.JNI_TRUE // C.jboolean(C.JNI_TRUE)
 }
 
 @[inline]
@@ -267,49 +268,49 @@ pub fn j2v_double(jdouble C.jdouble) f64 {
 @[inline]
 pub fn jboolean(val bool) C.jboolean {
 	if val {
-		return C.jboolean(C.JNI_TRUE)
+		return u8(C.JNI_TRUE) // C.jboolean(C.JNI_TRUE)
 	}
-	return C.jboolean(C.JNI_FALSE)
+	return u8(C.JNI_FALSE) // C.jboolean(C.JNI_FALSE)
 }
 
 @[inline]
 pub fn jbyte(val u8) C.jbyte {
-	return C.jbyte(val)
+	return val // C.jbyte(val)
 }
 
 @[inline]
 pub fn jfloat(val f32) C.jfloat {
-	return C.jfloat(val)
+	return val // C.jfloat(val)
 }
 
 @[inline]
 pub fn jdouble(val f64) C.jdouble {
-	return C.jdouble(val)
+	return val // C.jdouble(val)
 }
 
 @[inline]
 pub fn jint(val int) C.jint {
-	return C.jint(val)
+	return i32(val) // C.jint(val)
 }
 
 @[inline]
 pub fn jsize(val int) C.jsize {
-	return C.jsize(val)
+	return i32(val) // C.jsize(val) = C.jint = i32
 }
 
 @[inline]
 pub fn jshort(val i16) C.jshort {
-	return C.jshort(val)
+	return val // C.jshort(val)
 }
 
 @[inline]
 pub fn jlong(val i64) C.jlong {
-	return C.jlong(val)
+	return val // C.jlong(val)
 }
 
 @[inline]
 pub fn jchar(val rune) C.jchar {
-	return C.jchar(val)
+	return u16(val) // C.jchar(val)
 }
 
 @[inline]

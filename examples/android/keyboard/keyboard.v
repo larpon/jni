@@ -39,7 +39,7 @@ fn on_soft_keyboard_input(env &jni.Env, thiz jni.JavaObject, app_ptr i64, jstr j
 	buffer := jni.j2v_string(env, jstr)
 	println(@MOD + '.' + @FN + ': "${buffer}" (${start},${before},${count})')
 
-	mut char_code := byte(0)
+	mut char_code := u8(0)
 	mut char_literal := ''
 
 	mut pos := start + before
@@ -49,7 +49,7 @@ fn on_soft_keyboard_input(env &jni.Env, thiz jni.JavaObject, app_ptr i64, jstr j
 		// Backspace
 		println(@MOD + '.' + @FN + ': ${start} > ${buffer.len}')
 	} else {
-		char_code = byte(buffer[pos])
+		char_code = u8(buffer[pos])
 		char_literal = char_code.ascii_str()
 	}
 
@@ -173,7 +173,7 @@ fn event(ev &gg.Event, mut app App) {
 
 fn main() {
 	mut app := &App{
-		gg: 0
+		gg: unsafe { nil }
 	}
 
 	app.gg = gg.new_context(

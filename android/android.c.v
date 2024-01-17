@@ -11,7 +11,7 @@ pub fn env() &jni.Env {
 }
 */
 
-pub fn activity() ?&os.NativeActivity {
+pub fn activity() !&os.NativeActivity {
 	actvty := &os.NativeActivity(C.sapp_android_get_native_activity())
 	if isnil(actvty) {
 		return error(@MOD + '.' + @FN + ': could not get reference to Android native activity')
