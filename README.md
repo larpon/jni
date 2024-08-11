@@ -27,10 +27,10 @@ To build the desktop example do:
 
 ```
 cd ~/.vmodules/jni/examples/desktop/v_as_library
-v run build.vsh
+v run build_and_run.vsh
 ```
 
-The `build.vsh` script is a simple helper for doing:
+The `build_and_run.vsh` script is a simple helper for doing:
 ```
 export JAVA_HOME=/detect/path/to/java/root
 export LD_LIBRARY_PATH="$(pwd)":$LD_LIBRARY_PATH # Needed for Java to load the shared library
