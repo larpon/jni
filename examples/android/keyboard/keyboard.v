@@ -177,18 +177,18 @@ fn main() {
 	}
 
 	app.gg = gg.new_context(
-		width: 200
-		height: 400
-		use_ortho: true
+		width:         200
+		height:        400
+		use_ortho:     true
 		create_window: true
-		window_title: 'Keyboard Demo'
-		user_data: app
-		bg_color: bg_color
-		frame_fn: frame
-		init_fn: init
-		cleanup_fn: cleanup
-		event_fn: event
-		font_path: font.default()
+		window_title:  'Keyboard Demo'
+		user_data:     app
+		bg_color:      bg_color
+		frame_fn:      frame
+		init_fn:       init
+		cleanup_fn:    cleanup
+		event_fn:      event
+		font_path:     font.default()
 	)
 
 	app.gg.run()

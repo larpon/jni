@@ -1182,9 +1182,9 @@ fn C.GetDirectBufferCapacity(env &C.JNIEnv, buf C.jobject) C.jlong
 
 // JObjectRefType is C.jobjectRefType
 pub enum JObjectRefType {
-	invald      = C.JNIInvalidRefType // = 0,
-	local       = C.JNILocalRefType // = 1,
-	global      = C.JNIGlobalRefType // = 2,
+	invald      = C.JNIInvalidRefType    // = 0,
+	local       = C.JNILocalRefType      // = 1,
+	global      = C.JNIGlobalRefType     // = 2,
 	weak_global = C.JNIWeakGlobalRefType // = 3
 }
 

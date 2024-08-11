@@ -93,68 +93,68 @@ pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 	//
 	if return_type.contains('/') || return_type.contains('.') {
 		call_result = CallResult{
-			call: signature
+			call:   signature
 			result: call_static_boolean_method_a(env, class, mid, jv_args.data)
 		}
 	} else {
 		call_result = match return_type {
 			'bool' {
 				CallResult{
-					call: signature
+					call:   signature
 					result: call_static_boolean_method_a(env, class, mid, jv_args.data)
 				}
 			}
 			'u8' {
 				CallResult{
-					call: signature
+					call:   signature
 					result: call_static_byte_method_a(env, class, mid, jv_args.data)
 				}
 			}
 			'rune' {
 				CallResult{
-					call: signature
+					call:   signature
 					result: call_static_char_method_a(env, class, mid, jv_args.data)
 				}
 			}
 			'i16' {
 				CallResult{
-					call: signature
+					call:   signature
 					result: call_static_short_method_a(env, class, mid, jv_args.data)
 				}
 			}
 			'int' {
 				CallResult{
-					call: signature
+					call:   signature
 					result: call_static_int_method_a(env, class, mid, jv_args.data)
 				}
 			}
 			'i64' {
 				CallResult{
-					call: signature
+					call:   signature
 					result: call_static_long_method_a(env, class, mid, jv_args.data)
 				}
 			}
 			'f32' {
 				CallResult{
-					call: signature
+					call:   signature
 					result: call_static_float_method_a(env, class, mid, jv_args.data)
 				}
 			}
 			'f64' {
 				CallResult{
-					call: signature
+					call:   signature
 					result: call_static_double_method_a(env, class, mid, jv_args.data)
 				}
 			}
 			'string' {
 				CallResult{
-					call: signature
+					call:   signature
 					result: call_static_string_method_a(env, class, mid, jv_args.data)
 				}
 			}
 			'object' {
 				CallResult{
-					call: signature
+					call:   signature
 					result: call_static_object_method_a(env, class, mid, jv_args.data)
 				}
 			}
@@ -201,68 +201,68 @@ pub fn call_object_method(env &Env, obj JavaObject, signature string, args ...Ty
 	//
 	if return_type.contains('/') || return_type.contains('.') {
 		call_result = CallResult{
-			call: signature
+			call:   signature
 			result: call_object_method_a(env, obj, mid, jv_args.data)
 		}
 	} else {
 		call_result = match return_type {
 			'bool' {
 				CallResult{
-					call: signature
+					call:   signature
 					result: call_boolean_method_a(env, obj, mid, jv_args.data)
 				}
 			}
 			'u8' {
 				CallResult{
-					call: signature
+					call:   signature
 					result: call_byte_method_a(env, obj, mid, jv_args.data)
 				}
 			}
 			'rune' {
 				CallResult{
-					call: signature
+					call:   signature
 					result: call_char_method_a(env, obj, mid, jv_args.data)
 				}
 			}
 			'i16' {
 				CallResult{
-					call: signature
+					call:   signature
 					result: call_short_method_a(env, obj, mid, jv_args.data)
 				}
 			}
 			'int' {
 				CallResult{
-					call: signature
+					call:   signature
 					result: call_int_method_a(env, obj, mid, jv_args.data)
 				}
 			}
 			'i64' {
 				CallResult{
-					call: signature
+					call:   signature
 					result: call_long_method_a(env, obj, mid, jv_args.data)
 				}
 			}
 			'f32' {
 				CallResult{
-					call: signature
+					call:   signature
 					result: call_float_method_a(env, obj, mid, jv_args.data)
 				}
 			}
 			'f64' {
 				CallResult{
-					call: signature
+					call:   signature
 					result: call_double_method_a(env, obj, mid, jv_args.data)
 				}
 			}
 			'string' {
 				CallResult{
-					call: signature
+					call:   signature
 					result: call_string_method_a(env, obj, mid, jv_args.data)
 				}
 			}
 			'object' {
 				CallResult{
-					call: signature
+					call:   signature
 					result: call_object_method_a(env, obj, mid, jv_args.data)
 				}
 			}

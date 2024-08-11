@@ -112,17 +112,17 @@ fn main() {
 	}
 
 	app.gg = gg.new_context(
-		width: 200
-		height: 400
-		use_ortho: true // This is needed for 2D drawing
+		width:         200
+		height:        400
+		use_ortho:     true // This is needed for 2D drawing
 		create_window: true
-		window_title: 'Toast Demo'
-		user_data: app
-		bg_color: bg_color
-		frame_fn: frame
-		init_fn: init
-		cleanup_fn: cleanup
-		event_fn: event
+		window_title:  'Toast Demo'
+		user_data:     app
+		bg_color:      bg_color
+		frame_fn:      frame
+		init_fn:       init
+		cleanup_fn:    cleanup
+		event_fn:      event
 	)
 
 	app.ticks = time.ticks()
