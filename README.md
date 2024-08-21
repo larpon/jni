@@ -9,7 +9,7 @@ and a working Java JDK environment (version >= 8).
 
 ## Install
 ```bash
-git clone https://github.com/Larpon/jni.git ~/.vmodules/jni
+git clone https://github.com/larpon/jni.git ~/.vmodules/jni
 ```
 
 ## Quick start
