@@ -179,7 +179,6 @@ fn main() {
 	app.gg = gg.new_context(
 		width:         200
 		height:        400
-		use_ortho:     true
 		create_window: true
 		window_title:  'Keyboard Demo'
 		user_data:     app
