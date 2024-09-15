@@ -97,7 +97,7 @@ fn jprintln(text string) {
 	// 2. typeof(text).name
 	// 3. auto...
 	// 4. .call_static_method(meth,text)
-	meth := libvlang.pkg + '.' + jni.v2j_fn_name(@FN) + '(' + typeof(text).name + ')'
+	meth := pkg + '.' + jni.v2j_fn_name(@FN) + '(' + typeof(text).name + ')'
 	auto.call_static_method(meth, text)
 }
 
@@ -107,10 +107,9 @@ fn jprintln(text string) {
 */
 // java_float_func is "reflected" from "public static float javaFloatFunc(String s, int i)" in "io.vlang.V"
 fn java_float_func(text string, i int) f32 {
-	return auto.call_static_method(jni.sig(libvlang.pkg, @FN, f32(0), text, i), text,
-		i).result as f32
+	return auto.call_static_method(jni.sig(pkg, @FN, f32(0), text, i), text, i).result as f32
 }
 
 fn java_void_func(text string, i int) {
-	auto.call_static_method(jni.sig(libvlang.pkg, @FN, 'void', text, i), text, i)
+	auto.call_static_method(jni.sig(pkg, @FN, 'void', text, i), text, i)
 }
