@@ -62,18 +62,18 @@ public class VKeyboardActivity extends io.v.android.VActivity {
 	protected void onPause(){
 		super.onPause();
 		thiz.hideSoftKeyboard();
-    }
+	}
 
-    @Override
+	@Override
 	protected void onResume(){
 		super.onResume();
 		if(thiz.hiddenEditText == null) {
 			return;
 		}
 		thiz.showSoftKeyboard();
-    }
+	}
 
-    public static void setSoftKeyboardBuffer(String text) {
+	public static void setSoftKeyboardBuffer(String text) {
 		if(thiz.hiddenEditText == null) {
 			Log.e(TAG,"No keyboard initalized");
 			return;
@@ -88,7 +88,7 @@ public class VKeyboardActivity extends io.v.android.VActivity {
 		});
 	}
 
-    public static void showSoftKeyboard() {
+	public static void showSoftKeyboard() {
 		//Log.d(TAG,"showSoftKeyboard called");
 
 		final EditText editText = new EditText(thiz);
@@ -110,7 +110,13 @@ public class VKeyboardActivity extends io.v.android.VActivity {
 				editText.requestFocus();
 
 				InputMethodManager imm = (InputMethodManager) thiz.getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+
+				if (android.os.Build.VERSION.SDK_INT < 33) {
+					// NOTE: deprecated in "TIRAMISU" (API 33)
+					imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+				} else {
+					imm.showSoftInput(editText, InputMethodManager.SHOW_IMPLICIT);
+				}
 
 				editText.addTextChangedListener(new TextWatcher() {
 
