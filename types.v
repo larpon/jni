@@ -1,7 +1,18 @@
 module jni
 
 type Void = bool
-type Type = JavaObject | Void | bool | f32 | f64 | i16 | i64 | int | rune | string | u8
+pub type Type = JavaClass
+	| JavaObject
+	| Void
+	| bool
+	| f32
+	| f64
+	| i16
+	| i64
+	| int
+	| rune
+	| string
+	| u8
 
 // pub type Any = string | int | i64 | f32 | f64 | bool | []Any | map[voidptr]Any
 pub enum MethodType {
@@ -86,8 +97,10 @@ fn v2j_signature_type(env &Env, vt Type) string {
 			'Ljava/lang/String;'
 		}
 		JavaObject {
-			//'Ljava/lang/Object;'
 			'L' + vt.class_name(env).replace('.', '/') + ';'
+		}
+		JavaClass {
+			'Ljava/lang/Class;'
 		}
 		else {
 			'V'
@@ -129,6 +142,9 @@ fn v2j_string_signature_type(vt string) string {
 		}
 		'string' {
 			'Ljava/lang/String;'
+		}
+		'object' {
+			'Ljava/lang/Object;'
 		}
 		else {
 			type_or_void(vt)
@@ -190,6 +206,11 @@ pub fn v2j_value(env &Env, vt Type) JavaValue {
 			//}
 		}
 		JavaObject {
+			JavaValue{
+				l: vt // JavaObject(vt)
+			}
+		}
+		JavaClass {
 			JavaValue{
 				l: vt // JavaObject(vt)
 			}

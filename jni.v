@@ -72,7 +72,18 @@ fn parse_signature(fqn_sig string) (string, string) {
 	return fqn, return_type
 }
 
-//
+fn parse_signature_raw(fqn_sig string) (string, string, string) {
+	sig := fqn_sig.trim_space()
+	fqn := sig.all_before('(')
+	mut return_type := sig.all_after_last(')').trim_space()
+	if return_type == '' {
+		return_type = 'void'
+	}
+	args_str := sig.all_after('(').all_before(')')
+
+	return fqn, args_str, return_type
+}
+
 pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 	fqn, return_type := parse_signature(signature)
 
@@ -94,7 +105,114 @@ pub fn call_static_method(env &Env, signature string, args ...Type) CallResult {
 	if return_type.contains('/') || return_type.contains('.') {
 		call_result = CallResult{
 			call:   signature
-			result: call_static_boolean_method_a(env, class, mid, jv_args.data)
+			result: call_static_object_method_a(env, class, mid, jv_args.data)
+		}
+	} else {
+		call_result = match return_type {
+			'bool' {
+				CallResult{
+					call:   signature
+					result: call_static_boolean_method_a(env, class, mid, jv_args.data)
+				}
+			}
+			'u8' {
+				CallResult{
+					call:   signature
+					result: call_static_byte_method_a(env, class, mid, jv_args.data)
+				}
+			}
+			'rune' {
+				CallResult{
+					call:   signature
+					result: call_static_char_method_a(env, class, mid, jv_args.data)
+				}
+			}
+			'i16' {
+				CallResult{
+					call:   signature
+					result: call_static_short_method_a(env, class, mid, jv_args.data)
+				}
+			}
+			'int' {
+				CallResult{
+					call:   signature
+					result: call_static_int_method_a(env, class, mid, jv_args.data)
+				}
+			}
+			'i64' {
+				CallResult{
+					call:   signature
+					result: call_static_long_method_a(env, class, mid, jv_args.data)
+				}
+			}
+			'f32' {
+				CallResult{
+					call:   signature
+					result: call_static_float_method_a(env, class, mid, jv_args.data)
+				}
+			}
+			'f64' {
+				CallResult{
+					call:   signature
+					result: call_static_double_method_a(env, class, mid, jv_args.data)
+				}
+			}
+			'string' {
+				CallResult{
+					call:   signature
+					result: call_static_string_method_a(env, class, mid, jv_args.data)
+				}
+			}
+			'object' {
+				CallResult{
+					call:   signature
+					result: call_static_object_method_a(env, class, mid, jv_args.data)
+				}
+			}
+			'void' {
+				call_static_void_method_a(env, class, mid, jv_args.data)
+				CallResult{
+					call: signature
+					// result: Void{}
+				}
+			}
+			else {
+				CallResult{}
+			}
+		}
+	}
+	// Check for any exceptions
+	$if debug {
+		if exception_check(env) {
+			exception_describe(env)
+			excp := 'An exception occured while executing "${signature}" in JNIEnv (${ptr_str(env)})'
+			panic(excp)
+		}
+	}
+	return call_result
+}
+
+pub fn call_static_method_raw(env &Env, signature string, args ...Type) CallResult {
+	fqn, args_str, return_type := parse_signature_raw(signature)
+
+	mut jv_args := []JavaValue{}
+
+	for vt in args {
+		jv_args << v2j_value(env, vt)
+	}
+
+	jdef := fqn + '(' + args_str + ')' + v2j_string_signature_type(return_type)
+	$if debug_signatures ? {
+		println(@MOD + '.' + @FN + ' Java call style definition: "${fqn} -> ${jdef}"')
+	}
+	class, mid := get_class_static_method_id(env, jdef)
+
+	mut call_result := CallResult{}
+	//
+	if return_type.contains('/') || return_type.contains('.') {
+		call_result = CallResult{
+			call:   signature
+			result: call_static_object_method_a(env, class, mid, jv_args.data)
 		}
 	} else {
 		call_result = match return_type {

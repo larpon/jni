@@ -10,6 +10,9 @@ pub enum Version {
 	v1_8 = 0x00010008 // C.JNI_VERSION_1_8
 	v9   = 0x00090000 // C.JNI_VERSION_9
 	v10  = 0x000a0000 // C.JNI_VERSION_10
+	v19  = 0x00130000 // C.JNI_VERSION_19
+	v20  = 0x00140000 // C.JNI_VERSION_20
+	v21  = 0x00150000 // C.JNI_VERSION_21
 }
 
 pub type JavaVM = C.JavaVM
@@ -1094,6 +1097,18 @@ fn C.NewDoubleArray(env &C.JNIEnv, len C.jsize) C.jdoubleArray
 
 fn C.GetBooleanArrayElements(env &C.JNIEnv, array C.jbooleanArray, isCopy &C.jboolean) &C.jboolean
 fn C.GetByteArrayElements(env &C.JNIEnv, array C.jbyteArray, isCopy &C.jboolean) &C.jbyte
+pub fn get_byte_array_elements(env &Env, array JavaByteArray, is_copy &bool) &C.jbyte {
+	if is_copy == unsafe { nil } {
+		return C.GetByteArrayElements(env, array, &C.jboolean(0))
+	}
+	j_bool := jboolean(*is_copy)
+	res := C.GetByteArrayElements(env, array, &j_bool)
+	unsafe {
+		*is_copy = j2v_boolean(j_bool)
+	}
+	return res
+}
+
 fn C.GetCharArrayElements(env &C.JNIEnv, array C.jcharArray, isCopy &C.jboolean) &C.jchar
 fn C.GetShortArrayElements(env &C.JNIEnv, array C.jshortArray, isCopy &C.jboolean) &C.jshort
 fn C.GetIntArrayElements(env &C.JNIEnv, array C.jintArray, isCopy &C.jboolean) &C.jint
@@ -1103,6 +1118,10 @@ fn C.GetDoubleArrayElements(env &C.JNIEnv, array C.jdoubleArray, isCopy &C.jbool
 
 fn C.ReleaseBooleanArrayElements(env &C.JNIEnv, array C.jbooleanArray, elems &C.jboolean, mode C.jint)
 fn C.ReleaseByteArrayElements(env &C.JNIEnv, array C.jbyteArray, elems &C.jbyte, mode C.jint)
+pub fn release_byte_array_elements(env &Env, array JavaByteArray, elems &C.jbyte, mode int) {
+	C.ReleaseByteArrayElements(env, array, elems, jint(mode))
+}
+
 fn C.ReleaseCharArrayElements(env &C.JNIEnv, array C.jcharArray, elems &C.jchar, mode C.jint)
 fn C.ReleaseShortArrayElements(env &C.JNIEnv, array C.jshortArray, elems &C.jshort, mode C.jint)
 fn C.ReleaseIntArrayElements(env &C.JNIEnv, array C.jintArray, elems &C.jint, mode C.jint)
